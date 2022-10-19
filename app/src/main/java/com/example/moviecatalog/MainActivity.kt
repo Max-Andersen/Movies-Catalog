@@ -20,19 +20,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import com.example.moviecatalog.ui.theme.MyTheme
+import kotlin.math.log
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
-                // A surface container using the 'background' color from the theme
                 SingInScreen()
 
         }
@@ -55,6 +55,8 @@ fun show(){
 @Composable
 fun SingInScreen(){
     MyTheme {
+        var login by remember { mutableStateOf("") }
+        var password by remember { mutableStateOf("") }
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background,
@@ -62,39 +64,25 @@ fun SingInScreen(){
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
             ) {
-                Column(
-                    modifier = Modifier
-                        .padding(
-                            start = 55.dp,
-                            top = 32.dp,
-                            end = 55.dp),
-
-
-                ){
-                    Image(
-                        painter = painterResource(id = R.drawable.logo),
-                        contentDescription = null
+                Image(painter = painterResource(id = R.drawable.logo_group) ,
+                    contentDescription = null,
+                    modifier = Modifier.padding(
+                        start = 55.dp,
+                        top = 56.dp,
+                        end = 55.dp
                     )
-                    Spacer(modifier = Modifier.size(12.dp))
-                    Image(
-                        painter = painterResource(id = R.drawable.moviecatalog),
-                        contentDescription = null
-                    )
-                }
+                )
 
                 Spacer(modifier = Modifier.size(48.dp))
                 Column(
                     modifier = Modifier.padding(
-                        top = 48.dp,
                         start = 16.dp,
                         end = 16.dp,
                     ),
 
                 ) {
-                    var login by remember { mutableStateOf("") }
-                    var password by remember { mutableStateOf("") }
-
                     val textInputColorTheme = TextFieldDefaults.outlinedTextFieldColors(
                         textColor = MaterialTheme.colorScheme.primary,
                         cursorColor = MaterialTheme.colorScheme.secondary,
@@ -107,7 +95,7 @@ fun SingInScreen(){
                         onValueChange = {newText -> login = newText},
                         textStyle = MaterialTheme.typography.bodySmall,
                         singleLine = true,
-                        modifier = Modifier.size(428.dp, 55.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text(text = "Логин", color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.bodySmall) },
                         colors = textInputColorTheme
                     )
@@ -119,38 +107,46 @@ fun SingInScreen(){
                         onValueChange = {newPassword -> password = newPassword},
                         textStyle = MaterialTheme.typography.bodySmall,
                         singleLine = true,
-                        modifier = Modifier.size(428.dp, 55.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text(text = "Пароль", color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.bodySmall) },
                         colors = textInputColorTheme
                     )
+                }
 
-                    Spacer(modifier = Modifier.size(164.dp))
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                        .padding(start = 16.dp,
+                            end = 16.dp,
+                            bottom = 16.dp),
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.CenterHorizontally,
 
-                    fun isAllFieldsFull(): Boolean {
-                        return !login.isBlank() && !password.isBlank()
-                    }
+                ) {
+
 
                     OutlinedButton(
                         onClick = { /*TODO*/ },
-                        enabled = isAllFieldsFull(),
-                        modifier = Modifier.size(428.dp, 55.dp),
+                        enabled = isAllFieldsFull(login, password),
+                        modifier = Modifier.fillMaxWidth()
+                            .height(53.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = if (isAllFieldsFull()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background,
+                            backgroundColor = if (isAllFieldsFull(login, password)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background,
                             contentColor = MaterialTheme.colorScheme.primary,
                             disabledContentColor = MaterialTheme.colorScheme.background
                         ),
-                        border = BorderStroke(1.dp, if (isAllFieldsFull()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary)
+                        border = BorderStroke(1.dp, if (isAllFieldsFull(login, password)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary)
 
-                        ) {
+                    ) {
                         Text(text = "Войти",
-                            color = if (isAllFieldsFull()) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+                            color = if (isAllFieldsFull(login, password)) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                         )
                     }
 
                     TextButton(
                         onClick = { /*TODO*/ },
-                        modifier = Modifier.size(428.dp, 55.dp),
-                        ) {
+                        modifier = Modifier.fillMaxWidth()
+                            .height(40.dp),
+                    ) {
                         Text(text = "Регистрация", color = MaterialTheme.colorScheme.primary)
                     }
                 }
@@ -159,4 +155,6 @@ fun SingInScreen(){
     }
 }
 
-
+fun isAllFieldsFull(login: String, password: String): Boolean {
+    return login.isNotBlank() && password.isNotBlank()
+}
