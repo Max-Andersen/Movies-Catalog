@@ -18,6 +18,8 @@ val White = Color(0xFFFFFFFF)
 
 val NearBlack = Color(0xFF150D0B)
 
+val SystemColor = Color(0x4D000000)
+
 
 val Gray = Color(0xFFB7B7B7)
 val GrayFaded = Color(0xFFD1D1D1)

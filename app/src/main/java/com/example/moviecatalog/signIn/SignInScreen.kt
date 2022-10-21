@@ -56,11 +56,11 @@ fun SignInScreen(model: SignInViewModel = viewModel()){
                     ) {
 
 
-                    SetOutlinedTextField(variable = login, "Логин",textInputColorTheme = getTextInputColorTheme())
+                    SetOutlinedTextField(variable = login, "Логин")
 
                     Spacer(modifier = Modifier.size(14.dp))
 
-                    SetOutlinedTextField(variable = password, "Пароль",textInputColorTheme = getTextInputColorTheme())
+                    SetOutlinedTextField(variable = password, "Пароль")
                 }
 
                 Column(

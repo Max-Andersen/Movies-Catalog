@@ -12,7 +12,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-                SignInScreen()
+                SignUpScreen()
 
         }
     }
@@ -22,6 +22,6 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun Show(){
-    SignInScreen()
+    //SignInScreen()
     //SignUpScreen()
 }

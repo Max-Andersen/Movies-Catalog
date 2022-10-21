@@ -26,23 +26,25 @@ private val MyColorScheme = darkColorScheme(
     onSecondary = Gray,
 
     background = NearBlack,
+    surface = SystemColor
 )
 
 @Composable
 fun MovieCatalogTheme(content: @Composable () -> Unit) {
-    val currentActivity = LocalView.current.context as Activity
 
-    currentActivity.window.statusBarColor = MyColorScheme.background.toArgb()
-    currentActivity.window.navigationBarColor = MyColorScheme.background.toArgb()
-
-
+//    val currentActivity = LocalView.current.context as Activity         // Not working with Preview
+//    currentActivity.window.statusBarColor = MyColorScheme.surface.toArgb()
+//    currentActivity.window.navigationBarColor = MyColorScheme.surface.toArgb()
+//
+//
+//
 //    val windowInsetsController =          //Not working on my phone, but working on Emulator
 //        ViewCompat.getWindowInsetsController(currentActivity.window.decorView) ?: return
 //    // Configure the behavior of the hidden system bars
 //    windowInsetsController.systemBarsBehavior =
 //        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 //    // Hide both the status bar and the navigation bar
-//    windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+//    windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars())
 
     MaterialTheme(
         colorScheme = MyColorScheme,

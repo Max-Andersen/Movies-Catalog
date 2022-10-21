@@ -23,8 +23,9 @@ fun getTextInputColorTheme(): TextFieldColors{
 }
 
 @Composable
-fun SetOutlinedTextField(variable: MutableState<String>, name: String, textInputColorTheme: TextFieldColors){
+fun SetOutlinedTextField(variable: MutableState<String>, name: String){
     var passwordVisible by remember { mutableStateOf(false) }
+    val textInputColorTheme = getTextInputColorTheme()
 
     if(name in setOf("Пароль", "Подтвердите пароль") ){
         OutlinedTextField(
