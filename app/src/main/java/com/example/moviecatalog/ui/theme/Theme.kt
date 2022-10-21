@@ -2,6 +2,7 @@ package com.example.moviecatalog.ui.theme
 
 import android.app.Activity
 import android.os.Build
+import android.view.View
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -14,28 +15,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
-
-private val DarkColorScheme = darkColorScheme(
-    primary = red,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
-)
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 private val MyColorScheme = darkColorScheme(
     primary = Accent,
@@ -46,47 +28,25 @@ private val MyColorScheme = darkColorScheme(
     background = NearBlack,
 )
 
-
-
-
-
 @Composable
-fun MovieCatalogTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
-) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
-            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
-        }
-    }
+fun MovieCatalogTheme(content: @Composable () -> Unit) {
+    val currentActivity = LocalView.current.context as Activity
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
-}
+    currentActivity.window.statusBarColor = MyColorScheme.background.toArgb()
+    currentActivity.window.navigationBarColor = MyColorScheme.background.toArgb()
 
 
-@Composable
-fun MyTheme(content: @Composable () -> Unit){
+//    val windowInsetsController =          //Not working on my phone, but working on Emulator
+//        ViewCompat.getWindowInsetsController(currentActivity.window.decorView) ?: return
+//    // Configure the behavior of the hidden system bars
+//    windowInsetsController.systemBarsBehavior =
+//        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+//    // Hide both the status bar and the navigation bar
+//    windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+
     MaterialTheme(
         colorScheme = MyColorScheme,
         typography = Typography,
         content = content
     )
 }
-
