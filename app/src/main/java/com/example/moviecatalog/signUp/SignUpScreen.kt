@@ -1,13 +1,19 @@
 package com.example.moviecatalog.signUp
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.icu.text.SimpleDateFormat
+import android.widget.DatePicker
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Icon
@@ -28,6 +34,7 @@ import com.example.moviecatalog.R
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviecatalog.SetOutlinedTextField
+import com.example.moviecatalog.isAllTextFieldsFull
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.util.*
 
@@ -40,27 +47,61 @@ fun Show(){
 
 
 @Composable
-fun DatePickerView( ) {
+fun DatePickerView( mDate: MutableState<String> ) {
+    // Fetching the Local Context
+    val mContext = LocalContext.current
+
+    // Declaring integer values
+    // for year, month and day
+    val mYear: Int
+    val mMonth: Int
+    val mDay: Int
+
+    // Initializing a Calendar
+    val mCalendar = Calendar.getInstance()
+
+    // Fetching current year, month and day
+    mYear = mCalendar.get(Calendar.YEAR)
+    mMonth = mCalendar.get(Calendar.MONTH)
+    mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
+
+    mCalendar.time = Date()
+
+    // Declaring a string value to
+    // store date in string format
+
+    // Declaring DatePickerDialog and setting
+    // initial values as current values (present year, month and day)
+    val mDatePickerDialog = DatePickerDialog(
+        mContext,
+        R.style.datepicker,
+        { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
+            mDate.value = "$mDayOfMonth.${mMonth+1}.$mYear"
+        }, mYear, mMonth, mDay
+    )
+
+
+
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .wrapContentSize(Alignment.TopStart)
+            .height(53.dp)
             .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(4.dp))
             .clickable {
+                mDatePickerDialog.show()
             }
     ) {
 
         ConstraintLayout(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(16.dp)
         ) {
 
             val (label, iconView) = createRefs()
 
             Text(
-                text= "Дата рождения",
-                color = MaterialTheme.colorScheme.secondary,
+                text = if(mDate.value == "") "Дата рождения" else mDate.value,
+                color = if(mDate.value == "") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .fillMaxWidth()
                     .constrainAs(label) {
@@ -70,7 +111,8 @@ fun DatePickerView( ) {
                         end.linkTo(iconView.start)
                         width = Dimension.fillToConstraints
                     },
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+
             )
 
             Icon(
@@ -99,6 +141,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel()){ //
         val name = remember { mutableStateOf("") }
         val password = remember { mutableStateOf("") }
         val passwordConfirmation = remember { mutableStateOf("") }
+        val mDate = remember { mutableStateOf("") }
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -136,7 +179,40 @@ fun SignUpScreen(model: SignUpViewModel = viewModel()){ //
                 SetOutlinedTextField(password, "Пароль")
                 SetOutlinedTextField(passwordConfirmation, "Подтвердите пароль")
 
-                DatePickerView()
+
+
+                DatePickerView(mDate)
+
+                OutlinedButton(
+                    onClick = { /*TODO*/ },
+                    enabled = isAllTextFieldsFull(login, email, name, password, passwordConfirmation, mDate),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(53.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        backgroundColor = if (isAllTextFieldsFull(login, email, name, password, passwordConfirmation, mDate)) MaterialTheme.colorScheme.primary
+                                            else MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        disabledContentColor = MaterialTheme.colorScheme.background
+                    ),
+                    border = BorderStroke(1.dp, if (isAllTextFieldsFull(login, email, name, password, passwordConfirmation, mDate)) MaterialTheme.colorScheme.primary
+                                                else MaterialTheme.colorScheme.onSecondary)
+
+                ) {
+                    Text(text = "Зарегистрироваться",
+                        color = if (isAllTextFieldsFull(login, email, name, password, passwordConfirmation, mDate)) MaterialTheme.colorScheme.onPrimary
+                                else MaterialTheme.colorScheme.primary,
+                    )
+                }
+
+                TextButton(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp),
+                ) {
+                    Text(text = "У меня уже есть аккаунт", color = MaterialTheme.colorScheme.primary)
+                }
 
             }
         }

@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviecatalog.R
 import com.example.moviecatalog.SetOutlinedTextField
 import com.example.moviecatalog.getTextInputColorTheme
+import com.example.moviecatalog.isAllTextFieldsFull
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 
 @Composable
@@ -79,20 +80,20 @@ fun SignInScreen(model: SignInViewModel = viewModel()){
 
                     OutlinedButton(
                         onClick = { /*TODO*/ },
-                        enabled = isAllFieldsInSignInFull(login, password),
+                        enabled = isAllTextFieldsFull(login, password),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(53.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = if (isAllFieldsInSignInFull(login, password)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background,
+                            backgroundColor = if (isAllTextFieldsFull(login, password)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background,
                             contentColor = MaterialTheme.colorScheme.primary,
                             disabledContentColor = MaterialTheme.colorScheme.background
                         ),
-                        border = BorderStroke(1.dp, if (isAllFieldsInSignInFull(login, password)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary)
+                        border = BorderStroke(1.dp, if (isAllTextFieldsFull(login, password)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary)
 
                     ) {
                         Text(text = "Войти",
-                            color = if (isAllFieldsInSignInFull(login, password)) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+                            color = if (isAllTextFieldsFull(login, password)) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                         )
                     }
 
@@ -110,6 +111,4 @@ fun SignInScreen(model: SignInViewModel = viewModel()){
     }
 }
 
-fun isAllFieldsInSignInFull(login: MutableState<String>, password: MutableState<String>): Boolean {
-    return login.value.isNotBlank() && password.value.isNotBlank()
-}
+

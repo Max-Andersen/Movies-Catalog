@@ -65,3 +65,7 @@ fun SetOutlinedTextField(variable: MutableState<String>, name: String){
 
 
 }
+
+fun isAllTextFieldsFull(vararg strings: MutableState<String>): Boolean {
+    return strings.map{ if(it.value.isNotBlank()) 1 else 0 }.sum() == strings.size
+}
