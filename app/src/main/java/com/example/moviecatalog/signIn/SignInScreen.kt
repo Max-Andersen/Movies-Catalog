@@ -78,7 +78,7 @@ fun SignInScreen(model: SignInViewModel = viewModel()){
 
 
                     OutlinedButton(
-                        onClick = { /*TODO*/ },
+                        onClick = { model.signInButtonPressed(login, password) },
                         enabled = isAllFieldsInSignInFull(login, password),
                         modifier = Modifier
                             .fillMaxWidth()

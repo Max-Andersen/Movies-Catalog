@@ -42,7 +42,7 @@ fun MovieCatalogTheme(content: @Composable () -> Unit) {
 //    windowInsetsController.systemBarsBehavior =
 //        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 //    // Hide both the status bar and the navigation bar
-//    windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+//    windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars())
 
     MaterialTheme(
         colorScheme = MyColorScheme,
