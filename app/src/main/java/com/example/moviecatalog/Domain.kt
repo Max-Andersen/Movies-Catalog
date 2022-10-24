@@ -1,6 +1,7 @@
 package com.example.moviecatalog
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -11,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun getTextInputColorTheme(): TextFieldColors{
@@ -36,6 +38,7 @@ fun SetOutlinedTextField(variable: MutableState<String>, name: String){
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(text = name, color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.bodySmall) },
             colors = textInputColorTheme,
+            shape = RoundedCornerShape(8.dp),
             visualTransformation = if (!passwordVisible) PasswordVisualTransformation('*') else VisualTransformation.None,
             trailingIcon = {
                 val image = if (passwordVisible)
@@ -57,6 +60,7 @@ fun SetOutlinedTextField(variable: MutableState<String>, name: String){
             onValueChange = {newText -> variable.value = newText} ,
             textStyle = MaterialTheme.typography.bodySmall,
             singleLine = true,
+            shape = RoundedCornerShape(8.dp),
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(text = name, color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.bodySmall) },
             colors = textInputColorTheme,

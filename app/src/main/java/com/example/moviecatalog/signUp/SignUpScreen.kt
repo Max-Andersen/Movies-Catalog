@@ -8,8 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.TextButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -17,8 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -40,44 +40,32 @@ fun Show(){
 
 @Composable
 fun DatePickerView( mDate: MutableState<String> ) {
-    // Fetching the Local Context
-    val mContext = LocalContext.current
+    val context = LocalContext.current
 
-    // Declaring integer values
-    // for year, month and day
-    val mYear: Int
-    val mMonth: Int
-    val mDay: Int
+    val year: Int
+    val month: Int
+    val day: Int
 
-    // Initializing a Calendar
-    val mCalendar = Calendar.getInstance()
+    val calendar = Calendar.getInstance()
 
-    // Fetching current year, month and day
-    mYear = mCalendar.get(Calendar.YEAR)
-    mMonth = mCalendar.get(Calendar.MONTH)
-    mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
+    year = calendar.get(Calendar.YEAR)
+    month = calendar.get(Calendar.MONTH)
+    day = calendar.get(Calendar.DAY_OF_MONTH)
 
-    mCalendar.time = Date()
+    calendar.time = Date()
 
-    // Declaring a string value to
-    // store date in string format
-
-    // Declaring DatePickerDialog and setting
-    // initial values as current values (present year, month and day)
     val mDatePickerDialog = DatePickerDialog(
-        mContext,
+        context,
         R.style.datepicker,
         { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
             mDate.value = "$mDayOfMonth.${mMonth+1}.$mYear"
-        }, mYear, mMonth, mDay
+        }, year, month, day
     )
-
-
 
     Box(
         modifier = Modifier
             .height(53.dp)
-            .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(4.dp))
+            .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(8.dp))
             .clickable {
                 mDatePickerDialog.show()
             }
@@ -108,7 +96,7 @@ fun DatePickerView( mDate: MutableState<String> ) {
             )
 
             Icon(
-                imageVector = Icons.Default.DateRange,
+                imageVector = ImageVector.vectorResource(id = R.drawable.calendar),
                 contentDescription = null,
                 modifier = Modifier
                     .size(20.dp, 20.dp)
@@ -130,7 +118,7 @@ fun DatePickerView( mDate: MutableState<String> ) {
 fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>){
     Box(modifier = Modifier
         .clip(RoundedCornerShape(1.dp))
-        .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(4.dp))
+        .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(8.dp))
         .height(47.dp)
     )
     {
@@ -147,8 +135,8 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>){
                     .fillMaxSize(),
                 border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.secondary),
                 shape = RoundedCornerShape(
-                    topStart = 4.dp,
-                    bottomStart = 4.dp,
+                    topStart = 8.dp,
+                    bottomStart = 8.dp,
                     topEnd = 0.dp,
                     bottomEnd = 0.dp
                 )
@@ -173,8 +161,8 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>){
                 shape = RoundedCornerShape(
                     topStart = 0.dp,
                     bottomStart = 0.dp,
-                    topEnd = 4.dp,
-                    bottomEnd = 4.dp
+                    topEnd = 8.dp,
+                    bottomEnd = 8.dp
                 )
                 ) {
                 Text(text = "Женщина",
