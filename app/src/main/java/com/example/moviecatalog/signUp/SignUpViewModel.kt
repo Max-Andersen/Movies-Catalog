@@ -3,14 +3,16 @@ package com.example.moviecatalog.signUp
 import android.content.Context
 import android.text.TextUtils
 import android.util.Patterns
-import android.view.Gravity
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
+import com.example.moviecatalog.repository.AccountRepository
 import java.util.*
 
 
 class SignUpViewModel : ViewModel() {
+    private val accountRepository = AccountRepository()
+
     fun ChangeGerder(currentGender: MutableState<String>, buttonType: String){ // 0 - male   1 - female
         if (currentGender.value != buttonType){
             currentGender.value = buttonType
@@ -22,7 +24,7 @@ class SignUpViewModel : ViewModel() {
                  name: MutableState<String>,
                  password: MutableState<String>,
                  passwordConfirmation: MutableState<String>,
-                 dateOFBirthday: MutableState<String>,
+                 dateOfBirthday: MutableState<String>,
                  gender: MutableState<String>
                  , context: Context): String {  // the fields are not empty, because then the button would be inactive
 
@@ -35,9 +37,9 @@ class SignUpViewModel : ViewModel() {
         val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
 
 
-        val enteredDay = dateOFBirthday.value.substringBefore('.').toInt()
-        val enteredMonth = dateOFBirthday.value.substringAfter('.').substringBefore(".").toInt()
-        val enteredYear = dateOFBirthday.value.substringAfterLast('.').toInt()
+        val enteredDay = dateOfBirthday.value.substringBefore('.').toInt()
+        val enteredMonth = dateOfBirthday.value.substringAfter('.').substringBefore(".").toInt()
+        val enteredYear = dateOfBirthday.value.substringAfterLast('.').toInt()
 
 
         if (!emailCorrect){  //email incorrect
@@ -53,8 +55,8 @@ class SignUpViewModel : ViewModel() {
         }
 
         return if (resultMessage.isEmpty()){
-            //request
-            ""  //token
+            accountRepository.Regiser(login.value, name.value, password.value, email.value, dateOfBirthday.value, gender.value)
+            //""  //token
         } else{
             Toast.makeText(context, "Ответ от валидирующих котиков:$resultMessage", Toast.LENGTH_LONG).show()
             ""

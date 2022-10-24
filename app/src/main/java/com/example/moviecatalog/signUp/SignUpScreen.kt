@@ -186,7 +186,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel()){ //
         val dateOfBirthday = remember { mutableStateOf("") }
         val gender = remember { mutableStateOf("") }
 
-        var allTextsFull = isAllTextFieldsFull(login, email, name, password, passwordConfirmation, dateOfBirthday, gender)
+        val allTextsFull = isAllTextFieldsFull(login, email, name, password, passwordConfirmation, dateOfBirthday, gender)
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -196,7 +196,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel()){ //
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
-                        top = 56.dp,
+                        top = 32.dp,
                         start = 16.dp,
                         end = 16.dp
                     )
@@ -233,7 +233,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel()){ //
                 Spacer(modifier = Modifier.size(16.dp))
                 val context = LocalContext.current
                 OutlinedButton(
-                    onClick = {model.Register(login, email, name, password, passwordConfirmation, dateOfBirthday, gender, context)},
+                    onClick = { println(model.Register(login, email, name, password, passwordConfirmation, dateOfBirthday, gender, context))  },
                     enabled = allTextsFull,
                     modifier = Modifier
                         .fillMaxWidth()
