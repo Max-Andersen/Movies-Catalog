@@ -39,7 +39,7 @@ fun Show(){
 
 
 @Composable
-fun DatePickerView( mDate: MutableState<String> ) {
+fun DatePickerView( date: MutableState<String> ) {
     val context = LocalContext.current
 
     val year: Int
@@ -57,8 +57,9 @@ fun DatePickerView( mDate: MutableState<String> ) {
     val mDatePickerDialog = DatePickerDialog(
         context,
         R.style.datepicker,
-        { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-            mDate.value = "$mDayOfMonth.${mMonth+1}.$mYear"
+        { _: DatePicker, mYear: Int, mMonth: Int, dayOfMonth: Int ->
+            if (dayOfMonth < 10) date.value = "0$dayOfMonth.${mMonth+1}.$mYear"
+            else date.value = "$dayOfMonth.${mMonth+1}.$mYear"
         }, year, month, day
     )
 
@@ -80,8 +81,8 @@ fun DatePickerView( mDate: MutableState<String> ) {
             val (label, iconView) = createRefs()
 
             Text(
-                text = if(mDate.value == "") "Дата рождения" else mDate.value,
-                color = if(mDate.value == "") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
+                text = if(date.value == "") "Дата рождения" else date.value,
+                color = if(date.value == "") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .fillMaxWidth()
                     .constrainAs(label) {
@@ -182,8 +183,10 @@ fun SignUpScreen(model: SignUpViewModel = viewModel()){ //
         val name = remember { mutableStateOf("") }
         val password = remember { mutableStateOf("") }
         val passwordConfirmation = remember { mutableStateOf("") }
-        val mDate = remember { mutableStateOf("") }
+        val dateOfBirthday = remember { mutableStateOf("") }
         val gender = remember { mutableStateOf("") }
+
+        var allTextsFull = isAllTextFieldsFull(login, email, name, password, passwordConfirmation, dateOfBirthday, gender)
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -223,30 +226,30 @@ fun SignUpScreen(model: SignUpViewModel = viewModel()){ //
                 SetOutlinedTextField(password, "Пароль")
                 SetOutlinedTextField(passwordConfirmation, "Подтвердите пароль")
 
-                DatePickerView(mDate)
+                DatePickerView(dateOfBirthday)
 
                 ChoseGender(model = model, gender = gender)
 
                 Spacer(modifier = Modifier.size(16.dp))
-
+                val context = LocalContext.current
                 OutlinedButton(
-                    onClick = { /*TODO*/ },
-                    enabled = isAllTextFieldsFull(login, email, name, password, passwordConfirmation, mDate, gender),
+                    onClick = {model.Register(login, email, name, password, passwordConfirmation, dateOfBirthday, gender, context)},
+                    enabled = allTextsFull,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(53.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        backgroundColor = if (isAllTextFieldsFull(login, email, name, password, passwordConfirmation, mDate, gender)) MaterialTheme.colorScheme.primary
+                        backgroundColor = if (allTextsFull) MaterialTheme.colorScheme.primary
                                             else MaterialTheme.colorScheme.background,
                         contentColor = MaterialTheme.colorScheme.primary,
                         disabledContentColor = MaterialTheme.colorScheme.background
                     ),
-                    border = BorderStroke(1.dp, if (isAllTextFieldsFull(login, email, name, password, passwordConfirmation, mDate, gender)) MaterialTheme.colorScheme.primary
+                    border = BorderStroke(1.dp, if (allTextsFull) MaterialTheme.colorScheme.primary
                                                 else MaterialTheme.colorScheme.onSecondary)
 
                 ) {
                     Text(text = "Зарегистрироваться",
-                        color = if (isAllTextFieldsFull(login, email, name, password, passwordConfirmation, mDate, gender)) MaterialTheme.colorScheme.onPrimary
+                        color = if (allTextsFull) MaterialTheme.colorScheme.onPrimary
                                 else MaterialTheme.colorScheme.primary,
                     )
                 }
