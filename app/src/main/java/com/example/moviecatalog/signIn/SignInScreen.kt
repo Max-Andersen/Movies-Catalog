@@ -57,11 +57,11 @@ fun SignInScreen(model: SignInViewModel = viewModel()){
                     ) {
 
 
-                    SetOutlinedTextField(variable = login, "Логин")
+                    SetOutlinedTextField(variable = login, "Логин",textInputColorTheme = getTextInputColorTheme())
 
                     Spacer(modifier = Modifier.size(14.dp))
 
-                    SetOutlinedTextField(variable = password, "Пароль")
+                    SetOutlinedTextField(variable = password, "Пароль",textInputColorTheme = getTextInputColorTheme())
                 }
 
                 Column(
@@ -79,8 +79,8 @@ fun SignInScreen(model: SignInViewModel = viewModel()){
 
 
                     OutlinedButton(
-                        onClick = { /*TODO*/ },
-                        enabled = isAllTextFieldsFull(login, password),
+                        onClick = { model.signInButtonPressed(login, password) },
+                        enabled = isAllFieldsInSignInFull(login, password),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(53.dp),
