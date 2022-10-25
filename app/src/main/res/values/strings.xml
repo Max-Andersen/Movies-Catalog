@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Movie catalog</string>
+
+    <string name="title_list">List</string>
+    <string name="title_complex">Complex</string>
+    <string name="title_push">Push</string>
+    <string name="action_message">Написать сообщение</string>
+    <string name="action_friend">В друзья</string>
+    <string name="title_message">Новое сообщение</string>
+
 </resources>

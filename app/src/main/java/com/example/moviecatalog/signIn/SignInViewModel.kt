@@ -7,7 +7,7 @@ import com.example.moviecatalog.repository.AccountRepository
 class SignInViewModel : ViewModel() {
     private val accountRepository = AccountRepository()
 
-    fun signInButtonPressed(login: MutableState<String>, password: MutableState<String>){
-        println(accountRepository.Login(login.value, password.value)) // check for token or error message
+    fun signInButtonPressed(login: MutableState<String>, password: MutableState<String>): String{
+       return accountRepository.Login(login.value, password.value) // check for token or error message
     }
 }

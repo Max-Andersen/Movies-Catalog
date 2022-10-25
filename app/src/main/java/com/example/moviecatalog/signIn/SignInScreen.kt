@@ -1,11 +1,13 @@
 package com.example.moviecatalog.signIn
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.TextButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -18,14 +20,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.moviecatalog.R
 import com.example.moviecatalog.SetOutlinedTextField
 import com.example.moviecatalog.getTextInputColorTheme
 import com.example.moviecatalog.isAllTextFieldsFull
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 
+@ExperimentalFoundationApi
+@ExperimentalMaterial3Api
 @Composable
-fun SignInScreen(model: SignInViewModel = viewModel()){
+fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavController){
     MovieCatalogTheme {
         val login = remember { mutableStateOf("") }
         val password = remember { mutableStateOf("") }
@@ -79,7 +84,7 @@ fun SignInScreen(model: SignInViewModel = viewModel()){
 
 
                     OutlinedButton(
-                        onClick = { model.signInButtonPressed(login, password) },
+                        onClick = { if( model.signInButtonPressed(login, password) == "Success") navController.navigate("mainScreen") },
                         enabled = isAllTextFieldsFull(login, password),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -98,7 +103,7 @@ fun SignInScreen(model: SignInViewModel = viewModel()){
                     }
 
                     TextButton(
-                        onClick = { /*TODO*/ },
+                        onClick = { navController.navigate("sign-up") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(40.dp),

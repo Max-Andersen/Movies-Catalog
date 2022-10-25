@@ -9,7 +9,7 @@ class AccountRepository {
 
     fun Login(username: String, password: String): String{
         //make request on url with login and password
-        return "$username login successful"
+        return "Success"
     }
 
     fun Logout(){

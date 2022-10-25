@@ -26,16 +26,10 @@ import androidx.constraintlayout.compose.Dimension
 import com.example.moviecatalog.R
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.moviecatalog.SetOutlinedTextField
 import com.example.moviecatalog.isAllTextFieldsFull
 import java.util.*
-
-
-@Preview()
-@Composable
-fun Show(){
-    SignUpScreen()
-}
 
 
 @Composable
@@ -176,7 +170,7 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>){
 
 
 @Composable
-fun SignUpScreen(model: SignUpViewModel = viewModel()){ //
+fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavController){
     MovieCatalogTheme {
         val login = remember { mutableStateOf("") }
         val email = remember { mutableStateOf("") }
@@ -255,7 +249,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel()){ //
                 }
 
                 TextButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { navController.navigate("sign-in") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(40.dp),
