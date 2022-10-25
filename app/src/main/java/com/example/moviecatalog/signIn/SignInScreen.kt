@@ -84,7 +84,7 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
 
 
                     OutlinedButton(
-                        onClick = { if( model.signInButtonPressed(login, password) == "Success") navController.navigate("mainScreen") },
+                        onClick = { if( model.signInButtonPressed(login, password) == "Success") navController.navigate("mainScreen") }, // TODO( обработка ответа)
                         enabled = isAllTextFieldsFull(login, password),
                         modifier = Modifier
                             .fillMaxWidth()

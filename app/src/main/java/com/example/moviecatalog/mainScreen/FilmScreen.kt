@@ -20,7 +20,8 @@ fun FilmScreen(filmId: String, navController: NavController){
     MovieCatalogTheme {
         Surface(modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)) {
+            .background(MaterialTheme.colorScheme.background)
+            .padding(top=50.dp)) {
             Column() {
                 Button(onClick = { navController.navigateUp() }, modifier = Modifier.size(50.dp)) {
                     Text("Back")

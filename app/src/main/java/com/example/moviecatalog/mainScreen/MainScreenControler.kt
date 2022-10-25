@@ -25,14 +25,10 @@ import com.example.moviecatalog.mainScreen.navBarItems.NavBarItems
 @ExperimentalAnimationApi
 @Composable
 fun MainScreenController(externalNavController: NavController) {
-    // Stored in memory NavHostController
-    // Live through recompose and configuration changed cycle by rememberSaveable
     val navController = rememberNavController()
-    val bottomItems = listOf("Главное", "Профиль")
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
-    //val currentRoute = navController.currentBackStackEntryAsState()?.destination?.route
 
     MaterialTheme{
         Surface(modifier = Modifier.fillMaxSize()) {
@@ -46,13 +42,6 @@ fun MainScreenController(externalNavController: NavController) {
                                 onClick = {
                                     navController.navigate(barItem.route) {
                                         popUpTo(navController.graph.startDestinationId)
-                                        // Pop up to the start destination of the graph to
-                                        // avoid building up a large stack of destinations
-                                        // on the back stack as users select items
-                                        //popUpTo =
-
-                                        // Avoid multiple copies of the same destination when
-                                        // reselecting the same item
                                         launchSingleTop = true
                                     }
                                 },
@@ -72,8 +61,6 @@ fun MainScreenController(externalNavController: NavController) {
                 }
             ) {
                 Text(text = "", modifier = Modifier.padding(it))
-
-
 
                 NavHost(navController = navController, startDestination = "main") {
                     composable("main") { MainScreen(externalNavController) }
