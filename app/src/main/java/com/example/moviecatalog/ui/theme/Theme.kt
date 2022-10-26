@@ -37,15 +37,18 @@ fun MovieCatalogTheme(content: @Composable () -> Unit) {
     currentActivity.window.statusBarColor = MyColorScheme.surface.toArgb()
     currentActivity.window.navigationBarColor = MyColorScheme.surface.toArgb()
 
+    WindowInsetsControllerCompat(currentActivity.window, LocalView.current).let { controller ->
+        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        controller.hide(WindowInsetsCompat.Type.navigationBars())
+    }
 
-
-    val windowInsetsController =          //Not working on my phone, but working on Emulator
-        ViewCompat.getWindowInsetsController(currentActivity.window.decorView) ?: return
-    // Configure the behavior of the hidden system bars
-    windowInsetsController.systemBarsBehavior =
-        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-    // Hide both the status bar and the navigation bar
-    windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars())
+//    val windowInsetsController =          //Not working on my phone, but working on Emulator
+//        ViewCompat.getWindowInsetsController(currentActivity.window.decorView) ?: return
+//    // Configure the behavior of the hidden system bars
+//    windowInsetsController.systemBarsBehavior =
+//        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+//    // Hide both the status bar and the navigation bar
+//    windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars())
 
     MaterialTheme(
         colorScheme = MyColorScheme,
