@@ -1,4 +1,4 @@
-package com.example.moviecatalog.mainScreen
+package com.example.moviecatalog.mainScreen.movie
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -23,10 +23,10 @@ fun MovieScreen(filmId: String, navController: NavController){
             .background(MaterialTheme.colorScheme.background)
             .padding(top=50.dp)) {
             Column() {
-                Button(onClick = { navController.navigateUp() }, modifier = Modifier.size(50.dp)) {
+                Button(onClick = { navController.navigateUp() }, modifier = Modifier.size(100.dp)) {
                     Text("Back")
                 }
-                Text("MY  FILMM", modifier = Modifier.padding(70.dp))
+                Text("MY  FILM", modifier = Modifier.padding(70.dp))
             }
 
         }

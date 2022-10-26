@@ -26,14 +26,18 @@ import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.moviecatalog.mainScreen.MovieScreen
+import com.example.moviecatalog.mainScreen.movie.MovieScreen
 import com.example.moviecatalog.mainScreen.MainScreenController
 import com.example.moviecatalog.signIn.SignInScreen
 import com.example.moviecatalog.signUp.SignUpScreen
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlinx.coroutines.delay
 
-fun NavController.navigate(route: String, params: Bundle?, builder: NavOptionsBuilder.() -> Unit = {}) {
+fun NavController.navigate(
+    route: String,
+    params: Bundle?,
+    builder: NavOptionsBuilder.() -> Unit = {}
+) {
     this.currentBackStackEntry?.arguments?.putAll(params)
 
     navigate(route, builder)
@@ -53,12 +57,12 @@ class MainActivity : ComponentActivity() {
                 Surface(modifier = Modifier) {
 
                     NavHost(navController = navController, startDestination = "splashScreen") {
-                        composable("splashScreen"){ SplashScreen(navController = navController)}
-                        composable("tokenCheck"){ TODO() }
-                        composable("sign-In"){ SignInScreen(navController = navController)}
-                        composable("sign-Up"){ SignUpScreen(navController = navController)}
-                        composable("mainScreen"){ MainScreenController(navController) }
-                        composable("movie" + "/{id}"){ navBackStack ->
+                        composable("splashScreen") { SplashScreen(navController = navController) }
+                        composable("tokenCheck") { TODO() }
+                        composable("sign-In") { SignInScreen(navController = navController) }
+                        composable("sign-Up") { SignUpScreen(navController = navController) }
+                        composable("mainScreen") { MainScreenController(navController) }
+                        composable("movie" + "/{id}") { navBackStack ->
                             val filmId = navBackStack.arguments?.getString("id")
                             if (filmId != null) {
                                 MovieScreen(filmId, navController)
@@ -88,23 +92,27 @@ fun SplashScreen(navController: NavController) {
                 durationMillis = 1500,
                 easing = {
                     OvershootInterpolator(3f).getInterpolation(it)
-                }))
+                })
+        )
 
         delay(1500L)
-        navController.navigate("sign-In"){
+        navController.navigate("sign-In") {
             popUpTo(navController.graph.id)
         }
     }
 
     // Image
-    Box(contentAlignment = Alignment.Center,
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
 
         ) {
-        Image(painter = painterResource(id = R.drawable.logo_group),
+        Image(
+            painter = painterResource(id = R.drawable.logo_group),
             contentDescription = "Logo",
-            modifier = Modifier.scale(scale.value))
+            modifier = Modifier.scale(scale.value)
+        )
     }
 }

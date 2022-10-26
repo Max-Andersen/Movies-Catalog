@@ -18,6 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.moviecatalog.R
 import com.example.moviecatalog.mainScreen.navBarItems.NavBarItems
 
 
@@ -30,12 +31,12 @@ fun MainScreenController(externalNavController: NavController) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
-    MaterialTheme{
+    MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             Scaffold(
                 bottomBar = {
                     BottomNavigation {
-                        NavBarItems.BarItems.forEach{ barItem ->
+                        NavBarItems.BarItems.forEach { barItem ->
                             BottomNavigationItem(
                                 selected = currentRoute == barItem.route,
                                 modifier = Modifier.background(MaterialTheme.colorScheme.onBackground),
@@ -45,15 +46,18 @@ fun MainScreenController(externalNavController: NavController) {
                                         launchSingleTop = true
                                     }
                                 },
-                                label = {Text(barItem.title, color =  if (currentRoute == barItem.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary)},
+                                label = {
+                                    Text(
+                                        barItem.title,
+                                        color = if (currentRoute == barItem.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                                    )
+                                },
                                 icon = {
                                     Icon(
-                                        imageVector = ImageVector.vectorResource(
-                                            id = if (currentRoute == barItem.route) barItem.imageSelected else barItem.image
-                                        ),
+                                        imageVector = ImageVector.vectorResource(id = barItem.image),
                                         contentDescription = barItem.title,
-                                        modifier = Modifier.background(MaterialTheme.colorScheme.primary)
-                                        )
+                                        tint = if (currentRoute == barItem.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                                    )
                                 })
                         }
 

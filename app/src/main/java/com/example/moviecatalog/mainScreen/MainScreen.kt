@@ -19,7 +19,7 @@ import com.example.moviecatalog.R
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 
 @Composable
-fun MainScreen(navController: NavController, model: MainScreenViewModel = viewModel()){
+fun MainScreen(navController: NavController, model: MainScreenViewModel = viewModel()) {
 
     MovieCatalogTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
@@ -38,27 +38,29 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
 }
 
 @Composable
-fun PromotedFilm(navController: NavController, model: MainScreenViewModel){
+fun PromotedFilm(navController: NavController, model: MainScreenViewModel) {
     //val filmDescription = model.getMovie()
 
     MovieCatalogTheme {
-        Surface(modifier = Modifier
-            .fillMaxWidth()
-            .height(370.dp)) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(370.dp)
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.the_magicians),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable { navController.navigate("movie/1") }
-                )
+            )
         }
     }
 }
 
 
 @Composable
-fun TestMovie(navController: NavController){
+fun TestMovie(navController: NavController) {
     Image(
         painter = painterResource(id = R.drawable.the_magicians),
         contentDescription = null,
@@ -66,15 +68,19 @@ fun TestMovie(navController: NavController){
             .height(144.dp)
             .padding(10.dp)
             .clickable { navController.navigate("movie/1") },
-        )
+    )
 }
 
 @Composable
-fun GalleryMovie(navController: NavController , model: MainScreenViewModel){
+fun GalleryMovie(navController: NavController, model: MainScreenViewModel) {
     val movie = model.getPreView()
-    Surface(modifier = Modifier.fillMaxSize().clickable { navController.navigate("movie/1") }) {
-        Row(modifier = Modifier
-            .fillMaxSize()) {
+    Surface(modifier = Modifier
+        .fillMaxSize()
+        .clickable { navController.navigate("movie/1") }) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
             Image(
                 painter = painterResource(id = movie.TEMP_IMG),
                 contentDescription = null,
@@ -83,9 +89,21 @@ fun GalleryMovie(navController: NavController , model: MainScreenViewModel){
                     .padding(10.dp)
             )
             Column(modifier = Modifier.fillMaxSize()) {
-                Text(text = movie.name, color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.headlineMedium)
-                Text(text = "${movie.year} • ${movie.country}", color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.bodySmall)
-                Text(text = movie.genres.joinToString(), color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = movie.name,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                Text(
+                    text = "${movie.year} • ${movie.country}",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = movie.genres.joinToString(),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }
@@ -94,14 +112,18 @@ fun GalleryMovie(navController: NavController , model: MainScreenViewModel){
 }
 
 
-
 @Composable
-fun Favorite(navController: NavController, model: MainScreenViewModel){
+fun Favorite(navController: NavController, model: MainScreenViewModel) {
     MovieCatalogTheme {
         Surface(modifier = Modifier.height(212.dp)) {
             Column {
-               Text(text = "Избранное", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(start = 16.dp))
-                LazyRow(){
+                Text(
+                    text = "Избранное",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+                LazyRow() {
                     item() { TestMovie(navController = navController) }
                     item() { TestMovie(navController = navController) }
                     item() { TestMovie(navController = navController) }
@@ -114,12 +136,17 @@ fun Favorite(navController: NavController, model: MainScreenViewModel){
 }
 
 @Composable
-fun Gallery(navController: NavController, model: MainScreenViewModel){
+fun Gallery(navController: NavController, model: MainScreenViewModel) {
     MovieCatalogTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
-                Text("Галерея", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(start = 16.dp))
-                LazyColumn(){
+                Text(
+                    "Галерея",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+                LazyColumn() {
                     item { GalleryMovie(navController = navController, model = model) }
                     item { GalleryMovie(navController = navController, model = model) }
                     item { GalleryMovie(navController = navController, model = model) }

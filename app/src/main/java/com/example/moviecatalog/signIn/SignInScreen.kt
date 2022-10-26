@@ -30,7 +30,7 @@ import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 @ExperimentalFoundationApi
 @ExperimentalMaterial3Api
 @Composable
-fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavController){
+fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavController) {
     MovieCatalogTheme {
         val login = remember { mutableStateOf("") }
         val password = remember { mutableStateOf("") }
@@ -43,7 +43,8 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                Image(painter = painterResource(id = R.drawable.logo_group) ,
+                Image(
+                    painter = painterResource(id = R.drawable.logo_group),
                     contentDescription = null,
                     modifier = Modifier.padding(
                         start = 55.dp,
@@ -84,21 +85,43 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
 
 
                     OutlinedButton(
-                        onClick = { if( model.signInButtonPressed(login, password) == "Success") navController.navigate("mainScreen") }, // TODO( обработка ответа)
+                        onClick = {
+                            if (model.signInButtonPressed(
+                                    login,
+                                    password
+                                ) == "Success"
+                            ) navController.navigate("mainScreen")
+                        }, // TODO( обработка ответа)
                         enabled = isAllTextFieldsFull(login, password),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(53.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = if (isAllTextFieldsFull(login, password)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background,
+                            backgroundColor = if (isAllTextFieldsFull(
+                                    login,
+                                    password
+                                )
+                            ) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background,
                             contentColor = MaterialTheme.colorScheme.primary,
                             disabledContentColor = MaterialTheme.colorScheme.background
                         ),
-                        border = BorderStroke(1.dp, if (isAllTextFieldsFull(login, password)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary)
+                        border = BorderStroke(
+                            1.dp,
+                            if (isAllTextFieldsFull(
+                                    login,
+                                    password
+                                )
+                            ) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary
+                        )
 
                     ) {
-                        Text(text = "Войти",
-                            color = if (isAllTextFieldsFull(login, password)) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+                        Text(
+                            text = "Войти",
+                            color = if (isAllTextFieldsFull(
+                                    login,
+                                    password
+                                )
+                            ) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                         )
                     }
 

@@ -33,7 +33,7 @@ import java.util.*
 
 
 @Composable
-fun DatePickerView( date: MutableState<String> ) {
+fun DatePickerView(date: MutableState<String>) {
     val context = LocalContext.current
 
     val year: Int
@@ -52,8 +52,8 @@ fun DatePickerView( date: MutableState<String> ) {
         context,
         R.style.datepicker,
         { _: DatePicker, mYear: Int, mMonth: Int, dayOfMonth: Int ->
-            if (dayOfMonth < 10) date.value = "0$dayOfMonth.${mMonth+1}.$mYear"
-            else date.value = "$dayOfMonth.${mMonth+1}.$mYear"
+            if (dayOfMonth < 10) date.value = "0$dayOfMonth.${mMonth + 1}.$mYear"
+            else date.value = "$dayOfMonth.${mMonth + 1}.$mYear"
         }, year, month, day
     )
 
@@ -75,8 +75,8 @@ fun DatePickerView( date: MutableState<String> ) {
             val (label, iconView) = createRefs()
 
             Text(
-                text = if(date.value == "") "Дата рождения" else date.value,
-                color = if(date.value == "") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
+                text = if (date.value == "") "Дата рождения" else date.value,
+                color = if (date.value == "") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .fillMaxWidth()
                     .constrainAs(label) {
@@ -88,7 +88,7 @@ fun DatePickerView( date: MutableState<String> ) {
                     },
                 style = MaterialTheme.typography.bodySmall,
 
-            )
+                )
 
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.calendar),
@@ -110,17 +110,20 @@ fun DatePickerView( date: MutableState<String> ) {
 
 
 @Composable
-fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>){
-    Box(modifier = Modifier
-        .clip(RoundedCornerShape(1.dp))
-        .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(8.dp))
-        .height(47.dp)
+fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(1.dp))
+            .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(8.dp))
+            .height(47.dp)
     )
     {
-        Row(modifier = Modifier.fillMaxSize(),
-            ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+        ) {
 
-            OutlinedButton(onClick = { model.ChangeGerder(gender, "0") },
+            OutlinedButton(
+                onClick = { model.ChangeGerder(gender, "0") },
                 colors = ButtonDefaults.outlinedButtonColors(
                     backgroundColor = if (gender.value == "0") MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
@@ -135,16 +138,18 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>){
                     topEnd = 0.dp,
                     bottomEnd = 0.dp
                 )
-                )
+            )
             {
-                Text(text = "Мужчина",
+                Text(
+                    text = "Мужчина",
                     color = if (gender.value == "0") MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
 
                     )
             }
 
-            OutlinedButton(onClick = { model.ChangeGerder(gender, "1")  },
+            OutlinedButton(
+                onClick = { model.ChangeGerder(gender, "1") },
                 colors = ButtonDefaults.outlinedButtonColors(
                     backgroundColor = if (gender.value == "1") MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
@@ -159,10 +164,12 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>){
                     topEnd = 8.dp,
                     bottomEnd = 8.dp
                 )
-                ) {
-                Text(text = "Женщина",
+            ) {
+                Text(
+                    text = "Женщина",
                     color = if (gender.value == "1") MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.secondary,)
+                    else MaterialTheme.colorScheme.secondary,
+                )
             }
         }
     }
@@ -170,7 +177,7 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>){
 
 
 @Composable
-fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavController){
+fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavController) {
     MovieCatalogTheme {
         val login = remember { mutableStateOf("") }
         val email = remember { mutableStateOf("") }
@@ -180,7 +187,15 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
         val dateOfBirthday = remember { mutableStateOf("") }
         val gender = remember { mutableStateOf("") }
 
-        val allTextsFull = isAllTextFieldsFull(login, email, name, password, passwordConfirmation, dateOfBirthday, gender)
+        val allTextsFull = isAllTextFieldsFull(
+            login,
+            email,
+            name,
+            password,
+            passwordConfirmation,
+            dateOfBirthday,
+            gender
+        )
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -227,24 +242,40 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                 Spacer(modifier = Modifier.size(16.dp))
                 val context = LocalContext.current
                 OutlinedButton(
-                    onClick = { println(model.Register(login, email, name, password, passwordConfirmation, dateOfBirthday, gender, context))  },
+                    onClick = {
+                        println(
+                            model.Register(
+                                login,
+                                email,
+                                name,
+                                password,
+                                passwordConfirmation,
+                                dateOfBirthday,
+                                gender,
+                                context
+                            )
+                        )
+                    },
                     enabled = allTextsFull,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(53.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
                         backgroundColor = if (allTextsFull) MaterialTheme.colorScheme.primary
-                                            else MaterialTheme.colorScheme.background,
+                        else MaterialTheme.colorScheme.background,
                         contentColor = MaterialTheme.colorScheme.primary,
                         disabledContentColor = MaterialTheme.colorScheme.background
                     ),
-                    border = BorderStroke(1.dp, if (allTextsFull) MaterialTheme.colorScheme.primary
-                                                else MaterialTheme.colorScheme.onSecondary)
+                    border = BorderStroke(
+                        1.dp, if (allTextsFull) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSecondary
+                    )
 
                 ) {
-                    Text(text = "Зарегистрироваться",
+                    Text(
+                        text = "Зарегистрироваться",
                         color = if (allTextsFull) MaterialTheme.colorScheme.onPrimary
-                                else MaterialTheme.colorScheme.primary,
+                        else MaterialTheme.colorScheme.primary,
                     )
                 }
 
@@ -254,7 +285,10 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                         .fillMaxWidth()
                         .height(40.dp),
                 ) {
-                    Text(text = "У меня уже есть аккаунт", color = MaterialTheme.colorScheme.primary)
+                    Text(
+                        text = "У меня уже есть аккаунт",
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
                 Spacer(modifier = Modifier.size(32.dp))
             }

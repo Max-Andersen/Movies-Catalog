@@ -20,7 +20,7 @@ class MainScreenViewModel: ViewModel() {
         newMovie.country = "США"
         newMovie.TEMP_IMG = R.drawable.lucifer
         newMovie.year = "2022"
-        newMovie.genres = mutableListOf("КАША", "ПИПЕЦ")
+        newMovie.genres = mutableListOf("ЭКШОН", "ПИПЕЦ КРУТО!")
         return newMovie
     }
 
