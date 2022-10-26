@@ -26,7 +26,7 @@ import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.moviecatalog.mainScreen.FilmScreen
+import com.example.moviecatalog.mainScreen.MovieScreen
 import com.example.moviecatalog.mainScreen.MainScreenController
 import com.example.moviecatalog.signIn.SignInScreen
 import com.example.moviecatalog.signUp.SignUpScreen
@@ -58,10 +58,10 @@ class MainActivity : ComponentActivity() {
                         composable("sign-In"){ SignInScreen(navController = navController)}
                         composable("sign-Up"){ SignUpScreen(navController = navController)}
                         composable("mainScreen"){ MainScreenController(navController) }
-                        composable("film" + "/{id}"){ navBackStack ->
+                        composable("movie" + "/{id}"){ navBackStack ->
                             val filmId = navBackStack.arguments?.getString("id")
                             if (filmId != null) {
-                                FilmScreen(filmId, navController)
+                                MovieScreen(filmId, navController)
                             }
                         }
                     }
