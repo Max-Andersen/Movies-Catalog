@@ -21,14 +21,18 @@ import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 
 @Composable
 fun MainScreen(navController: NavController, model: MainScreenViewModel = viewModel()) {
-
     MovieCatalogTheme {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
         ) {
 
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
                 item { PromotedFilm(navController, model) }
                 item { Spacer(modifier = Modifier.size(10.dp)) }
 
@@ -51,17 +55,6 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                 item { GalleryMovie(navController = navController, model = model) }
 
             }
-//            Column(modifier = Modifier
-//
-//               ) {
-//                PromotedFilm(navController, model)
-//                Spacer(modifier = Modifier.size(10.dp))
-//
-//                Favorite(navController = navController, model = model)
-//                Gallery(navController = navController, model = model)
-//
-//            }
-
         }
     }
 }
@@ -98,6 +91,7 @@ fun TestMovie(navController: NavController) {
         modifier = Modifier
             .height(144.dp)
             .padding(10.dp)
+            .background(MaterialTheme.colorScheme.background)
             .clickable { navController.navigate("movie/1") },
         contentScale = ContentScale.FillHeight,
 
@@ -109,10 +103,12 @@ fun GalleryMovie(navController: NavController, model: MainScreenViewModel) {
     val movie = model.getPreView()
     Surface(modifier = Modifier
         .fillMaxSize()
+        .background(MaterialTheme.colorScheme.background)
         .clickable { navController.navigate("movie/1") }) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Image(
                 painter = painterResource(id = movie.TEMP_IMG),
@@ -151,7 +147,7 @@ fun GalleryMovie(navController: NavController, model: MainScreenViewModel) {
 fun Favorite(navController: NavController, model: MainScreenViewModel) {
     MovieCatalogTheme {
         Surface(modifier = Modifier.height(212.dp)) {
-            Column {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Text(
                     text = "Избранное",
                     color = MaterialTheme.colorScheme.primary,
