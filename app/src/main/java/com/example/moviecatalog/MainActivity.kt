@@ -101,7 +101,6 @@ fun SplashScreen(navController: NavController) {
         }
     }
 
-    // Image
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier

@@ -90,7 +90,7 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                                     login,
                                     password
                                 ) == "Success"
-                            ) navController.navigate("mainScreen")
+                            ) navController.navigate("mainScreen"){popUpTo(navController.graph.id)}
                         }, // TODO( обработка ответа)
                         enabled = isAllTextFieldsFull(login, password),
                         modifier = Modifier
@@ -122,16 +122,21 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                                     password
                                 )
                             ) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
 
                     TextButton(
-                        onClick = { navController.navigate("sign-up") },
+                        onClick = { navController.navigate("sign-up")},
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(40.dp),
                     ) {
-                        Text(text = "Регистрация", color = MaterialTheme.colorScheme.primary)
+                        Text(
+                            text = "Регистрация",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }

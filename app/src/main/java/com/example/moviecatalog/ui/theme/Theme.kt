@@ -11,6 +11,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -34,7 +35,7 @@ private val MyColorScheme = darkColorScheme(
 fun MovieCatalogTheme(content: @Composable () -> Unit) {
 
     val currentActivity = LocalView.current.context as Activity         // Not working with Preview
-    currentActivity.window.statusBarColor = MyColorScheme.surface.toArgb()
+    currentActivity.window.statusBarColor = Color.Transparent.toArgb()
     currentActivity.window.navigationBarColor = MyColorScheme.surface.toArgb()
 
     WindowInsetsControllerCompat(currentActivity.window, LocalView.current).let { controller ->

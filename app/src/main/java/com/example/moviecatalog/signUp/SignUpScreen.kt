@@ -144,7 +144,7 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>) {
                     text = "Мужчина",
                     color = if (gender.value == "0") MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
-
+                    style = MaterialTheme.typography.bodySmall
                     )
             }
 
@@ -169,6 +169,7 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>) {
                     text = "Женщина",
                     color = if (gender.value == "1") MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         }
@@ -276,6 +277,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                         text = "Зарегистрироваться",
                         color = if (allTextsFull) MaterialTheme.colorScheme.onPrimary
                         else MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
 
@@ -287,7 +289,8 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                 ) {
                     Text(
                         text = "У меня уже есть аккаунт",
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
                 Spacer(modifier = Modifier.size(32.dp))
