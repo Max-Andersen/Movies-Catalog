@@ -26,7 +26,7 @@ import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.moviecatalog.mainScreen.movie.MovieScreen
+import com.example.moviecatalog.mainScreen.movieScreen.MovieScreen
 import com.example.moviecatalog.mainScreen.MainScreenController
 import com.example.moviecatalog.signIn.SignInScreen
 import com.example.moviecatalog.signUp.SignUpScreen

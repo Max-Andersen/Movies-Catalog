@@ -6,8 +6,9 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -15,10 +16,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.example.moviecatalog.R
+import com.example.moviecatalog.mainScreen.movieData.MoviePreView
 import com.example.moviecatalog.normalizedItemPosition
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlin.math.absoluteValue
+import androidx.compose.ui.draw.clip
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(navController: NavController, model: MainScreenViewModel = viewModel()) {
@@ -28,35 +34,65 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-            ) {
-                item { PromotedFilm(navController, model) }
-                item { Spacer(modifier = Modifier.size(10.dp)) }
-
-                item { Favorite(navController = navController, model = model) }
-
-                item {
-                    Text(
-                        "Галерея",
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.headlineLarge,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
+            Box(modifier = Modifier.fillMaxSize()) {
+                val superLazyMovieItems = model.movies.collectAsLazyPagingItems()
+                val listState = rememberLazyListState()
+                val coroutineScope = rememberCoroutineScope()
+                val showUpButton by remember {
+                    derivedStateOf {
+                        listState.firstVisibleItemIndex > 0
+                    }
                 }
-                item { GalleryMovie(navController = navController, model = model) }
-                item { GalleryMovie(navController = navController, model = model) }
-                item { GalleryMovie(navController = navController, model = model) }
-                item { GalleryMovie(navController = navController, model = model) }
-                item { GalleryMovie(navController = navController, model = model) }
-                item { GalleryMovie(navController = navController, model = model) }
-                item { GalleryMovie(navController = navController, model = model) }
-                item { GalleryMovie(navController = navController, model = model) }
+                val configuration = LocalConfiguration.current
+                val screenHeight = configuration.screenHeightDp.dp
+                val screenWidth = configuration.screenWidthDp.dp
+
+
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
+                    item { PromotedFilm(navController, model) }
+                    item { Spacer(modifier = Modifier.size(10.dp)) }
+
+                    item { Favorite(navController = navController, model = model) }
+
+                    item {
+                        Text(
+                            "Галерея",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.headlineLarge,
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    }
+
+                    items(superLazyMovieItems) { newMovie ->
+                        if (newMovie != null) {
+                            GalleryMovie(navController = navController, movie = newMovie)
+                        }
+                    }
+                }
+
+
+
+                Icon(painter = painterResource(id = R.drawable.button_up),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(start = screenWidth - 100.dp, top = screenHeight - 40.dp)
+                        .clickable {
+                            coroutineScope.launch {
+                                listState.animateScrollToItem(index = 0)
+                            }
+                        }
+                        .size(40.dp)
+                        .alpha(if (showUpButton) 0.7f else 0f)
+                )
 
             }
+
+
         }
     }
 }
@@ -98,55 +134,9 @@ fun PromotedFilm(navController: NavController, model: MainScreenViewModel) {
                     Text("Смотреть", style = MaterialTheme.typography.bodyMedium)
                 }
             }
-
         }
     }
 }
-
-@Composable
-fun GalleryMovie(navController: NavController, model: MainScreenViewModel) {
-    val movie = model.getPreView()
-    Surface(modifier = Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)
-        .clickable { navController.navigate("movie/1") }) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            Image(
-                painter = painterResource(id = movie.TEMP_IMG),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(100.dp, 144.dp)
-                    .padding(10.dp),
-                contentScale = ContentScale.FillHeight
-
-            )
-            Column(modifier = Modifier.fillMaxSize()) {
-                Text(
-                    text = movie.name,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                Text(
-                    text = "${movie.year} • ${movie.country}",
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = movie.genres.joinToString(),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
-    }
-
-
-}
-
 
 @Composable
 fun Favorite(navController: NavController, model: MainScreenViewModel) {
@@ -183,19 +173,23 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                                     modifier = Modifier
                                         .size(120.dp, 172.dp)
                                         .background(MaterialTheme.colorScheme.background)
-                                        .clickable { navController.navigate("movie/1") },
+                                        .clickable { navController.navigate("movie/1") }
+                                        .clip(
+                                            RoundedCornerShape(8.dp)
+                                        ),
                                     contentScale = ContentScale.FillHeight,
                                 )
                                 Image(
                                     painter = painterResource(id = R.drawable.close_button),
                                     contentDescription = null,
-                                    modifier = Modifier.padding(
-                                        start = 104.dp,
-                                        top = 4.dp,
-                                        end = 4.dp,
-                                        bottom = 156.dp
-                                    )
-                                        .clickable {  } // TODO(удаление из избранного)
+                                    modifier = Modifier
+                                        .padding(
+                                            start = 104.dp,
+                                            top = 4.dp,
+                                            end = 4.dp,
+                                            bottom = 156.dp
+                                        )
+                                        .clickable { } // TODO(удаление из избранного)
                                 )
                             }
                         }
@@ -206,22 +200,51 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
     }
 }
 
-
 @Composable
-fun Gallery(navController: NavController, model: MainScreenViewModel) {
-    Text(
-        "Галерея",
-        color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.headlineLarge,
-        modifier = Modifier.padding(start = 16.dp)
-    )
-    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        item { GalleryMovie(navController = navController, model = model) }
-        item { GalleryMovie(navController = navController, model = model) }
-        item { GalleryMovie(navController = navController, model = model) }
-        item { GalleryMovie(navController = navController, model = model) }
-        item { GalleryMovie(navController = navController, model = model) }
+fun GalleryMovie(navController: NavController, movie: MoviePreView) {
 
+    Surface(modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 16.dp, top = 16.dp)
+        .height(144.dp)
+        .background(MaterialTheme.colorScheme.background)
+        .clickable { navController.navigate("movie/1") }) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+
+        ) {
+            Image(
+                painter = painterResource(id = movie.TEMP_IMG),
+                contentDescription = null,
+                modifier = Modifier
+                //.height(144.dp),
+                ,
+                contentScale = ContentScale.FillHeight
+
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 16.dp)
+            ) {
+                Text(
+                    text = movie.name,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                Text(
+                    text = "${movie.year} • ${movie.country}",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = movie.genres.joinToString(),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
     }
-
 }
