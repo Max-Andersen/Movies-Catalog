@@ -3,13 +3,14 @@ package com.example.moviecatalog.mainScreen
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,7 +38,7 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                 item { Spacer(modifier = Modifier.size(10.dp)) }
 
                 item { Favorite(navController = navController, model = model) }
-                
+
                 item {
                     Text(
                         "Галерея",
@@ -70,32 +71,36 @@ fun PromotedFilm(navController: NavController, model: MainScreenViewModel) {
                 .fillMaxWidth()
                 .height(320.dp)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.the_magicians),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable { navController.navigate("movie/1") },
-                contentScale = ContentScale.Crop,
-
+            Box(modifier = Modifier.fillMaxSize()) {
+                Image(
+                    painter = painterResource(id = R.drawable.the_magicians),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentScale = ContentScale.Crop,
                 )
+                Button(
+                    onClick = { navController.navigate("movie/1") },
+                    modifier = Modifier
+                        .padding(
+                            start = LocalConfiguration.current.screenWidthDp.dp / 3,
+                            end = LocalConfiguration.current.screenWidthDp.dp / 3,
+                            //bottom = 63.dp,
+                            top = 249.dp
+                        )
+                        .size(160.dp, 44.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Text("Смотреть", style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+
         }
     }
-}
-
-
-@Composable
-fun TestMovie(navController: NavController) {
-    Image(
-        painter = painterResource(id = R.drawable.the_magicians),
-        contentDescription = null,
-        modifier = Modifier
-            .height(144.dp)
-            .padding(10.dp)
-            .background(MaterialTheme.colorScheme.background)
-            .clickable { navController.navigate("movie/1") },
-        contentScale = ContentScale.FillHeight,
-        )
 }
 
 @Composable
@@ -146,8 +151,8 @@ fun GalleryMovie(navController: NavController, model: MainScreenViewModel) {
 @Composable
 fun Favorite(navController: NavController, model: MainScreenViewModel) {
     val movies = model.getFavouriteMovies()
-    
-    if (movies.isNotEmpty()){
+
+    if (movies.isNotEmpty()) {
         MovieCatalogTheme {
             Surface(modifier = Modifier.height(212.dp)) {
                 Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -158,8 +163,8 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                         modifier = Modifier.padding(start = 16.dp)
                     )
                     val state = rememberLazyListState()
-                    LazyRow(state = state, horizontalArrangement = Arrangement.spacedBy(16.dp)){
-                        items(movies, key = {it.id}){ movie ->
+                    LazyRow(state = state, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        items(movies, key = { it.id }) { movie ->
                             Image(
                                 painter = painterResource(id = movie.TEMP_IMG), //TODO()
                                 contentDescription = null,
@@ -185,7 +190,6 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
         }
     }
 }
-
 
 
 @Composable
