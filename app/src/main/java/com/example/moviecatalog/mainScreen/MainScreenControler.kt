@@ -12,14 +12,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.moviecatalog.R
 import com.example.moviecatalog.mainScreen.navBarItems.NavBarItems
+import com.example.moviecatalog.mainScreen.profileScreen.ProfileScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)

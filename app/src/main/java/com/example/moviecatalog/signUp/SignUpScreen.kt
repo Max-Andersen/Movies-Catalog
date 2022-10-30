@@ -27,6 +27,7 @@ import com.example.moviecatalog.R
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.moviecatalog.ChoseGender
 import com.example.moviecatalog.SetOutlinedTextField
 import com.example.moviecatalog.isAllTextFieldsFull
 import java.util.*
@@ -108,75 +109,6 @@ fun DatePickerView(date: MutableState<String>) {
     }
 }
 
-
-@Composable
-fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(1.dp))
-            .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(8.dp))
-            .height(47.dp)
-    )
-    {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-
-            OutlinedButton(
-                onClick = { model.ChangeGerder(gender, "0") },
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = if (gender.value == "0") MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.background,
-                ),
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize(),
-                border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.secondary),
-                shape = RoundedCornerShape(
-                    topStart = 8.dp,
-                    bottomStart = 8.dp,
-                    topEnd = 0.dp,
-                    bottomEnd = 0.dp
-                )
-            )
-            {
-                Text(
-                    text = "Мужчина",
-                    color = if (gender.value == "0") MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.bodySmall
-                    )
-            }
-
-            OutlinedButton(
-                onClick = { model.ChangeGerder(gender, "1") },
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = if (gender.value == "1") MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.background,
-                ),
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize(),
-                border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.secondary),
-                shape = RoundedCornerShape(
-                    topStart = 0.dp,
-                    bottomStart = 0.dp,
-                    topEnd = 8.dp,
-                    bottomEnd = 8.dp
-                )
-            ) {
-                Text(
-                    text = "Женщина",
-                    color = if (gender.value == "1") MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
-    }
-}
-
-
 @Composable
 fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavController) {
     MovieCatalogTheme {
@@ -241,6 +173,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                 ChoseGender(model = model, gender = gender)
 
                 Spacer(modifier = Modifier.size(16.dp))
+
                 val context = LocalContext.current
                 OutlinedButton(
                     onClick = {

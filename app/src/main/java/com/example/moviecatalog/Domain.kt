@@ -1,6 +1,8 @@
 package com.example.moviecatalog
 
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -11,9 +13,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.moviecatalog.mainScreen.profileScreen.ProfileViewModel
+import com.example.moviecatalog.signUp.SignUpViewModel
 
 @Composable
 fun getTextInputColorTheme(): TextFieldColors{
@@ -46,7 +51,6 @@ fun SetOutlinedTextField(variable: MutableState<String>, name: String){
                     Icons.Filled.Visibility
                 else Icons.Filled.VisibilityOff
 
-                // Please provide localized description for accessibility services
                 val description = if (passwordVisible) "Hide password" else "Show password"
 
                 IconButton(onClick = {passwordVisible = !passwordVisible}){
@@ -83,3 +87,137 @@ fun LazyListLayoutInfo.normalizedItemPosition(key: Any): Float =
             (it.offset.toFloat() - center) / center
         }
         ?: 0F
+
+@Composable
+fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(1.dp))
+            .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(8.dp))
+            .height(47.dp)
+    )
+    {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+
+            OutlinedButton(
+                onClick = { model.ChangeGerder(gender, "0") },
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = if (gender.value == "0") MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.background,
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize(),
+                border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.secondary),
+                shape = RoundedCornerShape(
+                    topStart = 8.dp,
+                    bottomStart = 8.dp,
+                    topEnd = 0.dp,
+                    bottomEnd = 0.dp
+                )
+            )
+            {
+                Text(
+                    text = "Мужчина",
+                    color = if (gender.value == "0") MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
+            OutlinedButton(
+                onClick = { model.ChangeGerder(gender, "1") },
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = if (gender.value == "1") MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.background,
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize(),
+                border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.secondary),
+                shape = RoundedCornerShape(
+                    topStart = 0.dp,
+                    bottomStart = 0.dp,
+                    topEnd = 8.dp,
+                    bottomEnd = 8.dp
+                )
+            ) {
+                Text(
+                    text = "Женщина",
+                    color = if (gender.value == "1") MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ChoseGender(model: ProfileViewModel, gender: MutableState<String>) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(1.dp))
+            .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(8.dp))
+            .height(47.dp)
+    )
+    {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+
+            OutlinedButton(
+                onClick = { model.ChangeGerder(gender, "0") },
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = if (gender.value == "0") MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.background,
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize(),
+                border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.secondary),
+                shape = RoundedCornerShape(
+                    topStart = 8.dp,
+                    bottomStart = 8.dp,
+                    topEnd = 0.dp,
+                    bottomEnd = 0.dp
+                )
+            )
+            {
+                Text(
+                    text = "Мужчина",
+                    color = if (gender.value == "0") MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
+            OutlinedButton(
+                onClick = { model.ChangeGerder(gender, "1") },
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = if (gender.value == "1") MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.background,
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize(),
+                border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.secondary),
+                shape = RoundedCornerShape(
+                    topStart = 0.dp,
+                    bottomStart = 0.dp,
+                    topEnd = 8.dp,
+                    bottomEnd = 8.dp
+                )
+            ) {
+                Text(
+                    text = "Женщина",
+                    color = if (gender.value == "1") MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
+}
