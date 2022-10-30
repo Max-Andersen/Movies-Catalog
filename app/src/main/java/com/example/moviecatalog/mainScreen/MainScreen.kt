@@ -165,13 +165,9 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                     val state = rememberLazyListState()
                     LazyRow(state = state, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         items(movies, key = { it.id }) { movie ->
-                            Image(
-                                painter = painterResource(id = movie.TEMP_IMG), //TODO()
-                                contentDescription = null,
+                            Box(
                                 modifier = Modifier
-                                    .size(120.dp, 172.dp)
-                                    .background(MaterialTheme.colorScheme.background)
-                                    .clickable { navController.navigate("movie/1") }
+                                    .fillMaxSize()
                                     .graphicsLayer {
                                         var value =
                                             1 - (state.layoutInfo.normalizedItemPosition(movie.id).absoluteValue * 0.1F)
@@ -180,9 +176,28 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                                         scaleX = value
                                         scaleY = value
                                     },
-
-                                contentScale = ContentScale.FillHeight,
-                            )
+                            ) {
+                                Image(
+                                    painter = painterResource(id = movie.TEMP_IMG), //TODO()
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(120.dp, 172.dp)
+                                        .background(MaterialTheme.colorScheme.background)
+                                        .clickable { navController.navigate("movie/1") },
+                                    contentScale = ContentScale.FillHeight,
+                                )
+                                Image(
+                                    painter = painterResource(id = R.drawable.close_button),
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(
+                                        start = 104.dp,
+                                        top = 4.dp,
+                                        end = 4.dp,
+                                        bottom = 156.dp
+                                    )
+                                        .clickable {  } // TODO(удаление из избранного)
+                                )
+                            }
                         }
                     }
                 }
