@@ -1,6 +1,7 @@
 package com.example.moviecatalog
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -73,3 +74,12 @@ fun SetOutlinedTextField(variable: MutableState<String>, name: String){
 fun isAllTextFieldsFull(vararg strings: MutableState<String>): Boolean {
     return strings.map{ if(it.value.isNotBlank()) 1 else 0 }.sum() == strings.size
 }
+
+fun LazyListLayoutInfo.normalizedItemPosition(key: Any): Float =
+    visibleItemsInfo
+        .firstOrNull { it.key == key }
+        ?.let {
+            val center = (viewportEndOffset + viewportStartOffset - it.size*2.5f) / 2F
+            (it.offset.toFloat() - center) / center
+        }
+        ?: 0F

@@ -82,7 +82,7 @@ private fun ImageHeader(scroll: ScrollState, headerHeightPx: Float) {
         Image(
             painter = painterResource(id = R.drawable.the_magicians),
             contentDescription = "",
-            contentScale = ContentScale.FillBounds
+            contentScale = ContentScale.Crop
         )
     }
 }

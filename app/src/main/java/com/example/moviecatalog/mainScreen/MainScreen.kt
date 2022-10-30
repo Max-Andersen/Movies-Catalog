@@ -1,23 +1,23 @@
 package com.example.moviecatalog.mainScreen
 
-import android.widget.Gallery
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.moviecatalog.R
+import com.example.moviecatalog.normalizedItemPosition
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
+import kotlin.math.absoluteValue
 
 @Composable
 fun MainScreen(navController: NavController, model: MainScreenViewModel = viewModel()) {
@@ -37,6 +37,7 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                 item { Spacer(modifier = Modifier.size(10.dp)) }
 
                 item { Favorite(navController = navController, model = model) }
+                
                 item {
                     Text(
                         "Галерея",
@@ -94,7 +95,6 @@ fun TestMovie(navController: NavController) {
             .background(MaterialTheme.colorScheme.background)
             .clickable { navController.navigate("movie/1") },
         contentScale = ContentScale.FillHeight,
-
         )
 }
 
@@ -114,7 +114,7 @@ fun GalleryMovie(navController: NavController, model: MainScreenViewModel) {
                 painter = painterResource(id = movie.TEMP_IMG),
                 contentDescription = null,
                 modifier = Modifier
-                    .height(144.dp)
+                    .size(100.dp, 144.dp)
                     .padding(10.dp),
                 contentScale = ContentScale.FillHeight
 
@@ -145,30 +145,51 @@ fun GalleryMovie(navController: NavController, model: MainScreenViewModel) {
 
 @Composable
 fun Favorite(navController: NavController, model: MainScreenViewModel) {
-    MovieCatalogTheme {
-        Surface(modifier = Modifier.height(212.dp)) {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                Text(
-                    text = "Избранное",
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
-                Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                    TestMovie(navController = navController)
-                    TestMovie(navController = navController)
-                    TestMovie(navController = navController)
-                    TestMovie(navController = navController)
-                    TestMovie(navController = navController)
+    val movies = model.getFavouriteMovies()
+    
+    if (movies.isNotEmpty()){
+        MovieCatalogTheme {
+            Surface(modifier = Modifier.height(212.dp)) {
+                Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                    Text(
+                        text = "Избранное",
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.headlineLarge,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                    val state = rememberLazyListState()
+                    LazyRow(state = state, horizontalArrangement = Arrangement.spacedBy(16.dp)){
+                        items(movies, key = {it.id}){ movie ->
+                            Image(
+                                painter = painterResource(id = movie.TEMP_IMG), //TODO()
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(120.dp, 172.dp)
+                                    .background(MaterialTheme.colorScheme.background)
+                                    .clickable { navController.navigate("movie/1") }
+                                    .graphicsLayer {
+                                        var value =
+                                            1 - (state.layoutInfo.normalizedItemPosition(movie.id).absoluteValue * 0.1F)
+                                        value = if (value < 0.9f) 0.9f else value
+                                        alpha = value
+                                        scaleX = value
+                                        scaleY = value
+                                    },
+
+                                contentScale = ContentScale.FillHeight,
+                            )
+                        }
+                    }
                 }
             }
         }
     }
 }
 
+
+
 @Composable
 fun Gallery(navController: NavController, model: MainScreenViewModel) {
-
     Text(
         "Галерея",
         color = MaterialTheme.colorScheme.primary,
