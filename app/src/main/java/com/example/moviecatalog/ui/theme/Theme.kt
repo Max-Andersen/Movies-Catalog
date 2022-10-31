@@ -27,8 +27,10 @@ private val MyColorScheme = darkColorScheme(
     onSecondary = Gray,
 
     background = NearBlack,
+    onBackground = BottomSideColor,
     surface = SystemColor,
-    onBackground = BottomSideColor
+    onSurface = DescriptionColor,
+    onSurfaceVariant = GenresColor
 )
 
 @Composable

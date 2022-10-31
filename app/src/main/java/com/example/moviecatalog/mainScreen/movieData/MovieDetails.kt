@@ -7,6 +7,7 @@ data class Genre(
 
 
 data class MovieDetails(
+    var time: Int = 0,
     var tagline: String = "",
     var description: String = "",
     var director: String = "",

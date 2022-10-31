@@ -83,7 +83,7 @@ fun LazyListLayoutInfo.normalizedItemPosition(key: Any): Float =
     visibleItemsInfo
         .firstOrNull { it.key == key }
         ?.let {
-            val center = (viewportEndOffset + viewportStartOffset - it.size * 3.5f) / 2F
+            val center = (viewportEndOffset + viewportStartOffset - it.size * 2.4f) / 2F
             (it.offset.toFloat() - center) / center
         }
         ?: 0F

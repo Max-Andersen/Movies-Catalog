@@ -56,16 +56,6 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                     )
                 )
 
-//                GlideImage(
-//                    model = "https://github.com/bumptech/glide/raw/master/static/glide_logo.png",
-//                    contentDescription = null,
-//                    modifier = Modifier.padding(
-//                        start = 55.dp,
-//                        top = 16.dp,
-//                        end = 55.dp
-//                    )
-//                )
-
                 Spacer(modifier = Modifier.size(48.dp))
                 Column(
                     modifier = Modifier.padding(

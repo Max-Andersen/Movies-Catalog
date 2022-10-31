@@ -162,7 +162,7 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                         state = state, horizontalArrangement = Arrangement.spacedBy(16.dp),
                         contentPadding = PaddingValues(
                             start = 30.dp,
-                            end = 70.dp,
+                            end = 180.dp,
                         ),
                     ) {
                         items(movies, key = { it.id }) { movie ->
@@ -171,7 +171,7 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                                     .fillMaxSize()
                                     .graphicsLayer {
                                         var value =
-                                            1 - (state.layoutInfo.normalizedItemPosition(movie.id).absoluteValue * 0.01F)
+                                            1 - (state.layoutInfo.normalizedItemPosition(movie.id).absoluteValue * 0.04F)
                                         value = if (value < 0.9f) 0.9f else value
                                         alpha = value
                                         scaleX = value

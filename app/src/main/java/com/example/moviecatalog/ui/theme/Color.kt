@@ -25,5 +25,8 @@ val Gray = Color(0xFFB7B7B7)
 val GrayFaded = Color(0xFFD1D1D1)
 val BottomSideColor = Color(0xFF1C1A19)
 
+val DescriptionColor = Color(0xFFB3B3B3)
+val GenresColor = Color(0xFFE7E7E7)
+
 val DarkGrey = Color(0xFF3E3836)
 val DarkRed = Color(0xFF4C1908)
