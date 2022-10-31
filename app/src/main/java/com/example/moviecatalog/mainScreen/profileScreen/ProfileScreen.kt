@@ -1,7 +1,6 @@
 package com.example.moviecatalog.mainScreen.profileScreen
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedButton
@@ -53,9 +52,15 @@ fun ProfileScreen(model: ProfileViewModel = viewModel()) {
             }
 
 
-            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .background(MaterialTheme.colorScheme.background),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 Row(
-                    modifier = Modifier.height(130.dp),
+                    modifier = Modifier.height(110.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -110,7 +115,7 @@ fun ProfileScreen(model: ProfileViewModel = viewModel()) {
                 }
 
                 TextButton(
-                    onClick = {  },  //TODO(logout)
+                    onClick = { },  //TODO(logout)
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(40.dp),
@@ -121,6 +126,8 @@ fun ProfileScreen(model: ProfileViewModel = viewModel()) {
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
+
+                Spacer(modifier = Modifier.size(60.dp))
 
             }
 

@@ -21,12 +21,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.moviecatalog.R
 import com.example.moviecatalog.SetOutlinedTextField
 import com.example.moviecatalog.getTextInputColorTheme
 import com.example.moviecatalog.isAllTextFieldsFull
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @ExperimentalFoundationApi
 @ExperimentalMaterial3Api
 @Composable
@@ -52,6 +55,16 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                         end = 55.dp
                     )
                 )
+
+//                GlideImage(
+//                    model = "https://github.com/bumptech/glide/raw/master/static/glide_logo.png",
+//                    contentDescription = null,
+//                    modifier = Modifier.padding(
+//                        start = 55.dp,
+//                        top = 16.dp,
+//                        end = 55.dp
+//                    )
+//                )
 
                 Spacer(modifier = Modifier.size(48.dp))
                 Column(

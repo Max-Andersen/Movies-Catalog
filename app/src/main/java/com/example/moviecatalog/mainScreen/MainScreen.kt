@@ -24,6 +24,9 @@ import com.example.moviecatalog.normalizedItemPosition
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlin.math.absoluteValue
 import androidx.compose.ui.draw.clip
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
 @Composable
@@ -36,6 +39,7 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 val superLazyMovieItems = model.movies.collectAsLazyPagingItems()
+
                 val listState = rememberLazyListState()
                 val coroutineScope = rememberCoroutineScope()
                 val showUpButton by remember {
@@ -48,13 +52,16 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                 val screenWidth = configuration.screenWidthDp.dp
 
 
+
                 LazyColumn(
                     state = listState,
                     modifier = Modifier
                         .fillMaxSize()
                         .background(MaterialTheme.colorScheme.background)
                 ) {
-                    item { PromotedFilm(navController, model) }
+                    item {
+                        if (superLazyMovieItems.itemCount > 0){ PromotedFilm(navController, superLazyMovieItems[0]!!)}
+                    }
                     item { Spacer(modifier = Modifier.size(10.dp)) }
 
                     item { Favorite(navController = navController, model = model) }
@@ -74,8 +81,6 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                         }
                     }
                 }
-
-
 
                 Icon(painter = painterResource(id = R.drawable.button_up),
                     contentDescription = null,
@@ -97,10 +102,10 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
     }
 }
 
-@Composable
-fun PromotedFilm(navController: NavController, model: MainScreenViewModel) {
-    //val filmDescription = model.getMovie()
 
+
+@Composable
+fun PromotedFilm(navController: NavController, movie: MoviePreView) {
     MovieCatalogTheme {
         Surface(
             modifier = Modifier
@@ -109,7 +114,7 @@ fun PromotedFilm(navController: NavController, model: MainScreenViewModel) {
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Image(
-                    painter = painterResource(id = R.drawable.the_magicians),
+                    painter = painterResource(id = movie.TEMP_IMG),
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize(),
@@ -153,14 +158,20 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                         modifier = Modifier.padding(start = 16.dp)
                     )
                     val state = rememberLazyListState()
-                    LazyRow(state = state, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    LazyRow(
+                        state = state, horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(
+                            start = 30.dp,
+                            end = 70.dp,
+                        ),
+                    ) {
                         items(movies, key = { it.id }) { movie ->
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .graphicsLayer {
                                         var value =
-                                            1 - (state.layoutInfo.normalizedItemPosition(movie.id).absoluteValue * 0.1F)
+                                            1 - (state.layoutInfo.normalizedItemPosition(movie.id).absoluteValue * 0.01F)
                                         value = if (value < 0.9f) 0.9f else value
                                         alpha = value
                                         scaleX = value
@@ -219,8 +230,7 @@ fun GalleryMovie(navController: NavController, movie: MoviePreView) {
                 painter = painterResource(id = movie.TEMP_IMG),
                 contentDescription = null,
                 modifier = Modifier
-                //.height(144.dp),
-                ,
+                    .size(120.dp, 172.dp),
                 contentScale = ContentScale.FillHeight
 
             )

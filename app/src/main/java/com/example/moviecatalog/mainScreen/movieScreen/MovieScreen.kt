@@ -21,8 +21,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.moviecatalog.R
+import com.example.moviecatalog.repository.MovieRepository
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 
 @Composable
@@ -34,7 +37,7 @@ fun MovieScreen(filmId: String, navController: NavController) {
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            FilmContent(navController = navController)
+            FilmContent(navController = navController, filmId)
         }
     }
 }
@@ -51,11 +54,14 @@ private const val titleFontScaleStart = 1f
 private const val titleFontScaleEnd = 0.66f
 
 @Composable
-fun FilmContent(navController: NavController) {
+fun FilmContent(navController: NavController, filmId: String) {
     val scroll: ScrollState = rememberScrollState(0)
 
     val headerHeightPx = with(LocalDensity.current) { headerHeight.toPx() }
     val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.toPx() }
+
+    val movieRepository = MovieRepository()
+    var movieData = movieRepository.loadMovieDetails(filmId)
 
     Box(
         modifier = Modifier.fillMaxSize()
