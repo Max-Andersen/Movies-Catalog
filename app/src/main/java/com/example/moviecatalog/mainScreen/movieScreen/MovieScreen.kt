@@ -162,7 +162,7 @@ private fun Body(scroll: ScrollState, movieData: MovieDetails) {
             title = {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "Оставить отзыв",
+                        text = stringResource(id = R.string.makeReview),
                         style = MaterialTheme.typography.headlineLarge,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -192,7 +192,7 @@ private fun Body(scroll: ScrollState, movieData: MovieDetails) {
                         ),
                         placeholder = {
                             Text(
-                                text = "Некий текст",
+                                text = stringResource(id = R.string.someText),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.background
                             )
@@ -210,7 +210,7 @@ private fun Body(scroll: ScrollState, movieData: MovieDetails) {
                             .fillMaxWidth()
                     ) {
                         Text(
-                            text = "Сохранить",
+                            text = stringResource(id = R.string.save),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimary
                         )
@@ -221,7 +221,7 @@ private fun Body(scroll: ScrollState, movieData: MovieDetails) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "Отмена",
+                            text = stringResource(id = R.string.cancel),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -257,7 +257,7 @@ private fun Body(scroll: ScrollState, movieData: MovieDetails) {
                 Spacer(modifier = Modifier.size(1.dp))
 
                 Text(
-                    text = "О фильме",
+                    text = stringResource(id = R.string.aboutMovie),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
@@ -266,49 +266,49 @@ private fun Body(scroll: ScrollState, movieData: MovieDetails) {
 
                 if (movieData.year != "") {
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = "Год")
+                        AboutFilmDescriptionText(text = stringResource(id = R.string.year))
                         DataDescriptionText(text = movieData.year)
                     }
                 }
                 if (movieData.country != "") {
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = "Страна")
+                        AboutFilmDescriptionText(text = stringResource(id = R.string.country))
                         DataDescriptionText(text = movieData.country)
                     }
                 }
                 if (movieData.time != 0) {
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = "Время")
-                        DataDescriptionText(text = "${movieData.time} мин.")
+                        AboutFilmDescriptionText(text = stringResource(id = R.string.time))
+                        DataDescriptionText(text = "${movieData.time} ${stringResource(id = R.string.minutes)}")
                     }
                 }
                 if (movieData.tagline != "") {
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = "Слоган")
+                        AboutFilmDescriptionText(text = stringResource(id = R.string.tagline))
                         DataDescriptionText(text = "«${movieData.tagline}»")
                     }
                 }
                 if (movieData.director != "") {
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = "Режисёр")
+                        AboutFilmDescriptionText(text = stringResource(id = R.string.director))
                         DataDescriptionText(text = movieData.director)
                     }
                 }
                 if (movieData.budget != 0) {
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = "Бюджет")
+                        AboutFilmDescriptionText(text = stringResource(id = R.string.budget))
                         DataDescriptionText(text = "\$${movieData.budget}")
                     }
                 }
                 if (movieData.fees != 0) {
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = "Сборы в мире")
+                        AboutFilmDescriptionText(text = stringResource(id = R.string.fees))
                         DataDescriptionText(text = "\$${movieData.fees}")
                     }
                 }
                 if (movieData.ageLimit != 0) {
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = "Возраст")
+                        AboutFilmDescriptionText(text = stringResource(id = R.string.ageLimit))
                         DataDescriptionText(text = "${movieData.ageLimit}+")
                     }
                 }
@@ -316,7 +316,7 @@ private fun Body(scroll: ScrollState, movieData: MovieDetails) {
                 Spacer(modifier = Modifier.size(1.dp))
 
                 Text(
-                    text = "Жанры",
+                    text = stringResource(id = R.string.gender),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
@@ -359,7 +359,7 @@ private fun Body(scroll: ScrollState, movieData: MovieDetails) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Отзывы",
+                        text = stringResource(id = R.string.reviews),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -405,7 +405,7 @@ fun ReviewBox(review: Review) {
                 Spacer(modifier = Modifier.size(8.dp))
                 Column {
                     Text(
-                        text = if (!review.isAnonymous) review.nickName else "Анонимный пользователь",
+                        text = if (!review.isAnonymous) review.nickName else stringResource(id = R.string.anonymous),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimary,
 

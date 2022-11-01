@@ -24,6 +24,7 @@ import com.example.moviecatalog.normalizedItemPosition
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlin.math.absoluteValue
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
@@ -68,7 +69,7 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
 
                     item {
                         Text(
-                            "Галерея",
+                            stringResource(id = R.string.gallery),
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.headlineLarge,
                             modifier = Modifier.padding(start = 16.dp)
@@ -136,7 +137,7 @@ fun PromotedFilm(navController: NavController, movie: MoviePreView) {
                     ),
                     shape = RoundedCornerShape(4.dp)
                 ) {
-                    Text("Смотреть", style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(id = R.string.watch), style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }
@@ -152,7 +153,7 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
             Surface(modifier = Modifier.height(212.dp)) {
                 Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                     Text(
-                        text = "Избранное",
+                        text = stringResource(id = R.string.favourite),
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.headlineLarge,
                         modifier = Modifier.padding(start = 16.dp)

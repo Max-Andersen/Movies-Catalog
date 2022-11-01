@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -74,19 +75,19 @@ fun ProfileScreen(model: ProfileViewModel = viewModel()) {
                     )
                 }
 
-                Text(text = "E-mail", style = MaterialTheme.typography.bodyMedium)
+                Text(text = stringResource(id = R.string.E_Mail), style = MaterialTheme.typography.bodyMedium)
                 SetOutlinedTextField(variable = email, name = "E-Mail")
 
-                Text(text = "Ссылка на аватарку", style = MaterialTheme.typography.bodyMedium)
+                Text(text = stringResource(id = R.string.avatarLink), style = MaterialTheme.typography.bodyMedium)
                 SetOutlinedTextField(variable = avatarLink, name = "url")
 
-                Text(text = "Имя", style = MaterialTheme.typography.bodyMedium)
+                Text(text = stringResource(id = R.string.name), style = MaterialTheme.typography.bodyMedium)
                 SetOutlinedTextField(variable = name, name = "Имя(name)")
 
-                Text(text = "Дата рождения", style = MaterialTheme.typography.bodyMedium)
+                Text(text = stringResource(id = R.string.dateOfBirthday), style = MaterialTheme.typography.bodyMedium)
                 DatePickerView(date = dateOfBirthday)
 
-                Text(text = "Пол", style = MaterialTheme.typography.bodyMedium)
+                Text(text = stringResource(id = R.string.gender), style = MaterialTheme.typography.bodyMedium)
                 ChoseGender(model = model, gender = gender)
 
                 Spacer(modifier = Modifier.size(10.dp))
@@ -108,7 +109,7 @@ fun ProfileScreen(model: ProfileViewModel = viewModel()) {
 
                 ) {
                     Text(
-                        text = "Сохранить",
+                        text = stringResource(id = R.string.save),
                         color = MaterialTheme.colorScheme.onPrimary,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -121,7 +122,7 @@ fun ProfileScreen(model: ProfileViewModel = viewModel()) {
                         .height(40.dp),
                 ) {
                     Text(
-                        text = "Выйти из аккаунта",
+                        text = stringResource(id = R.string.logout),
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.bodyMedium
                     )

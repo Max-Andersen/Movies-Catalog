@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -76,7 +77,7 @@ fun DatePickerView(date: MutableState<String>) {
             val (label, iconView) = createRefs()
 
             Text(
-                text = if (date.value == "") "Дата рождения" else date.value,
+                text = if (date.value == "") stringResource(id = R.string.dateOfBirthday) else date.value,
                 color = if (date.value == "") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -157,16 +158,16 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                 )
 
                 Text(
-                    text = "Регистрация",
+                    text = stringResource(id = R.string.registration),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.headlineLarge,
                 )
 
-                SetOutlinedTextField(login, "Логин")
-                SetOutlinedTextField(email, "E-mail")
-                SetOutlinedTextField(name, "Имя")
-                SetOutlinedTextField(password, "Пароль")
-                SetOutlinedTextField(passwordConfirmation, "Подтвердите пароль")
+                SetOutlinedTextField(login, stringResource(id = R.string.login))
+                SetOutlinedTextField(email, stringResource(id = R.string.E_Mail))
+                SetOutlinedTextField(name, stringResource(id = R.string.name))
+                SetOutlinedTextField(password, stringResource(id = R.string.password))
+                SetOutlinedTextField(passwordConfirmation, stringResource(id = R.string.passwordConfirmation))
 
                 DatePickerView(dateOfBirthday)
 
@@ -207,7 +208,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
 
                 ) {
                     Text(
-                        text = "Зарегистрироваться",
+                        text = stringResource(id = R.string.register),
                         color = if (allTextsFull) MaterialTheme.colorScheme.onPrimary
                         else MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.bodyMedium
@@ -221,7 +222,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                         .height(40.dp),
                 ) {
                     Text(
-                        text = "У меня уже есть аккаунт",
+                        text = stringResource(id = R.string.iHaveAccountAlready),
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.bodyMedium
                     )

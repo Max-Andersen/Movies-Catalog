@@ -11,13 +11,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -66,11 +64,11 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                     ) {
 
 
-                    SetOutlinedTextField(variable = login, "Логин")
+                    SetOutlinedTextField(variable = login, stringResource(id = R.string.login))
 
                     Spacer(modifier = Modifier.size(14.dp))
 
-                    SetOutlinedTextField(variable = password, "Пароль")
+                    SetOutlinedTextField(variable = password, stringResource(id = R.string.password))
                 }
 
                 Column(
@@ -119,7 +117,7 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
 
                     ) {
                         Text(
-                            text = "Войти",
+                            text = stringResource(id = R.string.enter),
                             color = if (isAllTextFieldsFull(
                                     login,
                                     password
@@ -136,7 +134,7 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                             .height(40.dp),
                     ) {
                         Text(
-                            text = "Регистрация",
+                            text = stringResource(id = R.string.registration),
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.bodyMedium
                         )

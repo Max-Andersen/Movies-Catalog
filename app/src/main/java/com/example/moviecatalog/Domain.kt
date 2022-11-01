@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -120,7 +121,7 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>) {
             )
             {
                 Text(
-                    text = "Мужчина",
+                    text = stringResource(id = R.string.male),
                     color = if (gender.value == "0") MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodySmall
@@ -145,7 +146,7 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>) {
                 )
             ) {
                 Text(
-                    text = "Женщина",
+                    text = stringResource(id = R.string.female),
                     color = if (gender.value == "1") MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodySmall
@@ -187,7 +188,7 @@ fun ChoseGender(model: ProfileViewModel, gender: MutableState<String>) {
             )
             {
                 Text(
-                    text = "Мужчина",
+                    text = stringResource(id = R.string.male),
                     color = if (gender.value == "0") MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodySmall
@@ -212,7 +213,7 @@ fun ChoseGender(model: ProfileViewModel, gender: MutableState<String>) {
                 )
             ) {
                 Text(
-                    text = "Женщина",
+                    text = stringResource(id = R.string.female),
                     color = if (gender.value == "1") MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodySmall

@@ -83,11 +83,9 @@ fun SplashScreen(navController: NavController) {
         androidx.compose.animation.core.Animatable(0f)
     }
 
-    // Animation
     LaunchedEffect(key1 = true) {
         scale.animateTo(
             targetValue = 1.2f,
-            // tween Animation
             animationSpec = tween(
                 durationMillis = 1500,
                 easing = {
