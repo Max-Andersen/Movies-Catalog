@@ -1,6 +1,7 @@
 package com.example.moviecatalog.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import com.example.moviecatalog.mainScreen.movieData.Review
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
@@ -20,13 +21,13 @@ val NearBlack = Color(0xFF150D0B)
 
 val SystemColor = Color(0x4D000000)
 
-
 val Gray = Color(0xFFB7B7B7)
 val GrayFaded = Color(0xFFD1D1D1)
 val BottomSideColor = Color(0xFF1C1A19)
 
 val DescriptionColor = Color(0xFFB3B3B3)
 val GenresColor = Color(0xFFE7E7E7)
+val ReviewColor = Color(0xFF282828)
 
 val DarkGrey = Color(0xFF3E3836)
 val DarkRed = Color(0xFF4C1908)

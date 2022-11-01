@@ -5,10 +5,9 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.TopAppBar
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -131,14 +130,110 @@ fun DataDescriptionText(text: String) {
     )
 }
 
+@Composable
+fun setStar(number: Int, amount: MutableState<Int>) {
+    Image(
+        painter = painterResource(id = if (amount.value >= number) R.drawable.full_star else R.drawable.star),
+        contentDescription = null,
+        modifier = Modifier
+            .clickable { amount.value = number }
+            .size(24.dp)
+    )
+}
 
-@OptIn(ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Body(scroll: ScrollState, movieData: MovieDetails) {
-    val configuration = LocalConfiguration.current
+    val openReviewDialog = remember {
+        mutableStateOf(false)
+    }
 
-    val screenHeight = configuration.screenHeightDp.dp
-    val screenWidth = configuration.screenWidthDp.dp
+    val reviewText = remember {
+        mutableStateOf("")
+    }
+
+    val starAmount = remember {
+        mutableStateOf(0)
+    }
+
+    if (openReviewDialog.value) {
+        AlertDialog(
+            onDismissRequest = { openReviewDialog.value = false },
+            title = {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "Оставить отзыв",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        for (i in 1..10) {
+                            setStar(number = i, amount = starAmount)
+                        }
+                    }
+                    Spacer(modifier = Modifier.size(16.dp))
+                    TextField(
+                        value = reviewText.value,
+                        onValueChange = { newText -> reviewText.value = newText },
+                        modifier = Modifier
+                            .background(
+                                MaterialTheme.colorScheme.onPrimary,
+                                RoundedCornerShape(8.dp)
+                            )
+                            .height(120.dp)
+                            .fillMaxWidth(),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                            textColor = MaterialTheme.colorScheme.background
+                        ),
+                        placeholder = {
+                            Text(
+                                text = "Некий текст",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.background
+                            )
+                        }
+                    )
+                    Spacer(modifier = Modifier.size(16.dp))
+
+                    Button(
+                        onClick = { openReviewDialog.value = false }, // TODO(сохранение)
+                        modifier = Modifier
+                            .background(
+                                MaterialTheme.colorScheme.primary,
+                                RoundedCornerShape(4.dp)
+                            )
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Сохранить",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+
+                    TextButton(
+                        onClick = { openReviewDialog.value = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Отмена",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                }
+
+            },
+            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+            buttons = { }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -270,7 +365,8 @@ private fun Body(scroll: ScrollState, movieData: MovieDetails) {
                     )
                     Image(
                         painter = painterResource(id = R.drawable.plus),
-                        contentDescription = null
+                        contentDescription = null,
+                        modifier = Modifier.clickable { openReviewDialog.value = true }
                     )
                 }
 

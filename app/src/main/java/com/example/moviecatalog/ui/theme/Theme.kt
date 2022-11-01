@@ -30,7 +30,8 @@ private val MyColorScheme = darkColorScheme(
     onBackground = BottomSideColor,
     surface = SystemColor,
     onSurface = DescriptionColor,
-    onSurfaceVariant = GenresColor
+    onSurfaceVariant = GenresColor,
+    surfaceVariant = ReviewColor
 )
 
 @Composable
