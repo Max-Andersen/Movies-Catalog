@@ -15,7 +15,7 @@ class MainScreenViewModel : ViewModel() {
     val counter = 0
     private val movieRepository = MovieRepository()
 
-    val movies: Flow<PagingData<MoviePreView>> = Pager(PagingConfig(pageSize = 5)) {
+    val movies: Flow<PagingData<MoviePreView>> = Pager(PagingConfig(pageSize = 6)) {
         MovieSource(movieRepository)
     }.flow
 

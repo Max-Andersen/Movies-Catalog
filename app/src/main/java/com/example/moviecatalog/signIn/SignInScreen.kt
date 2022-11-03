@@ -1,5 +1,6 @@
 package com.example.moviecatalog.signIn
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -14,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -25,16 +27,42 @@ import com.example.moviecatalog.R
 import com.example.moviecatalog.SetOutlinedTextField
 import com.example.moviecatalog.getTextInputColorTheme
 import com.example.moviecatalog.isAllTextFieldsFull
+import com.example.moviecatalog.network.Auth.LoginRequestBody
+import com.example.moviecatalog.repository.AccountRepository
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @ExperimentalFoundationApi
 @ExperimentalMaterial3Api
 @Composable
 fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavController) {
+
+    val repository = AccountRepository()
+    val context = LocalContext.current
+//    LaunchedEffect(key1 = true) {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            repository.loggin(LoginRequestBody(username = "antoshaa", password = "1235545")).collect { token ->
+//                println("-----------------")
+//                token.onSuccess {
+//                    println(it.token)
+//                }.onFailure {
+//                    println(it.message.toString())
+//                }
+//                println("-----------------")
+//            }
+//        }
+//    }
+
+
     MovieCatalogTheme {
         val login = remember { mutableStateOf("") }
         val password = remember { mutableStateOf("") }
+        val coroutineScope = rememberCoroutineScope()
+
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background,
@@ -68,7 +96,10 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
 
                     Spacer(modifier = Modifier.size(14.dp))
 
-                    SetOutlinedTextField(variable = password, stringResource(id = R.string.password))
+                    SetOutlinedTextField(
+                        variable = password,
+                        stringResource(id = R.string.password)
+                    )
                 }
 
                 Column(
@@ -87,11 +118,39 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
 
                     OutlinedButton(
                         onClick = {
-                            if (model.signInButtonPressed(
+                            coroutineScope.launch(Dispatchers.IO){
+                                val answer = model.signInButtonPressed(
                                     login,
                                     password
-                                ) == "Success"
-                            ) navController.navigate("mainScreen"){popUpTo(navController.graph.id)}
+                                )
+                                if (answer.first == 1) {
+                                    println("Success")
+                                    launch(Dispatchers.Main) {
+                                        Toast.makeText(
+                                            context,
+                                            answer.second,
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                        navController.navigate("mainScreen") {
+                                            popUpTo(
+                                                navController.graph.id
+                                            )
+                                        } }
+
+                                }
+                                else {
+                                    println("Fail")
+                                    launch(Dispatchers.Main) {
+                                        Toast.makeText(
+                                            context,
+                                            answer.second,
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                }
+                            }
+
+
                         }, // TODO( обработка ответа)
                         enabled = isAllTextFieldsFull(login, password),
                         modifier = Modifier
@@ -128,7 +187,7 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                     }
 
                     TextButton(
-                        onClick = { navController.navigate("sign-up")},
+                        onClick = { navController.navigate("sign-up") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(40.dp),

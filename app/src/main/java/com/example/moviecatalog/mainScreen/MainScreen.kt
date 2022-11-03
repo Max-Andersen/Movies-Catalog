@@ -174,7 +174,7 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                                         var value =
                                             1 - (state.layoutInfo.normalizedItemPosition(movie.id).absoluteValue * 0.04F)
                                         value = if (value < 0.9f) 0.9f else value
-                                        alpha = value
+                                        //alpha = value
                                         scaleX = value
                                         scaleY = value
                                     },

@@ -69,6 +69,6 @@ class MovieRepository {
         anotherFilm.genres = mutableListOf("драма", "криминал")
 
 
-        return mutableListOf(anotherFilm, anotherFilm, newFilm, newFilm, newFilm)
+        return mutableListOf(anotherFilm, anotherFilm, newFilm, newFilm, newFilm, anotherFilm)
     }
 }

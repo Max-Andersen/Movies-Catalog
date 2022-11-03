@@ -55,7 +55,7 @@ class SignUpViewModel : ViewModel() {
         }
 
         return if (resultMessage.isEmpty()){
-            accountRepository.Regiser(login.value, name.value, password.value, email.value, dateOfBirthday.value, gender.value)
+            accountRepository.register(login.value, name.value, password.value, email.value, dateOfBirthday.value, gender.value)
             //""  //token
         } else{
             Toast.makeText(context, "Ответ от валидирующих котиков:$resultMessage", Toast.LENGTH_LONG).show()

@@ -131,7 +131,7 @@ fun DataDescriptionText(text: String) {
 }
 
 @Composable
-fun setStar(number: Int, amount: MutableState<Int>) {
+fun SetStar(number: Int, amount: MutableState<Int>) {
     Image(
         painter = painterResource(id = if (amount.value >= number) R.drawable.full_star else R.drawable.star),
         contentDescription = null,
@@ -172,7 +172,7 @@ private fun Body(scroll: ScrollState, movieData: MovieDetails) {
                         horizontalArrangement = Arrangement.spacedBy(3.dp)
                     ) {
                         for (i in 1..10) {
-                            setStar(number = i, amount = starAmount)
+                            SetStar(number = i, amount = starAmount)
                         }
                     }
                     Spacer(modifier = Modifier.size(16.dp))
