@@ -1,24 +1,14 @@
 package com.example.moviecatalog.repository
 
-import android.util.Log
 import com.example.moviecatalog.network.Auth.AuthApi
 import com.example.moviecatalog.network.Auth.LoginRequestBody
-import com.example.moviecatalog.network.Auth.RegisterRequestBody
 import com.example.moviecatalog.network.Network
-import com.example.moviecatalog.network.TokenResponse
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonParser
+import com.example.moviecatalog.network.Auth.TokenResponse
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import kotlin.reflect.typeOf
 
 class AccountRepository {
 
@@ -54,8 +44,8 @@ class AccountRepository {
             Network.token = tokenData.toString()
             emit(Result.success(tokenData) )
         }
-        catch (a: java.lang.Exception){
-            emit(Result.failure(a))
+        catch (e: java.lang.Exception){
+            emit(Result.failure(e))
         }
 
     }.flowOn(Dispatchers.IO)

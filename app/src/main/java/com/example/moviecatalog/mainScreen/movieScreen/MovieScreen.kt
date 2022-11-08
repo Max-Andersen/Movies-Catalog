@@ -1,6 +1,7 @@
 package com.example.moviecatalog.mainScreen.movieScreen
 
-
+import com.example.moviecatalog.network.Movie.MovieDetailsResponse
+import com.example.moviecatalog.mainScreen.movieData.ReviewsDetails
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -13,45 +14,52 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.booleanResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.moviecatalog.R
-import com.example.moviecatalog.mainScreen.movieData.MovieDetails
-import com.example.moviecatalog.mainScreen.movieData.Review
-import com.example.moviecatalog.repository.MovieRepository
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.google.accompanist.flowlayout.SizeMode
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
-fun MovieScreen(filmId: String, navController: NavController) {
-
+fun MovieScreen(
+    filmId: String,
+    navController: NavController,
+    model: MovieScreenViewModel = viewModel()
+) {
+    LaunchedEffect(key1 = 1) {
+        CoroutineScope(Dispatchers.IO).launch {
+            model.loadMovieDetails(filmId)
+        }
+    }
     MovieCatalogTheme {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            FilmContent(navController = navController, filmId)
+            if (model.movieData.poster != "") {
+                FilmContent(navController, filmId, model.movieData)
+            }
+
         }
     }
 }
@@ -68,14 +76,11 @@ private const val titleFontScaleStart = 1f
 private const val titleFontScaleEnd = 0.66f
 
 @Composable
-fun FilmContent(navController: NavController, filmId: String) {
+fun FilmContent(navController: NavController, filmId: String, movieData: MovieDetailsResponse) {
     val scroll: ScrollState = rememberScrollState(0)
 
     val headerHeightPx = with(LocalDensity.current) { headerHeight.toPx() }
     val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.toPx() }
-
-    val movieRepository = MovieRepository()
-    val movieData = movieRepository.loadMovieDetails(filmId)
 
     Box(
         modifier = Modifier
@@ -92,7 +97,11 @@ fun FilmContent(navController: NavController, filmId: String) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-private fun ImageHeader(scroll: ScrollState, headerHeightPx: Float, movieData: MovieDetails) {
+private fun ImageHeader(
+    scroll: ScrollState,
+    headerHeightPx: Float,
+    movieData: MovieDetailsResponse
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -141,9 +150,23 @@ fun SetStar(number: Int, amount: MutableState<Int>) {
     )
 }
 
+fun separatedNumber(number: Int): String{
+    var result = ""
+    val x = number.toString()
+    var index = 1
+    for (char in x.reversed()){
+        result += char
+        if (index % 3 == 0 && index != x.length){
+            result += " "
+        }
+        index++
+    }
+    return result.reversed()
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Body(scroll: ScrollState, movieData: MovieDetails) {
+private fun Body(scroll: ScrollState, movieData: MovieDetailsResponse) {
     val openReviewDialog = remember {
         mutableStateOf(false)
     }
@@ -264,10 +287,10 @@ private fun Body(scroll: ScrollState, movieData: MovieDetails) {
 
                 Spacer(modifier = Modifier.size(1.dp))
 
-                if (movieData.year != "") {
+                if (movieData.year != 0) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         AboutFilmDescriptionText(text = stringResource(id = R.string.year))
-                        DataDescriptionText(text = movieData.year)
+                        DataDescriptionText(text = movieData.year.toString())
                     }
                 }
                 if (movieData.country != "") {
@@ -297,13 +320,13 @@ private fun Body(scroll: ScrollState, movieData: MovieDetails) {
                 if (movieData.budget != 0) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         AboutFilmDescriptionText(text = stringResource(id = R.string.budget))
-                        DataDescriptionText(text = "\$${movieData.budget}")
+                        DataDescriptionText(text = "\$${separatedNumber(movieData.budget)}")
                     }
                 }
                 if (movieData.fees != 0) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         AboutFilmDescriptionText(text = stringResource(id = R.string.fees))
-                        DataDescriptionText(text = "\$${movieData.fees}")
+                        DataDescriptionText(text = "\$${separatedNumber(movieData.fees)}")
                     }
                 }
                 if (movieData.ageLimit != 0) {
@@ -382,7 +405,7 @@ private fun Body(scroll: ScrollState, movieData: MovieDetails) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ReviewBox(review: Review) {
+fun ReviewBox(review: ReviewsDetails) {
     Box(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
@@ -390,34 +413,43 @@ fun ReviewBox(review: Review) {
             .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(8.dp))
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+                val (avatar, author, rating) = createRefs()
                 GlideImage(
-                    model = review.avatar,
+                    model = if (review.author.avatar == null || review.author.avatar == "") R.drawable.empty_profile_photo else review.author.avatar,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(60.dp)
-                        .padding(8.dp)
+                        .size(40.dp)
                         .clip(CircleShape)
+                        .constrainAs(avatar) {
+                            top.linkTo(parent.top, 8.dp)
+                            start.linkTo(parent.start, 8.dp)
+                        }
                 )
-                Spacer(modifier = Modifier.size(8.dp))
-                Column {
+                Column(modifier = Modifier.constrainAs(author) {
+                    start.linkTo(parent.start, 56.dp)
+                    top.linkTo(parent.top, 8.dp)
+                }) {
                     Text(
-                        text = if (!review.isAnonymous) review.nickName else stringResource(id = R.string.anonymous),
+                        text = if (!review.isAnonymous) review.author.nickName else stringResource(
+                            id = R.string.anonymous
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimary,
+                    )
 
-                        )
+                    //TODO(Надпись "Мой отзыв")
                 }
                 Box(
                     modifier = Modifier
-                        .padding(end = 8.dp, start = 220.dp)
                         .background(
                             MaterialTheme.colorScheme.primary,
                             RoundedCornerShape(16.dp)
                         )
+                        .constrainAs(rating) {
+                            top.linkTo(parent.top, 14.dp)
+                            end.linkTo(parent.end, 8.dp)
+                        }
                 ) {
                     Text(
                         text = review.rating.toString(),
@@ -432,6 +464,9 @@ fun ReviewBox(review: Review) {
                     )
                 }
             }
+
+
+
             Text(
                 text = review.reviewText,
                 style = MaterialTheme.typography.bodySmall,
@@ -439,7 +474,9 @@ fun ReviewBox(review: Review) {
                 modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp)
             )
             Text(
-                text = review.createDateTime,
+                text = review.createDateTime.slice(8..9) + "." + review.createDateTime.slice(5..6) + "." + review.createDateTime.slice(
+                    0..3
+                ),
                 color = MaterialTheme.colorScheme.secondary,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 8.dp)
@@ -461,7 +498,7 @@ private fun Toolbar(
 
     val half = headerHeightPx / 4f
     val position = if (scroll.value > half) (scroll.value - half) / (half * 2.5f) else 0f
-    println("$position  $half")
+
     TopAppBar(
         modifier = Modifier.height(80.dp),
         backgroundColor = Color.Transparent,
@@ -507,7 +544,7 @@ fun Title(
     scroll: ScrollState,
     headerHeightPx: Float,
     toolbarHeightPx: Float,
-    movieData: MovieDetails
+    movieData: MovieDetailsResponse
 ) {
     var titleHeightPx by remember { mutableStateOf(0f) }
     val titleHeightDp = with(LocalDensity.current) { titleHeightPx.toDp() }
@@ -519,6 +556,8 @@ fun Title(
             .graphicsLayer {
                 val collapseRange: Float = (headerHeightPx - toolbarHeightPx)
                 val collapseFraction: Float = (scroll.value / collapseRange).coerceIn(0f, 1f)
+                //val titleExtraStartPadding = titleWidthPx.toDp() * (1 - scaleXY.value) / 2
+
                 val titleY = lerp(
                     headerHeight - titleHeightDp - paddingMedium, // start Y
                     toolbarHeight / 1.15f - titleHeightDp / 2f, // end Y
@@ -536,6 +575,8 @@ fun Title(
                     titleFontScaleEnd.dp,
                     collapseFraction
                 )
+
+
 
                 translationY = titleY.toPx()
                 translationX = titleX.toPx()

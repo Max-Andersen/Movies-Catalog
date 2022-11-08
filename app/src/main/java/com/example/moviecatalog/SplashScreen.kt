@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
+import com.example.moviecatalog.network.Network
 import kotlinx.coroutines.delay
 
 @Composable
@@ -35,9 +36,19 @@ fun SplashScreen(navController: NavController) {
         )
 
         delay(1500L)
-        navController.navigate("sign-In") {
-            popUpTo(navController.graph.id)
+
+        if (Network.token != ""){
+            navController.navigate("mainScreen") {
+                popUpTo(navController.graph.id)
+            }
         }
+        else{
+            navController.navigate("sign-In") {
+                popUpTo(navController.graph.id)
+            }
+        }
+
+
     }
 
     Box(

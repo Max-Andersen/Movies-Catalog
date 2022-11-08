@@ -1,5 +1,6 @@
 package com.example.moviecatalog.mainScreen
 
+import com.example.moviecatalog.mainScreen.movieData.Movies
 import androidx.lifecycle.ViewModel
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -10,28 +11,13 @@ import com.example.moviecatalog.mainScreen.movieData.MovieSource
 import com.example.moviecatalog.repository.MovieRepository
 import kotlinx.coroutines.flow.Flow
 
-class MainScreenViewModel : ViewModel() {
+class MainScreenViewModel() : ViewModel() {
 
-    val counter = 0
-    private val movieRepository = MovieRepository()
+    private val movieRepository: MovieRepository = MovieRepository()
 
-    val movies: Flow<PagingData<MoviePreView>> = Pager(PagingConfig(pageSize = 6)) {
+    val movies: Flow<PagingData<Movies>> = Pager(PagingConfig(pageSize = 6)) {
         MovieSource(movieRepository)
     }.flow
-
-    fun getMovie() {
-        //movieRepository.loadPageOfMovies(1)
-    }
-
-    fun getPreView(): MoviePreView {
-        val newMovie = MoviePreView()
-        newMovie.name = "Люцифер"
-        newMovie.country = "США"
-        newMovie.TEMP_IMG = R.drawable.lucifer
-        newMovie.year = "2022"
-        newMovie.genres = mutableListOf("ЭКШОН", "ПИПЕЦ КРУТО!")
-        return newMovie
-    }
 
     fun getFavouriteMovies(): List<MoviePreView> {
 
@@ -53,5 +39,4 @@ class MainScreenViewModel : ViewModel() {
 
         return movies
     }
-
 }

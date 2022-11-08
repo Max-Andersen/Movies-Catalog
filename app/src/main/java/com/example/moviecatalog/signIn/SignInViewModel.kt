@@ -28,11 +28,11 @@ class SignInViewModel : ViewModel() {
             token.onSuccess {
                 answer = it.token
                 success = 1
-                Log.d("ВСЁ КРУТО!!!!!!!!!!!", answer)
+                //Log.d("ВСЁ КРУТО!!!!!!!!!!!", answer)
 
             }.onFailure {
                 answer = it.message.toString()
-                Log.d("/////////", it.message.toString())
+                //Log.d("/////////", it.message.toString())
             }
         }
 

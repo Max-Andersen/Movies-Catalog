@@ -1,9 +1,10 @@
 package com.example.moviecatalog.mainScreen
 
+import com.example.moviecatalog.mainScreen.movieData.Movies
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,17 +18,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
 import com.example.moviecatalog.R
-import com.example.moviecatalog.mainScreen.movieData.MoviePreView
 import com.example.moviecatalog.normalizedItemPosition
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlin.math.absoluteValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.take
+import androidx.paging.compose.items
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import kotlinx.coroutines.launch
 
 @Composable
@@ -58,10 +57,17 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                     state = listState,
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background)
+                        .background(MaterialTheme.colorScheme.background),
+                    contentPadding = PaddingValues(
+                        bottom = 100.dp,
+                    ),
                 ) {
                     item {
-                        if (superLazyMovieItems.itemCount > 0){ PromotedFilm(navController, superLazyMovieItems[0]!!)}
+                        if (superLazyMovieItems.itemCount > 0) {
+                            PromotedFilm(navController, superLazyMovieItems[0]!!)
+
+                        }
+                        Log.d("WWWWWWWWW", superLazyMovieItems.itemCount.toString())
                     }
                     item { Spacer(modifier = Modifier.size(10.dp)) }
 
@@ -104,9 +110,10 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
 }
 
 
-
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PromotedFilm(navController: NavController, movie: MoviePreView) {
+fun PromotedFilm(navController: NavController, movie: Movies) {
+    Log.d("WWWWWWWWW", "ЗАШЁЛ")
     MovieCatalogTheme {
         Surface(
             modifier = Modifier
@@ -114,20 +121,18 @@ fun PromotedFilm(navController: NavController, movie: MoviePreView) {
                 .height(320.dp)
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
-                Image(
-                    painter = painterResource(id = movie.TEMP_IMG),
-                    contentDescription = null,
+                GlideImage(
+                    model = movie.poster, contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize(),
                     contentScale = ContentScale.Crop,
                 )
                 Button(
-                    onClick = { navController.navigate("movie/1") },
+                    onClick = { navController.navigate("movie/${movie.id}") },
                     modifier = Modifier
                         .padding(
                             start = LocalConfiguration.current.screenWidthDp.dp / 3,
                             end = LocalConfiguration.current.screenWidthDp.dp / 3,
-                            //bottom = 63.dp,
                             top = 249.dp
                         )
                         .size(160.dp, 44.dp),
@@ -137,7 +142,10 @@ fun PromotedFilm(navController: NavController, movie: MoviePreView) {
                     ),
                     shape = RoundedCornerShape(4.dp)
                 ) {
-                    Text(stringResource(id = R.string.watch), style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        stringResource(id = R.string.watch),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         }
@@ -212,49 +220,70 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun GalleryMovie(navController: NavController, movie: MoviePreView) {
-
+fun GalleryMovie(navController: NavController, movie: Movies?) {
     Surface(modifier = Modifier
         .fillMaxWidth()
         .padding(start = 16.dp, top = 16.dp)
         .height(144.dp)
         .background(MaterialTheme.colorScheme.background)
-        .clickable { navController.navigate("movie/1") }) {
+        .clickable {
+            if (movie != null) {
+                navController.navigate("movie/${movie.id}")
+            }
+        }) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
 
         ) {
-            Image(
-                painter = painterResource(id = movie.TEMP_IMG),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(120.dp, 172.dp),
-                contentScale = ContentScale.FillHeight
-
-            )
+            if (movie != null) {
+                GlideImage(
+                    model = movie.poster, contentDescription = null,
+                    modifier = Modifier
+                        .size(120.dp, 172.dp),
+                    contentScale = ContentScale.FillHeight
+                )
+            }
+//            Image(
+//                painter = painterResource(id = movie.TEMP_IMG),
+//                contentDescription = null,
+//                modifier = Modifier
+//                    .size(120.dp, 172.dp),
+//                contentScale = ContentScale.FillHeight
+//
+//            )
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(start = 16.dp)
             ) {
-                Text(
-                    text = movie.name,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                Text(
-                    text = "${movie.year} • ${movie.country}",
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = movie.genres.joinToString(),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                if (movie != null) {
+                    val genres = mutableListOf<String>()
+
+                    for (i in movie.genres) {
+                        genres.add(i.name)
+                    }
+
+                    Text(
+                        text = movie.name,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                    Text(
+                        text = "${movie.year} • ${movie.country}",
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Text(
+                        text = genres.joinToString(),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
             }
         }
     }

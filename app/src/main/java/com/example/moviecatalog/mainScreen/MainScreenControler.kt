@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -47,14 +48,14 @@ fun MainScreenController(externalNavController: NavController) {
                                 },
                                 label = {
                                     Text(
-                                        barItem.title,
+                                        stringResource(id = barItem.title) ,
                                         color = if (currentRoute == barItem.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
                                     )
                                 },
                                 icon = {
                                     Icon(
                                         imageVector = ImageVector.vectorResource(id = barItem.image),
-                                        contentDescription = barItem.title,
+                                        contentDescription = stringResource(id = barItem.title),
                                         tint = if (currentRoute == barItem.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
                                     )
                                 })

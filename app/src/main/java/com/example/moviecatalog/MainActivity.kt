@@ -46,7 +46,6 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(navController = navController, startDestination = "splashScreen") {
                         composable("splashScreen") { SplashScreen(navController = navController) }
-                        composable("tokenCheck") { TODO() }
                         composable("sign-In") { SignInScreen(navController = navController) }
                         composable("sign-Up") { SignUpScreen(navController = navController) }
                         composable("mainScreen") { MainScreenController(navController) }
@@ -57,10 +56,8 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-
                 }
             }
-
         }
     }
 }

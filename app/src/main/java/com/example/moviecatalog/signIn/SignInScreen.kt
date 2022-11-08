@@ -126,11 +126,11 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                                 if (answer.first == 1) {
                                     println("Success")
                                     launch(Dispatchers.Main) {
-                                        Toast.makeText(
-                                            context,
-                                            answer.second,
-                                            Toast.LENGTH_LONG
-                                        ).show()
+//                                        Toast.makeText(
+//                                            context,
+//                                            answer.second,
+//                                            Toast.LENGTH_LONG
+//                                        ).show()
                                         navController.navigate("mainScreen") {
                                             popUpTo(
                                                 navController.graph.id

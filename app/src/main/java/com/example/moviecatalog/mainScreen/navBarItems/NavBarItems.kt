@@ -4,7 +4,7 @@ package com.example.moviecatalog.mainScreen.navBarItems
 import com.example.moviecatalog.R
 
 data class BarItem(
-    val title: String,
+    val title: Int,
     val image: Int,
     val route: String
 )
@@ -12,12 +12,12 @@ data class BarItem(
 object NavBarItems {
     val BarItems = listOf(
         BarItem(
-            title = "Главное",
+            title = R.string.main,
             image = R.drawable.main,
             route = "main"
         ),
         BarItem(
-            title = "Профиль",
+            title = R.string.profile,
             image = R.drawable.profile,
             route = "profile"
         ),

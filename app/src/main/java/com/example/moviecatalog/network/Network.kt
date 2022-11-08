@@ -2,6 +2,7 @@ package com.example.moviecatalog.network
 
 
 import com.example.moviecatalog.network.Auth.AuthApi
+import com.example.moviecatalog.network.Movie.MovieApi
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -11,7 +12,7 @@ import java.util.concurrent.TimeUnit
 
 object Network {
 
-    private const val BASE_URL = "https://react-midterm.kreosoft.space/"
+    private const val BASE_URL = "https://react-midterm.kreosoft.space/api/"
     var token = ""
 
     private val json = Json {
@@ -46,5 +47,7 @@ object Network {
     private val retrofit: Retrofit = getRetrofit()
 
     fun getAuthApi(): AuthApi = retrofit.create(AuthApi::class.java)
+
+    fun getMovieApi(): MovieApi = retrofit.create(MovieApi::class.java)
 
 }
