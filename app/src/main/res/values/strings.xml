@@ -47,5 +47,6 @@
     <string name="genres">Genres</string>
     <string name="reviews">Reviews</string>
     <string name="anonymous">Anonymous user</string>
+    <string name="myReview">my review</string>
 
 </resources>

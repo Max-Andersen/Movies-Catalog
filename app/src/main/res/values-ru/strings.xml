@@ -47,5 +47,6 @@
     <string name="genres">Жанры</string>
     <string name="reviews">Отзывы</string>
     <string name="anonymous">Анонимный пользователь</string>
+    <string name="myReview">мой отзыв</string>
 
 </resources>

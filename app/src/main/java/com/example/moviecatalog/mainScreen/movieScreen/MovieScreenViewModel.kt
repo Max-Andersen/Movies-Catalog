@@ -9,10 +9,13 @@ import androidx.lifecycle.ViewModel
 import com.example.moviecatalog.mainScreen.movieData.Movies
 import com.example.moviecatalog.repository.FavoriteMoviesRepository
 import com.example.moviecatalog.repository.MovieRepository
+import com.example.moviecatalog.repository.UserRepository
+import kotlinx.coroutines.flow.collect
 
 class MovieScreenViewModel : ViewModel() {
     private val movieRepository: MovieRepository = MovieRepository()
     private val favoriteMoviesRepository: FavoriteMoviesRepository = FavoriteMoviesRepository()
+    private val userRepository: UserRepository = UserRepository()
 
     var movieData = MovieDetailsResponse(
         "",
@@ -32,6 +35,16 @@ class MovieScreenViewModel : ViewModel() {
     )
 
     var favoriteMovies: MutableList<String> = mutableListOf()
+
+    var myId = ""
+
+    suspend fun getMyId(){
+        userRepository.getData().collect{
+            it.onSuccess { data ->
+                myId = data.id
+            }
+        }
+    }
 
     suspend fun getFavoriteMovies() {
         for (movie in favoriteMoviesRepository.getFavoriteMovies().movies){

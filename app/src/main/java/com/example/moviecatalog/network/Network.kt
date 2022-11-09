@@ -4,12 +4,14 @@ package com.example.moviecatalog.network
 import com.example.moviecatalog.network.Auth.AuthApi
 import com.example.moviecatalog.network.FavoriteMovies.FavoriteMoviesApi
 import com.example.moviecatalog.network.Movie.MovieApi
+import com.example.moviecatalog.network.Review.ReviewApi
 import com.example.moviecatalog.network.User.UserApi
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import java.util.concurrent.TimeUnit
 
 object Network {
@@ -59,5 +61,7 @@ object Network {
     fun getUserApi(): UserApi = retrofit.create(UserApi::class.java)
 
     fun getFavoriteMoviesApi(): FavoriteMoviesApi = retrofit.create(FavoriteMoviesApi::class.java)
+
+    fun getReviewApi(): ReviewApi = retrofit.create(ReviewApi::class.java)
 
 }

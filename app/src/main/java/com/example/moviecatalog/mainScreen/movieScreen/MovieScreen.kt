@@ -32,6 +32,7 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.moviecatalog.R
+import com.example.moviecatalog.mainScreen.movieData.Author
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.MainAxisAlignment
@@ -54,6 +55,7 @@ fun MovieScreen(
         CoroutineScope(Dispatchers.IO).launch {
             model.loadMovieDetails(filmId)
             model.getFavoriteMovies()
+            model.getMyId()
             dataExist.value = true
         }
     }
@@ -102,7 +104,7 @@ fun FilmContent(
                     .background(MaterialTheme.colorScheme.background)
             ) {
                 ImageHeader(scroll, headerHeightPx, movieData)
-                Body(scroll, movieData)
+                Body(scroll, movieData, model)
                 Toolbar(scroll, headerHeightPx, navController, model)
                 Title(scroll, headerHeightPx, toolbarHeightPx, movieData)
 
@@ -183,7 +185,11 @@ fun separatedNumber(number: Int): String {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Body(scroll: ScrollState, movieData: MovieDetailsResponse) {
+private fun Body(
+    scroll: ScrollState,
+    movieData: MovieDetailsResponse,
+    model: MovieScreenViewModel
+) {
     val openReviewDialog = remember {
         mutableStateOf(false)
     }
@@ -410,8 +416,24 @@ private fun Body(scroll: ScrollState, movieData: MovieDetailsResponse) {
                     )
                 }
 
+                var myReview: ReviewsDetails? = null
+
                 for (review in movieData.reviews) {
-                    ReviewBox(review = review)
+                    if (review.author.userId == model.myId){
+                        myReview = review
+                        movieData.reviews.toMutableList().remove(review)
+                        break
+                    }
+                }
+
+                if (myReview != null){
+                    ReviewBox(review = myReview, model = model)
+                }
+
+                for (review in movieData.reviews) {
+                    if (review != myReview){
+                        ReviewBox(review = review, model)
+                    }
                 }
 
                 Spacer(modifier = Modifier.size(180.dp))
@@ -422,7 +444,7 @@ private fun Body(scroll: ScrollState, movieData: MovieDetailsResponse) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ReviewBox(review: ReviewsDetails) {
+fun ReviewBox(review: ReviewsDetails, model: MovieScreenViewModel) {
     Box(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
@@ -455,7 +477,14 @@ fun ReviewBox(review: ReviewsDetails) {
                         color = MaterialTheme.colorScheme.onPrimary,
                     )
 
-                    //TODO(Надпись "Мой отзыв")
+                    if (review.author.userId == model.myId) {
+                        Text(
+                            text = stringResource(id = R.string.myReview),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontSize = 12.sp
+                        )
+                    }
                 }
                 Box(
                     modifier = Modifier
@@ -490,14 +519,46 @@ fun ReviewBox(review: ReviewsDetails) {
                 color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp)
             )
-            Text(
-                text = review.createDateTime.slice(8..9) + "." + review.createDateTime.slice(5..6) + "." + review.createDateTime.slice(
-                    0..3
-                ),
-                color = MaterialTheme.colorScheme.secondary,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 8.dp)
-            )
+
+            ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+                val (date, editButton, deleteButton) = createRefs()
+
+                Text(
+                    text = review.createDateTime.slice(8..9) + "." + review.createDateTime.slice(5..6) + "." + review.createDateTime.slice(
+                        0..3
+                    ),
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 12.sp,
+                    modifier = Modifier.constrainAs(date) {//.padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 8.dp)
+                        start.linkTo(parent.start, 8.dp)
+                        bottom.linkTo(parent.bottom, 8.dp)
+                    }
+                )
+
+                if (review.author.userId == model.myId) {
+                    Image(
+                        painter = painterResource(id = R.drawable.delete),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .constrainAs(deleteButton) {
+                                end.linkTo(parent.end, 8.dp)
+                                bottom.linkTo(parent.bottom, 8.dp)
+                            }
+                            .clickable { }  //TODO()
+                    )
+                    Image(
+                        painter = painterResource(id = R.drawable.edit),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .constrainAs(editButton) {
+                                end.linkTo(deleteButton.start, 8.dp)
+                                bottom.linkTo(parent.bottom, 8.dp)
+                            }
+                            .clickable { }   //TODO()
+                    )
+                }
+            }
+
 
         }
     }
@@ -543,10 +604,9 @@ private fun Toolbar(
                         .padding(top = 40.dp, bottom = 16.dp, end = 16.dp)
                         .clickable {
                             CoroutineScope(Dispatchers.IO).launch {
-                                if (isFavorite.value){
+                                if (isFavorite.value) {
                                     model.deleteFromFavorite(model.movieData.id)
-                                }
-                                else{
+                                } else {
                                     model.addToFavorite(model.movieData.id)
                                 }
                                 isFavorite.value = !isFavorite.value
