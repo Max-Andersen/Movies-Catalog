@@ -53,6 +53,7 @@ fun MovieScreen(
     LaunchedEffect(key1 = 1) {
         CoroutineScope(Dispatchers.IO).launch {
             model.loadMovieDetails(filmId)
+            model.getFavoriteMovies()
             dataExist.value = true
         }
     }
@@ -64,7 +65,7 @@ fun MovieScreen(
                 .background(MaterialTheme.colorScheme.background)
         ) {
             if (dataExist.value) {
-                FilmContent(navController, model.movieData)
+                FilmContent(navController, model.movieData, model)
             }
             Log.d("data--->", model.movieData.poster.isNotBlank().toString())
         }
@@ -83,7 +84,11 @@ private const val titleFontScaleStart = 1f
 private const val titleFontScaleEnd = 0.66f
 
 @Composable
-fun FilmContent(navController: NavController, movieData: MovieDetailsResponse?) {
+fun FilmContent(
+    navController: NavController,
+    movieData: MovieDetailsResponse?,
+    model: MovieScreenViewModel
+) {
     val scroll: ScrollState = rememberScrollState(0)
 
     val headerHeightPx = with(LocalDensity.current) { headerHeight.toPx() }
@@ -98,7 +103,7 @@ fun FilmContent(navController: NavController, movieData: MovieDetailsResponse?) 
             ) {
                 ImageHeader(scroll, headerHeightPx, movieData)
                 Body(scroll, movieData)
-                Toolbar(scroll, headerHeightPx, navController)
+                Toolbar(scroll, headerHeightPx, navController, model)
                 Title(scroll, headerHeightPx, toolbarHeightPx, movieData)
 
             }
@@ -162,13 +167,13 @@ fun SetStar(number: Int, amount: MutableState<Int>) {
     )
 }
 
-fun separatedNumber(number: Int): String{
+fun separatedNumber(number: Int): String {
     var result = ""
     val x = number.toString()
     var index = 1
-    for (char in x.reversed()){
+    for (char in x.reversed()) {
         result += char
-        if (index % 3 == 0 && index != x.length){
+        if (index % 3 == 0 && index != x.length) {
             result += " "
         }
         index++
@@ -428,7 +433,7 @@ fun ReviewBox(review: ReviewsDetails) {
             ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
                 val (avatar, author, rating) = createRefs()
                 GlideImage(
-                    model = if (review.author.avatar == null || review.author.avatar == "") R.drawable.empty_profile_photo else review.author.avatar,
+                    model = if (review.author == null) R.drawable.empty_profile_photo else (if (review.author.avatar == null || review.author.avatar == "") R.drawable.empty_profile_photo else review.author.avatar),
                     contentDescription = null,
                     modifier = Modifier
                         .size(40.dp)
@@ -502,10 +507,11 @@ fun ReviewBox(review: ReviewsDetails) {
 private fun Toolbar(
     scroll: ScrollState,
     headerHeightPx: Float,
-    navController: NavController
+    navController: NavController,
+    model: MovieScreenViewModel
 ) {
     val isFavorite = remember {
-        mutableStateOf(false)
+        mutableStateOf(model.movieData.id in model.favoriteMovies)
     }
 
     val half = headerHeightPx / 4f
@@ -535,7 +541,18 @@ private fun Toolbar(
                     contentDescription = null,
                     modifier = Modifier
                         .padding(top = 40.dp, bottom = 16.dp, end = 16.dp)
-                        .clickable { isFavorite.value = !isFavorite.value }
+                        .clickable {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                if (isFavorite.value){
+                                    model.deleteFromFavorite(model.movieData.id)
+                                }
+                                else{
+                                    model.addToFavorite(model.movieData.id)
+                                }
+                                isFavorite.value = !isFavorite.value
+                            }
+
+                        }
                 )
             }
             Image(

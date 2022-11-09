@@ -7,6 +7,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.moviecatalog.network.Auth.RegisterRequestBody
+import com.example.moviecatalog.network.Network
 import com.example.moviecatalog.repository.AuthRepository
 import com.example.moviecatalog.repository.UserRepository
 import java.util.*
@@ -109,7 +110,7 @@ class ProfileViewModel() : ViewModel() {
         if (resultMessage.isEmpty()) {
             userRepository.putData(
                 UserDataResponse(
-                    id = "",
+                    id = Network.userId,
                     nickName = nickname,
                     email = enteredEmail.value,
                     avatarLink = enteredAvatarLink.value,
@@ -125,4 +126,7 @@ class ProfileViewModel() : ViewModel() {
         return answer
     }
 
+    suspend fun logout(){
+        authRepository.logout()
+    }
 }

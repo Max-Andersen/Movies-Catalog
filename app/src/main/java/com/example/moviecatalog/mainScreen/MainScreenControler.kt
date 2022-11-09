@@ -99,7 +99,7 @@ fun MainScreenController(externalNavController: NavController) {
 
                 NavHost(navController = navController, startDestination = "main") {
                     composable("main") { MainScreen(externalNavController) }
-                    composable("profile") { ProfileScreen() }
+                    composable("profile") { ProfileScreen(externalNavController) }
                 }
             }
         }

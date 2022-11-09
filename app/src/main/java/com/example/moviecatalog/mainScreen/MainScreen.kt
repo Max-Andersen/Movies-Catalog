@@ -1,5 +1,6 @@
 package com.example.moviecatalog.mainScreen
 
+import ListOfMovies
 import com.example.moviecatalog.mainScreen.movieData.Movies
 import android.util.Log
 import androidx.compose.foundation.*
@@ -24,10 +25,12 @@ import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlin.math.absoluteValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.paging.compose.items
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.moviecatalog.mainScreen.movieData.Genres
 import com.example.moviecatalog.mainScreen.movieData.Reviews
 import kotlinx.coroutines.launch
 
@@ -153,11 +156,27 @@ fun PromotedFilm(navController: NavController, movie: Movies) {
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun Favorite(navController: NavController, model: MainScreenViewModel) {
-    val movies = model.getFavouriteMovies()
 
-    if (movies.isNotEmpty()) {
+    val dataExist = remember {
+        mutableStateOf(false)
+    }
+
+    var favorites: List<Movies> = model.favoriteMovies
+
+    LaunchedEffect(key1 = true) {
+        model.getFavoriteMovies()
+        favorites = model.favoriteMovies              //TODO(Проверка на то, что пользователь жив....)
+        Log.e("LIST", favorites.toString())
+        //if (favorites.isNotEmpty()) dataExist.value = true
+    }
+
+    if (favorites.isNotEmpty()) {
+        Log.d("Size  INSIDE", favorites.size.toString())
+        Log.d("INSIDE", favorites.toString())
+
         MovieCatalogTheme {
             Surface(modifier = Modifier.height(212.dp)) {
                 Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -175,7 +194,7 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                             end = 180.dp,
                         ),
                     ) {
-                        items(movies, key = { it.id }) { movie ->
+                        items(favorites, key = { it.id }) { movie ->
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -188,18 +207,27 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                                         scaleY = value
                                     },
                             ) {
-                                Image(
-                                    painter = painterResource(id = movie.TEMP_IMG), //TODO()
-                                    contentDescription = null,
+                                GlideImage(model = movie.poster, contentDescription = null,
                                     modifier = Modifier
                                         .size(120.dp, 172.dp)
                                         .background(MaterialTheme.colorScheme.background)
-                                        .clickable { navController.navigate("movie/1") }
+                                        .clickable { navController.navigate("movie/${movie.id}") }
                                         .clip(
                                             RoundedCornerShape(8.dp)
                                         ),
-                                    contentScale = ContentScale.FillHeight,
-                                )
+                                    contentScale = ContentScale.FillHeight,)
+//                                Image(
+//                                    painter = painterResource(id = movie.TEMP_IMG), //TODO()
+//                                    contentDescription = null,
+//                                    modifier = Modifier
+//                                        .size(120.dp, 172.dp)
+//                                        .background(MaterialTheme.colorScheme.background)
+//                                        .clickable { navController.navigate("movie/1") }
+//                                        .clip(
+//                                            RoundedCornerShape(8.dp)
+//                                        ),
+//                                    contentScale = ContentScale.FillHeight,
+//                                )
                                 Image(
                                     painter = painterResource(id = R.drawable.close_button),
                                     contentDescription = null,
@@ -210,7 +238,9 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                                             end = 4.dp,
                                             bottom = 156.dp
                                         )
-                                        .clickable { } // TODO(удаление из избранного)
+                                        .clickable {
+
+                                        } // TODO(удаление из избранного)
                                 )
                             }
                         }
@@ -257,10 +287,12 @@ fun GalleryMovie(navController: NavController, movie: Movies) {
             )
 
 
-            ConstraintLayout(modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 16.dp)) {
-                val (title, about, genresList) = createRefs()
+            ConstraintLayout(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 16.dp)
+            ) {
+                val (title, about, genresList, rating) = createRefs()
 
                 val genres = mutableListOf<String>()
 
@@ -272,17 +304,18 @@ fun GalleryMovie(navController: NavController, movie: Movies) {
                     text = movie.name,
                     color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.constrainAs(title){
+                    modifier = Modifier.constrainAs(title) {
                         start.linkTo(parent.start)
                         top.linkTo(parent.top)
-                    }
+                    },
+                    fontSize = if (movie.name.length > 25) 15.sp else 20.sp
 
                 )
                 Text(
                     text = "${movie.year} • ${movie.country}",
                     color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.constrainAs(about){
+                    modifier = Modifier.constrainAs(about) {
                         start.linkTo(parent.start)
                         top.linkTo(title.bottom)
                     }
@@ -291,25 +324,36 @@ fun GalleryMovie(navController: NavController, movie: Movies) {
                     text = genres.joinToString(),
                     color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.constrainAs(genresList){
+                    modifier = Modifier.constrainAs(genresList) {
                         start.linkTo(parent.start)
                         top.linkTo(about.bottom)
                     }
                 )
 
+                Box(
+                    modifier = Modifier
+                        .background(
+                            MaterialTheme.colorScheme.primary,
+                            RoundedCornerShape(16.dp)
+                        )
+                        .constrainAs(rating) {
+                            start.linkTo(parent.start)
+                            bottom.linkTo(parent.bottom)
+                        }
+                ) {
+                    Text(
+                        text = calculateRating(movie.reviews),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 4.dp,
+                            bottom = 4.dp
+                        )
+                    )
+                }
             }
-
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(start = 16.dp)
-//            ) {
-//
-//
-//
-//
-//
-//            }
         }
     }
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.moviecatalog.ChoseGender
@@ -33,7 +34,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ProfileScreen(model: ProfileViewModel = viewModel()) {
+fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewModel(), ) {
     val email = remember {
         mutableStateOf("")
     }
@@ -50,7 +51,7 @@ fun ProfileScreen(model: ProfileViewModel = viewModel()) {
         mutableStateOf("")
     }
 
-    var currentName = remember {
+    val currentName = remember {
         mutableStateOf("")
     }
 
@@ -173,7 +174,16 @@ fun ProfileScreen(model: ProfileViewModel = viewModel()) {
                 }
 
                 TextButton(
-                    onClick = { },  //TODO(logout)
+                    onClick = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            model.logout()
+                            launch(Dispatchers.Main) {
+                                navController.navigate("sign-In"){
+                                    popUpTo(navController.graph.id)
+                                }
+                            }
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(40.dp),
