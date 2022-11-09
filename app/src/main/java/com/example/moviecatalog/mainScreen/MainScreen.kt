@@ -24,9 +24,11 @@ import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlin.math.absoluteValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.paging.compose.items
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.moviecatalog.mainScreen.movieData.Reviews
 import kotlinx.coroutines.launch
 
 @Composable
@@ -67,7 +69,7 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                             PromotedFilm(navController, superLazyMovieItems[0]!!)
 
                         }
-                        Log.d("WWWWWWWWW", superLazyMovieItems.itemCount.toString())
+                        Log.d("available movie count", superLazyMovieItems.itemCount.toString())
                     }
                     item { Spacer(modifier = Modifier.size(10.dp)) }
 
@@ -113,7 +115,6 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun PromotedFilm(navController: NavController, movie: Movies) {
-    Log.d("WWWWWWWWW", "ЗАШЁЛ")
     MovieCatalogTheme {
         Surface(
             modifier = Modifier
@@ -220,9 +221,17 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
     }
 }
 
+fun calculateRating(reviews: List<Reviews>): String {
+    var summ = 0f
+    for (review in reviews) {
+        summ += review.rating
+    }
+    return String.format("%.1f", summ / reviews.size)
+}
+
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun GalleryMovie(navController: NavController, movie: Movies?) {
+fun GalleryMovie(navController: NavController, movie: Movies) {
     Surface(modifier = Modifier
         .fillMaxWidth()
         .padding(start = 16.dp, top = 16.dp)
@@ -239,52 +248,68 @@ fun GalleryMovie(navController: NavController, movie: Movies?) {
                 .background(MaterialTheme.colorScheme.background)
 
         ) {
-            if (movie != null) {
-                GlideImage(
-                    model = movie.poster, contentDescription = null,
-                    modifier = Modifier
-                        .size(120.dp, 172.dp),
-                    contentScale = ContentScale.FillHeight
-                )
-            }
-//            Image(
-//                painter = painterResource(id = movie.TEMP_IMG),
-//                contentDescription = null,
-//                modifier = Modifier
-//                    .size(120.dp, 172.dp),
-//                contentScale = ContentScale.FillHeight
-//
-//            )
-            Column(
+
+            GlideImage(
+                model = movie.poster, contentDescription = null,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 16.dp)
-            ) {
-                if (movie != null) {
-                    val genres = mutableListOf<String>()
+                    .size(120.dp, 172.dp),
+                contentScale = ContentScale.FillHeight
+            )
 
-                    for (i in movie.genres) {
-                        genres.add(i.name)
-                    }
 
-                    Text(
-                        text = movie.name,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    Text(
-                        text = "${movie.year} • ${movie.country}",
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        text = genres.joinToString(),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.bodySmall
-                    )
+            ConstraintLayout(modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 16.dp)) {
+                val (title, about, genresList) = createRefs()
+
+                val genres = mutableListOf<String>()
+
+                for (i in movie.genres) {
+                    genres.add(i.name)
                 }
 
+                Text(
+                    text = movie.name,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.constrainAs(title){
+                        start.linkTo(parent.start)
+                        top.linkTo(parent.top)
+                    }
+
+                )
+                Text(
+                    text = "${movie.year} • ${movie.country}",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.constrainAs(about){
+                        start.linkTo(parent.start)
+                        top.linkTo(title.bottom)
+                    }
+                )
+                Text(
+                    text = genres.joinToString(),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.constrainAs(genresList){
+                        start.linkTo(parent.start)
+                        top.linkTo(about.bottom)
+                    }
+                )
+
             }
+
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(start = 16.dp)
+//            ) {
+//
+//
+//
+//
+//
+//            }
         }
     }
 }

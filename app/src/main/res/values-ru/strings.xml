@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">Movie catalog</string>
+
+    <string name="test_string">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tempus, sem vitae convallis imperdiet, lectus nunc pharetra diam, ac rhoncus quam eros eu risus. Nulla pulvinar condimentum erat, pulvinar tempus turpis blandit ut. Etiam sed ipsum sed lacus eleifend hendrerit eu quis quam. Etiam ligula eros, finibus vestibulum tortor ac, ultrices accumsan dolor. Vivamus vel nisl a libero lobortis posuere. Aenean facilisis nibh vel ultrices bibendum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse ac est vitae lacus commodo efficitur at ut massa. Etiam vestibulum sit amet sapien sed varius. Aliquam non ipsum imperdiet, pulvinar enim nec, mollis risus. Fusce id tincidunt nisl.</string>
+    <string name="dateOfBirthday">Дата рождения</string>
+    <string name="registration">Регистрация</string>
+    <string name="login">Логин</string>
+    <string name="E_Mail">E-mail</string>
+    <string name="name">Имя</string>
+    <string name="password">Пароль</string>
+    <string name="passwordConfirmation">Подтвердите пароль</string>
+    <string name="register">Зарегистрироваться</string>
+    <string name="iHaveAccountAlready">У меня уже есть аккаунт</string>
+    <string name="male">Мужчина</string>
+    <string name="female">Женщина</string>
+
+
+    <string name="invalidMail">Неверная почта!</string> <!-- TODO(привязать к viewModel)   !-->
+    <string name="invalidPassword">Пароли не совпадают!</string>
+    <string name="invalidDateOfBirthday">Дата рождения должна быть меньше текущего дня!</string>
+    <string name="validationAnswer">Ответ от валидирующих котиков:</string>
+
+
+    <string name="enter">Войти</string>
+    <string name="gallery">Галерея</string>
+    <string name="watch">Смотреть</string>
+    <string name="favourite">Избранное</string>
+    <string name="avatarLink">Ссылка на аватарку</string>
+    <string name="gender">Пол</string>
+    <string name="save">Сохранить</string>
+    <string name="logout">Выйти из аккаунта</string>
+    <string name="main">Главное</string>
+    <string name="profile">Профиль</string>
+    <string name="makeReview">Оставить отзыв</string>
+    <string name="someText">Некий текст</string>
+    <string name="cancel">Отмена</string>
+    <string name="aboutMovie">О фильме</string>
+    <string name="year">Год</string>
+    <string name="country">Страна</string>
+    <string name="time">Время</string>
+    <string name="tagline">Слоган</string>
+    <string name="director">Режисёр</string>
+    <string name="budget">Бюджет</string>
+    <string name="fees">Сборы в мире</string>
+    <string name="ageLimit">Возраст</string>
+    <string name="minutes">мин.</string>
+    <string name="genres">Жанры</string>
+    <string name="reviews">Отзывы</string>
+    <string name="anonymous">Анонимный пользователь</string>
+
+</resources>

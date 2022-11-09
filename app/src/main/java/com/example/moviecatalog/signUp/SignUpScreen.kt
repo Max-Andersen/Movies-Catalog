@@ -2,6 +2,7 @@ package com.example.moviecatalog.signUp
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,13 +15,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -31,6 +30,9 @@ import androidx.navigation.NavController
 import com.example.moviecatalog.ChoseGender
 import com.example.moviecatalog.SetOutlinedTextField
 import com.example.moviecatalog.isAllTextFieldsFull
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 
@@ -54,7 +56,9 @@ fun DatePickerView(date: MutableState<String>) {
         context,
         R.style.datepicker,
         { _: DatePicker, mYear: Int, mMonth: Int, dayOfMonth: Int ->
-            if (dayOfMonth < 10) date.value = "0$dayOfMonth.${mMonth + 1}.$mYear"
+            if (dayOfMonth < 10 && mMonth < 9) date.value = "0$dayOfMonth.0${mMonth + 1}.$mYear"
+            else if (dayOfMonth < 10) date.value = "0$dayOfMonth.${mMonth + 1}.$mYear"
+            else if (mMonth < 9) date.value = "$dayOfMonth.0${mMonth + 1}.$mYear"
             else date.value = "$dayOfMonth.${mMonth + 1}.$mYear"
         }, year, month, day
     )
@@ -167,7 +171,10 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                 SetOutlinedTextField(email, stringResource(id = R.string.E_Mail))
                 SetOutlinedTextField(name, stringResource(id = R.string.name))
                 SetOutlinedTextField(password, stringResource(id = R.string.password))
-                SetOutlinedTextField(passwordConfirmation, stringResource(id = R.string.passwordConfirmation))
+                SetOutlinedTextField(
+                    passwordConfirmation,
+                    stringResource(id = R.string.passwordConfirmation)
+                )
 
                 DatePickerView(dateOfBirthday)
 
@@ -178,8 +185,8 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                 val context = LocalContext.current
                 OutlinedButton(
                     onClick = {
-                        println(
-                            model.Register(
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val answer = model.register(
                                 login,
                                 email,
                                 name,
@@ -189,7 +196,22 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                                 gender,
                                 context
                             )
-                        )
+
+                            launch(Dispatchers.Main){
+                                if (answer.first == 1) {
+                                    navController.navigate("mainScreen") {
+                                        popUpTo(
+                                            navController.graph.id
+                                        )
+                                    }
+                                }
+                                else{
+                                    Toast.makeText(context, "Ответ от валидирующих котиков:${answer.second}", Toast.LENGTH_LONG).show()
+                                }
+                            }
+
+
+                        }
                     },
                     enabled = allTextsFull,
                     modifier = Modifier

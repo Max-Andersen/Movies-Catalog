@@ -1,5 +1,6 @@
 package com.example.moviecatalog.mainScreen.movieScreen
 
+import android.util.Log
 import com.example.moviecatalog.network.Movie.MovieDetailsResponse
 import com.example.moviecatalog.mainScreen.movieData.ReviewsDetails
 import androidx.compose.foundation.*
@@ -45,21 +46,27 @@ fun MovieScreen(
     navController: NavController,
     model: MovieScreenViewModel = viewModel()
 ) {
+    val dataExist = remember {
+        mutableStateOf(false)
+    }
+
     LaunchedEffect(key1 = 1) {
         CoroutineScope(Dispatchers.IO).launch {
             model.loadMovieDetails(filmId)
+            dataExist.value = true
         }
     }
+
     MovieCatalogTheme {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            if (model.movieData.poster != "") {
-                FilmContent(navController, filmId, model.movieData)
+            if (dataExist.value) {
+                FilmContent(navController, model.movieData)
             }
-
+            Log.d("data--->", model.movieData.poster.isNotBlank().toString())
         }
     }
 }
@@ -76,23 +83,28 @@ private const val titleFontScaleStart = 1f
 private const val titleFontScaleEnd = 0.66f
 
 @Composable
-fun FilmContent(navController: NavController, filmId: String, movieData: MovieDetailsResponse) {
+fun FilmContent(navController: NavController, movieData: MovieDetailsResponse?) {
     val scroll: ScrollState = rememberScrollState(0)
 
     val headerHeightPx = with(LocalDensity.current) { headerHeight.toPx() }
     val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.toPx() }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        ImageHeader(scroll, headerHeightPx, movieData)
-        Body(scroll, movieData)
-        Toolbar(scroll, headerHeightPx, navController)
-        Title(scroll, headerHeightPx, toolbarHeightPx, movieData)
+    if (movieData != null) {
+        if (movieData.poster != "") {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                ImageHeader(scroll, headerHeightPx, movieData)
+                Body(scroll, movieData)
+                Toolbar(scroll, headerHeightPx, navController)
+                Title(scroll, headerHeightPx, toolbarHeightPx, movieData)
 
+            }
+        }
     }
+
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)

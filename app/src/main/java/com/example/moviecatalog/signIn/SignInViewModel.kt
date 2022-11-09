@@ -1,15 +1,12 @@
 package com.example.moviecatalog.signIn
 
-import android.util.Log
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import com.example.moviecatalog.network.Auth.LoginRequestBody
-import com.example.moviecatalog.repository.AccountRepository
-import kotlinx.coroutines.*
+import com.example.moviecatalog.repository.AuthRepository
 
 class SignInViewModel : ViewModel() {
-    private val accountRepository = AccountRepository()
+    private val authRepository = AuthRepository()
 
     suspend fun signInButtonPressed(
         login: MutableState<String>,
@@ -19,7 +16,7 @@ class SignInViewModel : ViewModel() {
         var success = 0
         var answer = ""
 
-        accountRepository.loggin(
+        authRepository.login(
             LoginRequestBody(
                 username = login.value,
                 password = password.value
@@ -28,11 +25,9 @@ class SignInViewModel : ViewModel() {
             token.onSuccess {
                 answer = it.token
                 success = 1
-                //Log.d("ВСЁ КРУТО!!!!!!!!!!!", answer)
 
             }.onFailure {
                 answer = it.message.toString()
-                //Log.d("/////////", it.message.toString())
             }
         }
 

@@ -22,17 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.example.moviecatalog.R
 import com.example.moviecatalog.SetOutlinedTextField
-import com.example.moviecatalog.getTextInputColorTheme
 import com.example.moviecatalog.isAllTextFieldsFull
-import com.example.moviecatalog.network.Auth.LoginRequestBody
-import com.example.moviecatalog.repository.AccountRepository
+import com.example.moviecatalog.repository.AuthRepository
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -41,7 +36,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavController) {
 
-    val repository = AccountRepository()
+    val repository = AuthRepository()
     val context = LocalContext.current
 //    LaunchedEffect(key1 = true) {
 //        CoroutineScope(Dispatchers.IO).launch {
@@ -126,11 +121,6 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                                 if (answer.first == 1) {
                                     println("Success")
                                     launch(Dispatchers.Main) {
-//                                        Toast.makeText(
-//                                            context,
-//                                            answer.second,
-//                                            Toast.LENGTH_LONG
-//                                        ).show()
                                         navController.navigate("mainScreen") {
                                             popUpTo(
                                                 navController.graph.id

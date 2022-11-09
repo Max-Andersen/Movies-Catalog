@@ -1,5 +1,6 @@
 package com.example.moviecatalog
 
+import android.util.Log
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -16,11 +17,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
+import com.example.moviecatalog.mainScreen.profileScreen.ProfileScreen
 import com.example.moviecatalog.network.Network
+import com.example.moviecatalog.repository.UserRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @Composable
 fun SplashScreen(navController: NavController) {
+    val userRepository: UserRepository = UserRepository()
+
     val scale = remember {
         Animatable(0f)
     }
@@ -36,19 +45,24 @@ fun SplashScreen(navController: NavController) {
         )
 
         delay(1500L)
-
-        if (Network.token != ""){
-            navController.navigate("mainScreen") {
-                popUpTo(navController.graph.id)
+        CoroutineScope(Dispatchers.IO).launch {
+            val data = userRepository.getData().collect{
+                if (it.isSuccess){
+                    launch(Dispatchers.Main) {
+                        navController.navigate("mainScreen") {
+                            popUpTo(navController.graph.id)
+                        }
+                    }
+                }
+                else{
+                    launch(Dispatchers.Main) {
+                        navController.navigate("sign-In") {
+                            popUpTo(navController.graph.id)
+                        }
+                    }
+                }
             }
         }
-        else{
-            navController.navigate("sign-In") {
-                popUpTo(navController.graph.id)
-            }
-        }
-
-
     }
 
     Box(

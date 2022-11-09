@@ -1,5 +1,6 @@
 package com.example.moviecatalog.mainScreen.profileScreen
 
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ButtonDefaults
@@ -9,26 +10,61 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.moviecatalog.ChoseGender
 import com.example.moviecatalog.R
 import com.example.moviecatalog.SetOutlinedTextField
-import com.example.moviecatalog.mainScreen.profileScreen.ProfileViewModel
+import com.example.moviecatalog.isAllTextFieldsFull
 import com.example.moviecatalog.signUp.DatePickerView
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ProfileScreen(model: ProfileViewModel = viewModel()) {
+    val email = remember {
+        mutableStateOf("")
+    }
+    val avatarLink = remember {
+        mutableStateOf("")
+    }
+    val name = remember {
+        mutableStateOf("")
+    }
+    val dateOfBirthday = remember {
+        mutableStateOf("")
+    }
+    val gender = remember {
+        mutableStateOf("")
+    }
+
+    var currentName = remember {
+        mutableStateOf("")
+    }
+
+    val allFieldsFull = isAllTextFieldsFull(email, name, dateOfBirthday, gender)
+
+    LaunchedEffect(key1 = true) {
+        model.getInformation()
+        email.value = model.email
+        avatarLink.value = model.avatarLink
+        name.value = model.name
+        dateOfBirthday.value = model.dateOfBirthday
+        gender.value = model.gender.toString()
+        currentName.value = model.name
+    }
     MovieCatalogTheme {
         Surface(
             modifier = Modifier
@@ -36,23 +72,6 @@ fun ProfileScreen(model: ProfileViewModel = viewModel()) {
                 .fillMaxSize()
 
         ) {
-            val email = remember {
-                mutableStateOf("")
-            }
-            val avatarLink = remember {
-                mutableStateOf("")
-            }
-            val name = remember {
-                mutableStateOf("")
-            }
-            val dateOfBirthday = remember {
-                mutableStateOf("")
-            }
-            val gender = remember {
-                mutableStateOf("")
-            }
-
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -65,52 +84,90 @@ fun ProfileScreen(model: ProfileViewModel = viewModel()) {
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.empty_profile_photo),
+                    GlideImage(
+                        model = if (avatarLink.value == "") R.drawable.empty_profile_photo else avatarLink.value,
                         contentDescription = null
                     )
                     Text(
-                        text = "Test",
+                        text = currentName.value,
                         style = MaterialTheme.typography.headlineLarge,
                     )
                 }
 
-                Text(text = stringResource(id = R.string.E_Mail), style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = stringResource(id = R.string.E_Mail),
+                    style = MaterialTheme.typography.bodyMedium
+                )
                 SetOutlinedTextField(variable = email, name = "E-Mail")
 
-                Text(text = stringResource(id = R.string.avatarLink), style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = stringResource(id = R.string.avatarLink),
+                    style = MaterialTheme.typography.bodyMedium
+                )
                 SetOutlinedTextField(variable = avatarLink, name = "url")
 
-                Text(text = stringResource(id = R.string.name), style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = stringResource(id = R.string.name),
+                    style = MaterialTheme.typography.bodyMedium
+                )
                 SetOutlinedTextField(variable = name, name = "Имя(name)")
 
-                Text(text = stringResource(id = R.string.dateOfBirthday), style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = stringResource(id = R.string.dateOfBirthday),
+                    style = MaterialTheme.typography.bodyMedium
+                )
                 DatePickerView(date = dateOfBirthday)
 
-                Text(text = stringResource(id = R.string.gender), style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = stringResource(id = R.string.gender),
+                    style = MaterialTheme.typography.bodyMedium
+                )
                 ChoseGender(model = model, gender = gender)
 
                 Spacer(modifier = Modifier.size(10.dp))
 
                 val context = LocalContext.current
                 OutlinedButton(
-                    onClick = { },  //TODO(валидация + отправка на сервер)
+                    onClick = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val answer = model.putInformation(
+                                email,
+                                avatarLink,
+                                name,
+                                dateOfBirthday,
+                                gender
+                            )
+                            if (answer.isNotEmpty()) {
+                                launch(Dispatchers.Main) {
+                                    Toast.makeText(
+                                        context,
+                                        "Ответ от валидирующих котиков:${answer}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(53.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        backgroundColor = MaterialTheme.colorScheme.primary,
+                        backgroundColor = if (allFieldsFull) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.background,
                         contentColor = MaterialTheme.colorScheme.primary,
                         disabledContentColor = MaterialTheme.colorScheme.background
                     ),
                     border = BorderStroke(
-                        1.dp, MaterialTheme.colorScheme.primary
-                    )
+                        1.dp, if (allFieldsFull) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSecondary
+                    ),
+                    enabled = allFieldsFull
 
                 ) {
                     Text(
                         text = stringResource(id = R.string.save),
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        color = if (allFieldsFull) MaterialTheme.colorScheme.onPrimary
+                        else MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }

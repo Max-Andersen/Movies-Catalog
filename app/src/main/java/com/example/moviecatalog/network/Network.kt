@@ -3,6 +3,7 @@ package com.example.moviecatalog.network
 
 import com.example.moviecatalog.network.Auth.AuthApi
 import com.example.moviecatalog.network.Movie.MovieApi
+import com.example.moviecatalog.network.User.UserApi
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -13,7 +14,11 @@ import java.util.concurrent.TimeUnit
 object Network {
 
     private const val BASE_URL = "https://react-midterm.kreosoft.space/api/"
+
+    //private const val BASE_URL = "https://6e71-5-165-213-157.in.ngrok.io/api/"
+
     var token = ""
+    var userId = ""
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -25,9 +30,8 @@ object Network {
             connectTimeout(15, TimeUnit.SECONDS)
             readTimeout(60, TimeUnit.SECONDS)
             writeTimeout(60, TimeUnit.SECONDS)
-
+            addInterceptor(TokenInterceptor())
             // Authenticator не понадобится
-
             val logLevel = HttpLoggingInterceptor.Level.BODY
             addInterceptor(HttpLoggingInterceptor().setLevel(logLevel ))
         }
@@ -40,6 +44,7 @@ object Network {
             .addConverterFactory(
                 GsonConverterFactory.create()
             )
+
             .client(getHttpClient())
             .build()
     }
@@ -49,5 +54,7 @@ object Network {
     fun getAuthApi(): AuthApi = retrofit.create(AuthApi::class.java)
 
     fun getMovieApi(): MovieApi = retrofit.create(MovieApi::class.java)
+
+    fun getUserApi(): UserApi = retrofit.create(UserApi::class.java)
 
 }

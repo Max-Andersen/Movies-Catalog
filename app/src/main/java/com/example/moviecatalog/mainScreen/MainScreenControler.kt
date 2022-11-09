@@ -20,6 +20,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.moviecatalog.mainScreen.navBarItems.NavBarItems
 import com.example.moviecatalog.mainScreen.profileScreen.ProfileScreen
+import com.example.moviecatalog.repository.UserRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +35,8 @@ fun MainScreenController(externalNavController: NavController) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
+    val userRepository = UserRepository()
+
     MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             Scaffold(
@@ -41,14 +47,39 @@ fun MainScreenController(externalNavController: NavController) {
                                 selected = currentRoute == barItem.route,
                                 modifier = Modifier.background(MaterialTheme.colorScheme.onBackground),
                                 onClick = {
-                                    navController.navigate(barItem.route) {
-                                        popUpTo(navController.graph.startDestinationId)
-                                        launchSingleTop = true
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        if (barItem.route == "profile") {
+                                            userRepository.getData().collect {
+
+                                                launch(Dispatchers.Main) {
+                                                    if (it.isSuccess) {
+                                                        navController.navigate("profile") {
+                                                            popUpTo(navController.graph.startDestinationId)
+                                                            launchSingleTop = true
+                                                        }
+                                                    } else {
+                                                        externalNavController.navigate("sign-In") {
+                                                            popUpTo(navController.graph.startDestinationId)
+                                                        }
+                                                    }
+
+                                                }
+
+                                            }
+                                        } else {
+                                            launch(Dispatchers.Main) {
+                                                navController.navigate(barItem.route) {
+                                                    popUpTo(navController.graph.startDestinationId)
+                                                    launchSingleTop = true
+                                                }
+                                            }
+
+                                        }
                                     }
                                 },
                                 label = {
                                     Text(
-                                        stringResource(id = barItem.title) ,
+                                        stringResource(id = barItem.title),
                                         color = if (currentRoute == barItem.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
                                     )
                                 },

@@ -36,7 +36,7 @@ fun SetOutlinedTextField(variable: MutableState<String>, name: String){
     var passwordVisible by remember { mutableStateOf(false) }
     val textInputColorTheme = getTextInputColorTheme()
 
-    if(name in setOf("Пароль", "Подтвердите пароль") ){
+    if(name in setOf(stringResource(id = R.string.password), stringResource(id = R.string.passwordConfirmation)) ){
         OutlinedTextField(
             value = variable.value,
             onValueChange = {newText -> variable.value = newText} ,
@@ -103,7 +103,7 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>) {
         ) {
 
             OutlinedButton(
-                onClick = { model.ChangeGerder(gender, "0") },
+                onClick = { model.changeGender(gender, "0") },
                 colors = ButtonDefaults.outlinedButtonColors(
                     backgroundColor = if (gender.value == "0") MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
@@ -129,7 +129,7 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>) {
             }
 
             OutlinedButton(
-                onClick = { model.ChangeGerder(gender, "1") },
+                onClick = { model.changeGender(gender, "1") },
                 colors = ButtonDefaults.outlinedButtonColors(
                     backgroundColor = if (gender.value == "1") MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
@@ -170,7 +170,7 @@ fun ChoseGender(model: ProfileViewModel, gender: MutableState<String>) {
         ) {
 
             OutlinedButton(
-                onClick = { model.ChangeGerder(gender, "0") },
+                onClick = { model.changeGender(gender, "0") },
                 colors = ButtonDefaults.outlinedButtonColors(
                     backgroundColor = if (gender.value == "0") MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
@@ -196,7 +196,7 @@ fun ChoseGender(model: ProfileViewModel, gender: MutableState<String>) {
             }
 
             OutlinedButton(
-                onClick = { model.ChangeGerder(gender, "1") },
+                onClick = { model.changeGender(gender, "1") },
                 colors = ButtonDefaults.outlinedButtonColors(
                     backgroundColor = if (gender.value == "1") MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
