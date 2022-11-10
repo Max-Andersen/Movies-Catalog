@@ -45,6 +45,8 @@ class AuthRepository {
     fun logout() {
         CoroutineScope(Dispatchers.IO).launch{
             api.logout()
+            Network.token = ""
+            Network.userId = ""
         }
     }
 }

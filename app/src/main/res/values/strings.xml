@@ -48,5 +48,6 @@
     <string name="reviews">Reviews</string>
     <string name="anonymous">Anonymous user</string>
     <string name="myReview">my review</string>
+    <string name="anonymousReview">Anonymous review</string>
 
 </resources>

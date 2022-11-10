@@ -24,25 +24,9 @@ class MainScreenViewModel() : ViewModel() {
 
     suspend fun getFavoriteMovies() {
         favoriteMovies = favoriteMoviesRepository.getFavoriteMovies().movies
-        //return favoriteMovieRepository.getFavoriteMovies()
+    }
 
-
-//        val newMovie = MoviePreView()
-//        newMovie.id = "0"
-//        newMovie.name = "Люцифер"
-//        newMovie.country = "США"
-//        newMovie.TEMP_IMG = R.drawable.the_magicians
-//        newMovie.year = "2022"
-//        newMovie.genres = mutableListOf("ЭКШОН", "ПИПЕЦ КРУТО!")
-//
-//        val movies = mutableListOf(newMovie)
-//
-//        movies.add(newMovie.copy(id="1"))
-//        movies.add(newMovie.copy(id="2"))
-//        movies.add(newMovie.copy(id="3"))
-//        movies.add(newMovie.copy(id="4"))
-//        movies.add(newMovie.copy(id="5"))
-
-       // return movies
+    suspend fun deleteFromFavoriteMovies(movieId: String){
+        favoriteMoviesRepository.deleteFromFavorites(movieId)
     }
 }

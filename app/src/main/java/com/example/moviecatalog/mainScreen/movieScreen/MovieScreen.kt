@@ -56,6 +56,7 @@ fun MovieScreen(
             model.loadMovieDetails(filmId)
             model.getFavoriteMovies()
             model.getMyId()
+            model.getMyReview()
             dataExist.value = true
         }
     }
@@ -69,7 +70,6 @@ fun MovieScreen(
             if (dataExist.value) {
                 FilmContent(navController, model.movieData, model)
             }
-            Log.d("data--->", model.movieData.poster.isNotBlank().toString())
         }
     }
 }
@@ -97,19 +97,18 @@ fun FilmContent(
     val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.toPx() }
 
     if (movieData != null) {
-        if (movieData.poster != "") {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-            ) {
-                ImageHeader(scroll, headerHeightPx, movieData)
-                Body(scroll, movieData, model)
-                Toolbar(scroll, headerHeightPx, navController, model)
-                Title(scroll, headerHeightPx, toolbarHeightPx, movieData)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            ImageHeader(scroll, headerHeightPx, movieData)
+            Body(scroll, movieData, model)
+            Toolbar(scroll, headerHeightPx, navController, model)
+            Title(scroll, headerHeightPx, toolbarHeightPx, movieData)
 
-            }
         }
+
     }
 
 }
@@ -194,6 +193,10 @@ private fun Body(
         mutableStateOf(false)
     }
 
+    val isAnonymous = remember {
+        mutableStateOf(false)
+    }
+
     val reviewText = remember {
         mutableStateOf("")
     }
@@ -203,6 +206,12 @@ private fun Body(
     }
 
     if (openReviewDialog.value) {
+        if (model.myReview != null) {
+            reviewText.value = model.myReview!!.reviewText
+            starAmount.value = model.myReview!!.rating
+            isAnonymous.value = model.myReview!!.isAnonymous
+        }
+
         AlertDialog(
             onDismissRequest = { openReviewDialog.value = false },
             title = {
@@ -244,10 +253,66 @@ private fun Body(
                             )
                         }
                     )
+
+                    Spacer(modifier = Modifier.size(16.dp))
+
+                    ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+                        val (anonymousText, checkBox) = createRefs()
+
+                        Text(
+                            text = stringResource(id = R.string.anonymousReview),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.constrainAs(anonymousText) {
+                                start.linkTo(parent.start)
+                            }
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .constrainAs(checkBox) {
+                                    end.linkTo(parent.end)
+                                }
+                                .clickable {
+                                    isAnonymous.value = !isAnonymous.value
+                                }
+                        ) {
+                            Image(
+                                painter = painterResource(id = if (isAnonymous.value) R.drawable.full_checkbox else R.drawable.empty_checkbox),
+                                contentDescription = null
+                            )
+                        }
+
+                    }
+
+
                     Spacer(modifier = Modifier.size(16.dp))
 
                     Button(
-                        onClick = { openReviewDialog.value = false }, // TODO(сохранение)
+                        onClick = {
+                            openReviewDialog.value = false
+                            CoroutineScope(Dispatchers.IO).launch {
+                                if (model.myReview != null) {
+                                    model.editReview(
+                                        model.movieData!!.id,
+                                        reviewText.value,
+                                        starAmount.value,
+                                        isAnonymous.value,
+                                        model.myReview!!.id
+                                    )
+                                } else {
+                                    model.addReview(
+                                        model.movieData!!.id,
+                                        reviewText.value,
+                                        starAmount.value,
+                                        isAnonymous.value
+                                    )
+                                }
+                                // TODO(обновление в live режиме)
+                                model.getMyReview()
+                            }
+                        },
                         modifier = Modifier
                             .background(
                                 MaterialTheme.colorScheme.primary,
@@ -263,7 +328,9 @@ private fun Body(
                     }
 
                     TextButton(
-                        onClick = { openReviewDialog.value = false },
+                        onClick = {
+                            openReviewDialog.value = false
+                        },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
@@ -416,22 +483,18 @@ private fun Body(
                     )
                 }
 
-                var myReview: ReviewsDetails? = null
+//                for (review in movieData.reviews) {
+//                    if (review.author.userId == model.myId) {
+//                        model.myReview = review
+//                        movieData.reviews.toMutableList().remove(review)
+//                        break
+//                    }
+//                }
+
+                model.myReview?.let { ReviewBox(review = it, model = model, openReviewDialog) }
 
                 for (review in movieData.reviews) {
-                    if (review.author.userId == model.myId){
-                        myReview = review
-                        movieData.reviews.toMutableList().remove(review)
-                        break
-                    }
-                }
-
-                if (myReview != null){
-                    ReviewBox(review = myReview, model = model)
-                }
-
-                for (review in movieData.reviews) {
-                    if (review != myReview){
+                    if (review != model.myReview) {
                         ReviewBox(review = review, model)
                     }
                 }
@@ -444,7 +507,11 @@ private fun Body(
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ReviewBox(review: ReviewsDetails, model: MovieScreenViewModel) {
+fun ReviewBox(
+    review: ReviewsDetails,
+    model: MovieScreenViewModel,
+    openReviewDialog: MutableState<Boolean>? = null
+) {
     Box(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
@@ -476,15 +543,17 @@ fun ReviewBox(review: ReviewsDetails, model: MovieScreenViewModel) {
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimary,
                     )
-
-                    if (review.author.userId == model.myId) {
-                        Text(
-                            text = stringResource(id = R.string.myReview),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 12.sp
-                        )
+                    if (review.author != null){
+                        if (review.author.userId == model.myId) {
+                            Text(
+                                text = stringResource(id = R.string.myReview),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.secondary,
+                                fontSize = 12.sp
+                            )
+                        }
                     }
+
                 }
                 Box(
                     modifier = Modifier
@@ -535,31 +604,40 @@ fun ReviewBox(review: ReviewsDetails, model: MovieScreenViewModel) {
                     }
                 )
 
-                if (review.author.userId == model.myId) {
-                    Image(
-                        painter = painterResource(id = R.drawable.delete),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .constrainAs(deleteButton) {
-                                end.linkTo(parent.end, 8.dp)
-                                bottom.linkTo(parent.bottom, 8.dp)
-                            }
-                            .clickable { }  //TODO()
-                    )
-                    Image(
-                        painter = painterResource(id = R.drawable.edit),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .constrainAs(editButton) {
-                                end.linkTo(deleteButton.start, 8.dp)
-                                bottom.linkTo(parent.bottom, 8.dp)
-                            }
-                            .clickable { }   //TODO()
-                    )
+                if (review.author != null){
+                    if (review.author.userId == model.myId) {
+                        Image(
+                            painter = painterResource(id = R.drawable.delete),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .constrainAs(deleteButton) {
+                                    end.linkTo(parent.end, 8.dp)
+                                    bottom.linkTo(parent.bottom, 8.dp)
+                                }
+                                .clickable {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        model.deleteReview(model.movieData!!.id, model.myReview!!.id)
+                                        model.getMyReview()
+                                    }
+                                }
+                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.edit),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .constrainAs(editButton) {
+                                    end.linkTo(deleteButton.start, 8.dp)
+                                    bottom.linkTo(parent.bottom, 8.dp)
+                                }
+                                .clickable {
+                                    if (openReviewDialog != null) {
+                                        openReviewDialog.value = true
+                                    }
+                                }
+                        )
+                    }
                 }
             }
-
-
         }
     }
 }
@@ -572,7 +650,7 @@ private fun Toolbar(
     model: MovieScreenViewModel
 ) {
     val isFavorite = remember {
-        mutableStateOf(model.movieData.id in model.favoriteMovies)
+        mutableStateOf(model.movieData!!.id in model.favoriteMovies)
     }
 
     val half = headerHeightPx / 4f
@@ -605,9 +683,9 @@ private fun Toolbar(
                         .clickable {
                             CoroutineScope(Dispatchers.IO).launch {
                                 if (isFavorite.value) {
-                                    model.deleteFromFavorite(model.movieData.id)
+                                    model.deleteFromFavorite(model.movieData!!.id)
                                 } else {
-                                    model.addToFavorite(model.movieData.id)
+                                    model.addToFavorite(model.movieData!!.id)
                                 }
                                 isFavorite.value = !isFavorite.value
                             }
@@ -678,6 +756,5 @@ fun Title(
                 titleHeightPx = it.size.height.toFloat()
             },
         color = MaterialTheme.colorScheme.onPrimary
-
     )
 }

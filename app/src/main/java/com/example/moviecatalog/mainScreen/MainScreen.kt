@@ -32,6 +32,8 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.moviecatalog.mainScreen.movieData.Genres
 import com.example.moviecatalog.mainScreen.movieData.Reviews
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
@@ -168,7 +170,8 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
 
     LaunchedEffect(key1 = true) {
         model.getFavoriteMovies()
-        favorites = model.favoriteMovies              //TODO(Проверка на то, что пользователь жив....)
+        favorites =
+            model.favoriteMovies              //TODO(Проверка на то, что пользователь жив....)
         Log.e("LIST", favorites.toString())
         //if (favorites.isNotEmpty()) dataExist.value = true
     }
@@ -207,7 +210,8 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                                         scaleY = value
                                     },
                             ) {
-                                GlideImage(model = movie.poster, contentDescription = null,
+                                GlideImage(
+                                    model = movie.poster, contentDescription = null,
                                     modifier = Modifier
                                         .size(120.dp, 172.dp)
                                         .background(MaterialTheme.colorScheme.background)
@@ -215,19 +219,8 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                                         .clip(
                                             RoundedCornerShape(8.dp)
                                         ),
-                                    contentScale = ContentScale.FillHeight,)
-//                                Image(
-//                                    painter = painterResource(id = movie.TEMP_IMG), //TODO()
-//                                    contentDescription = null,
-//                                    modifier = Modifier
-//                                        .size(120.dp, 172.dp)
-//                                        .background(MaterialTheme.colorScheme.background)
-//                                        .clickable { navController.navigate("movie/1") }
-//                                        .clip(
-//                                            RoundedCornerShape(8.dp)
-//                                        ),
-//                                    contentScale = ContentScale.FillHeight,
-//                                )
+                                    contentScale = ContentScale.FillHeight,
+                                )
                                 Image(
                                     painter = painterResource(id = R.drawable.close_button),
                                     contentDescription = null,
@@ -239,8 +232,10 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                                             bottom = 156.dp
                                         )
                                         .clickable {
-
-                                        } // TODO(удаление из избранного)
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                model.deleteFromFavoriteMovies(movie.id)
+                                            }
+                                        }
                                 )
                             }
                         }
