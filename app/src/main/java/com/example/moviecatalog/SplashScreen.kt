@@ -46,20 +46,19 @@ fun SplashScreen(navController: NavController) {
 
         delay(1500L)
         CoroutineScope(Dispatchers.IO).launch {
-            val data = userRepository.getData().collect{
-                if (it.isSuccess){
-                    launch(Dispatchers.Main) {
-                        navController.navigate("mainScreen") {
-                            popUpTo(navController.graph.id)
-                        }
+            if (checkUserAlive()){
+                launch(Dispatchers.Main) {
+                    navController.navigate("mainScreen") {
+                        popUpTo(navController.graph.id)
                     }
                 }
-                else{
-                    launch(Dispatchers.Main) {
-                        navController.navigate("sign-In") {
-                            popUpTo(navController.graph.id)
-                        }
+            }
+            else{
+                launch(Dispatchers.Main) {
+                    navController.navigate("sign-In") {
+                        popUpTo(navController.graph.id)
                     }
+                    clearUserData()
                 }
             }
         }

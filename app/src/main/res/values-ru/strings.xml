@@ -15,7 +15,7 @@
     <string name="female">Женщина</string>
 
 
-    <string name="invalidMail">Неверная почта!</string> <!-- TODO(привязать к viewModel)   !-->
+    <string name="invalidMail">Неверная почта!</string>
     <string name="invalidPassword">Пароли не совпадают!</string>
     <string name="invalidDateOfBirthday">Дата рождения должна быть меньше текущего дня!</string>
     <string name="validationAnswer">Ответ от валидирующих котиков:</string>

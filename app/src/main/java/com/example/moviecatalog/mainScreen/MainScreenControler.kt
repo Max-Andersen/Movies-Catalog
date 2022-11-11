@@ -18,6 +18,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.moviecatalog.checkUserAlive
+import com.example.moviecatalog.clearUserData
 import com.example.moviecatalog.mainScreen.navBarItems.NavBarItems
 import com.example.moviecatalog.mainScreen.profileScreen.ProfileScreen
 import com.example.moviecatalog.repository.UserRepository
@@ -49,20 +51,19 @@ fun MainScreenController(externalNavController: NavController) {
                                 onClick = {
                                     CoroutineScope(Dispatchers.IO).launch {
                                         if (barItem.route == "profile") {
-                                            userRepository.getData().collect {
-
+                                            if (checkUserAlive()) {
                                                 launch(Dispatchers.Main) {
-                                                    if (it.isSuccess) {
-                                                        navController.navigate("profile") {
-                                                            popUpTo(navController.graph.startDestinationId)
-                                                            launchSingleTop = true
-                                                        }
-                                                    } else {
-                                                        externalNavController.navigate("sign-In") {
-                                                            popUpTo(navController.graph.startDestinationId)
-                                                        }
+                                                    navController.navigate("profile") {
+                                                        popUpTo(navController.graph.startDestinationId)
+                                                        launchSingleTop = true
                                                     }
-
+                                                }
+                                            } else {
+                                                launch(Dispatchers.IO) {
+                                                    externalNavController.navigate("sign-In") {
+                                                        popUpTo(navController.graph.startDestinationId)
+                                                    }
+                                                    clearUserData()
                                                 }
 
                                             }
@@ -73,7 +74,6 @@ fun MainScreenController(externalNavController: NavController) {
                                                     launchSingleTop = true
                                                 }
                                             }
-
                                         }
                                     }
                                 },

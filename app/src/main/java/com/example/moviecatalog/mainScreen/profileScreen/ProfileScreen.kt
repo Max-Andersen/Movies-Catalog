@@ -3,6 +3,7 @@ package com.example.moviecatalog.mainScreen.profileScreen
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.TextButton
@@ -15,6 +16,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -22,10 +25,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.example.moviecatalog.ChoseGender
+import com.example.moviecatalog.*
 import com.example.moviecatalog.R
-import com.example.moviecatalog.SetOutlinedTextField
-import com.example.moviecatalog.isAllTextFieldsFull
 import com.example.moviecatalog.signUp.DatePickerView
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlinx.coroutines.CoroutineScope
@@ -77,7 +78,7 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .background(MaterialTheme.colorScheme.background),
+                    .background(MaterialTheme.colorScheme.background),   //mutableStateListOf()
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Row(
@@ -87,7 +88,8 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                 ) {
                     GlideImage(
                         model = if (avatarLink.value == "") R.drawable.empty_profile_photo else avatarLink.value,
-                        contentDescription = null
+                        contentDescription = null,
+                        modifier = Modifier.clip(CircleShape)
                     )
                     Text(
                         text = currentName.value,
@@ -131,20 +133,30 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                 OutlinedButton(
                     onClick = {
                         CoroutineScope(Dispatchers.IO).launch {
-                            val answer = model.putInformation(
-                                email,
-                                avatarLink,
-                                name,
-                                dateOfBirthday,
-                                gender
-                            )
-                            if (answer.isNotEmpty()) {
+                            if (checkUserAlive()){
+                                val answer = model.putInformation(
+                                    email,
+                                    avatarLink,
+                                    name,
+                                    dateOfBirthday,
+                                    gender
+                                )
+                                if (answer.isNotEmpty()) {
+                                    launch(Dispatchers.Main) {
+                                        Toast.makeText(
+                                            context,
+                                            "Ответ от валидирующих котиков:${answer}",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                }
+                            }
+                            else{
                                 launch(Dispatchers.Main) {
-                                    Toast.makeText(
-                                        context,
-                                        "Ответ от валидирующих котиков:${answer}",
-                                        Toast.LENGTH_LONG
-                                    ).show()
+                                    navController.navigate("sign-In"){
+                                        popUpTo(navController.graph.id)
+                                    }
+                                    clearUserData()
                                 }
                             }
                         }
@@ -176,12 +188,25 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                 TextButton(
                     onClick = {
                         CoroutineScope(Dispatchers.IO).launch {
-                            model.logout()
-                            launch(Dispatchers.Main) {
-                                navController.navigate("sign-In"){
-                                    popUpTo(navController.graph.id)
+                            if (checkUserAlive()){
+                                model.logout()
+                                launch(Dispatchers.Main) {
+                                    navController.navigate("sign-In"){
+                                        popUpTo(navController.graph.id)
+                                    }
+                                    clearUserData()
                                 }
                             }
+                            else{
+                                launch(Dispatchers.Main) {
+                                    navController.navigate("sign-In"){
+                                        popUpTo(navController.graph.id)
+                                    }
+                                    clearUserData()
+                                }
+                            }
+
+
                         }
                     },
                     modifier = Modifier

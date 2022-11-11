@@ -1,6 +1,7 @@
 package com.example.moviecatalog.mainScreen.movieScreen
 
 import android.util.Log
+import android.widget.Toast
 import com.example.moviecatalog.network.Movie.MovieDetailsResponse
 import com.example.moviecatalog.mainScreen.movieData.ReviewsDetails
 import androidx.compose.foundation.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,6 +34,9 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.moviecatalog.R
+import com.example.moviecatalog.checkUserAlive
+import com.example.moviecatalog.clearUserData
+import com.example.moviecatalog.mainScreen.calculateColor
 import com.example.moviecatalog.mainScreen.movieData.Author
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import com.google.accompanist.flowlayout.FlowRow
@@ -103,7 +108,7 @@ fun FilmContent(
                 .background(MaterialTheme.colorScheme.background)
         ) {
             ImageHeader(scroll, headerHeightPx, movieData)
-            Body(scroll, movieData, model)
+            Body(scroll, movieData, model, navController)
             Toolbar(scroll, headerHeightPx, navController, model)
             Title(scroll, headerHeightPx, toolbarHeightPx, movieData)
 
@@ -182,12 +187,18 @@ fun separatedNumber(number: Int): String {
     return result.reversed()
 }
 
+fun refreshScreen(navController: NavController, movieId: String){
+    navController.popBackStack()
+    navController.navigate("movie/${movieId}")
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Body(
     scroll: ScrollState,
     movieData: MovieDetailsResponse,
-    model: MovieScreenViewModel
+    model: MovieScreenViewModel,
+    navController: NavController
 ) {
     val openReviewDialog = remember {
         mutableStateOf(false)
@@ -288,27 +299,55 @@ private fun Body(
 
 
                     Spacer(modifier = Modifier.size(16.dp))
-
+                    val context = LocalContext.current
                     Button(
                         onClick = {
                             openReviewDialog.value = false
+
                             CoroutineScope(Dispatchers.IO).launch {
-                                if (model.myReview != null) {
-                                    model.editReview(
-                                        model.movieData!!.id,
-                                        reviewText.value,
-                                        starAmount.value,
-                                        isAnonymous.value,
-                                        model.myReview!!.id
-                                    )
+                                if (checkUserAlive()) {
+                                    if (model.myReview != null) {
+                                        try {
+                                            model.editReview(
+                                                model.movieData!!.id,
+                                                reviewText.value,
+                                                starAmount.value,
+                                                isAnonymous.value,
+                                                model.myReview!!.id
+                                            )
+                                            launch(Dispatchers.Main) {
+                                                refreshScreen(navController, model.movieData!!.id)
+                                            }
+                                        } catch (e: Exception) {
+                                            launch(Dispatchers.Main) {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Косяк api! нельзя изменить отзыв на анонимный!",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            }
+                                        }
+
+                                    } else {
+                                        model.addReview(
+                                            model.movieData!!.id,
+                                            reviewText.value,
+                                            starAmount.value,
+                                            isAnonymous.value
+                                        )
+                                        launch(Dispatchers.Main) {
+                                            refreshScreen(navController, model.movieData!!.id)
+                                        }
+                                    }
                                 } else {
-                                    model.addReview(
-                                        model.movieData!!.id,
-                                        reviewText.value,
-                                        starAmount.value,
-                                        isAnonymous.value
-                                    )
+                                    launch(Dispatchers.Main) {
+                                        navController.navigate("sign-In") {
+                                            popUpTo(navController.graph.id)
+                                        }
+                                        clearUserData()
+                                    }
                                 }
+
                                 // TODO(обновление в live режиме)
                                 model.getMyReview()
                             }
@@ -491,11 +530,18 @@ private fun Body(
 //                    }
 //                }
 
-                model.myReview?.let { ReviewBox(review = it, model = model, openReviewDialog) }
+                model.myReview?.let {
+                    ReviewBox(
+                        review = it,
+                        model = model,
+                        navController,
+                        openReviewDialog
+                    )
+                }
 
                 for (review in movieData.reviews) {
                     if (review != model.myReview) {
-                        ReviewBox(review = review, model)
+                        ReviewBox(review = review, model, navController)
                     }
                 }
 
@@ -510,7 +556,8 @@ private fun Body(
 fun ReviewBox(
     review: ReviewsDetails,
     model: MovieScreenViewModel,
-    openReviewDialog: MutableState<Boolean>? = null
+    navController: NavController,
+    openReviewDialog: MutableState<Boolean>? = null,
 ) {
     Box(
         modifier = Modifier
@@ -530,7 +577,8 @@ fun ReviewBox(
                         .constrainAs(avatar) {
                             top.linkTo(parent.top, 8.dp)
                             start.linkTo(parent.start, 8.dp)
-                        }
+                        },
+                    contentScale = ContentScale.Crop
                 )
                 Column(modifier = Modifier.constrainAs(author) {
                     start.linkTo(parent.start, 56.dp)
@@ -543,7 +591,7 @@ fun ReviewBox(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimary,
                     )
-                    if (review.author != null){
+                    if (review.author != null) {
                         if (review.author.userId == model.myId) {
                             Text(
                                 text = stringResource(id = R.string.myReview),
@@ -558,7 +606,7 @@ fun ReviewBox(
                 Box(
                     modifier = Modifier
                         .background(
-                            MaterialTheme.colorScheme.primary,
+                            calculateColor(review.rating.toFloat()),
                             RoundedCornerShape(16.dp)
                         )
                         .constrainAs(rating) {
@@ -604,7 +652,7 @@ fun ReviewBox(
                     }
                 )
 
-                if (review.author != null){
+                if (review.author != null) {
                     if (review.author.userId == model.myId) {
                         Image(
                             painter = painterResource(id = R.drawable.delete),
@@ -616,8 +664,24 @@ fun ReviewBox(
                                 }
                                 .clickable {
                                     CoroutineScope(Dispatchers.IO).launch {
-                                        model.deleteReview(model.movieData!!.id, model.myReview!!.id)
-                                        model.getMyReview()
+                                        if (checkUserAlive()) {
+                                            model.deleteReview(
+                                                model.movieData!!.id,
+                                                model.myReview!!.id
+                                            )
+                                            model.getMyReview()
+                                            launch(Dispatchers.Main) {
+                                                refreshScreen(navController, model.movieData!!.id)
+                                            }
+                                        } else {
+                                            launch(Dispatchers.Main) {
+                                                navController.navigate("sign-In") {
+                                                    popUpTo(navController.graph.id)
+                                                }
+                                                clearUserData()
+                                            }
+                                        }
+
                                     }
                                 }
                         )

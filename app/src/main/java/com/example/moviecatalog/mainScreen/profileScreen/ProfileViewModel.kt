@@ -85,12 +85,6 @@ class ProfileViewModel() : ViewModel() {
         val enteredMonth = enteredBirthDay.value.substringAfter('.').substringBefore(".").toInt()
         val enteredYear = enteredBirthDay.value.substringAfterLast('.').toInt()
 
-        println("--------------------")
-        println("$currentDay, $currentMonth, $currentYear")
-        println("$enteredDay, $enteredMonth, $enteredYear")
-        println("--------------------")
-
-
         if (!emailCorrect) {  //email incorrect
             resultMessage += "\nНеверная почта!"
         }

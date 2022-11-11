@@ -19,7 +19,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.moviecatalog.mainScreen.profileScreen.ProfileViewModel
+import com.example.moviecatalog.network.Network
+import com.example.moviecatalog.repository.UserRepository
 import com.example.moviecatalog.signUp.SignUpViewModel
+import kotlinx.coroutines.flow.collect
 
 @Composable
 fun getTextInputColorTheme(): TextFieldColors{
@@ -221,4 +224,17 @@ fun ChoseGender(model: ProfileViewModel, gender: MutableState<String>) {
             }
         }
     }
+}
+
+suspend fun checkUserAlive(): Boolean{
+    var result = false
+    UserRepository().getData().collect{
+        result = it.isSuccess
+    }
+    return result
+}
+
+suspend fun clearUserData(){
+    Network.userId = ""
+    Network.token = ""
 }

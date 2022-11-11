@@ -1,6 +1,7 @@
 package com.example.moviecatalog.mainScreen
 
 import ListOfMovies
+import android.graphics.Color.rgb
 import com.example.moviecatalog.mainScreen.movieData.Movies
 import android.util.Log
 import androidx.compose.foundation.*
@@ -24,17 +25,21 @@ import com.example.moviecatalog.normalizedItemPosition
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlin.math.absoluteValue
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.paging.compose.items
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.moviecatalog.checkUserAlive
+import com.example.moviecatalog.clearUserData
 import com.example.moviecatalog.mainScreen.movieData.Genres
 import com.example.moviecatalog.mainScreen.movieData.Reviews
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.pow
 
 @Composable
 fun MainScreen(navController: NavController, model: MainScreenViewModel = viewModel()) {
@@ -72,9 +77,8 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                     item {
                         if (superLazyMovieItems.itemCount > 0) {
                             PromotedFilm(navController, superLazyMovieItems[0]!!)
-
                         }
-                        Log.d("available movie count", superLazyMovieItems.itemCount.toString())
+                        //Log.d("available movie count", superLazyMovieItems.itemCount.toString())
                     }
                     item { Spacer(modifier = Modifier.size(10.dp)) }
 
@@ -88,10 +92,11 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     }
-
-                    items(superLazyMovieItems) { newMovie ->
-                        if (newMovie != null) {
-                            GalleryMovie(navController = navController, movie = newMovie)
+                    if (superLazyMovieItems.itemCount > 0){
+                        items(superLazyMovieItems.itemSnapshotList.subList(1, superLazyMovieItems.itemCount)) { newMovie ->
+                            if (newMovie != null) {
+                                GalleryMovie(navController = navController, movie = newMovie)
+                            }
                         }
                     }
                 }
@@ -162,24 +167,28 @@ fun PromotedFilm(navController: NavController, movie: Movies) {
 @Composable
 fun Favorite(navController: NavController, model: MainScreenViewModel) {
 
-    val dataExist = remember {
-        mutableStateOf(false)
+    val favorites = remember {
+        mutableStateListOf<Movies>()//model.favoriteMovies.toMutableList()
     }
 
-    var favorites: List<Movies> = model.favoriteMovies
 
     LaunchedEffect(key1 = true) {
-        model.getFavoriteMovies()
-        favorites =
-            model.favoriteMovies              //TODO(Проверка на то, что пользователь жив....)
-        Log.e("LIST", favorites.toString())
-        //if (favorites.isNotEmpty()) dataExist.value = true
+        if (checkUserAlive()) {
+            model.getFavoriteMovies()
+            model.favoriteMovies.forEach { movie ->
+                favorites.add(movie)
+            }
+        } else {
+            launch(Dispatchers.Main) {
+                navController.navigate("sign-In") {
+                    popUpTo(navController.graph.id)
+                }
+                clearUserData()
+            }
+        }
     }
 
     if (favorites.isNotEmpty()) {
-        Log.d("Size  INSIDE", favorites.size.toString())
-        Log.d("INSIDE", favorites.toString())
-
         MovieCatalogTheme {
             Surface(modifier = Modifier.height(212.dp)) {
                 Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -205,7 +214,6 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                                         var value =
                                             1 - (state.layoutInfo.normalizedItemPosition(movie.id).absoluteValue * 0.04F)
                                         value = if (value < 0.9f) 0.9f else value
-                                        //alpha = value
                                         scaleX = value
                                         scaleY = value
                                     },
@@ -215,7 +223,22 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                                     modifier = Modifier
                                         .size(120.dp, 172.dp)
                                         .background(MaterialTheme.colorScheme.background)
-                                        .clickable { navController.navigate("movie/${movie.id}") }
+                                        .clickable {
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                if (checkUserAlive()) {
+                                                    launch(Dispatchers.Main) {
+                                                        navController.navigate("movie/${movie.id}")
+                                                    }
+                                                } else {
+                                                    launch(Dispatchers.Main) {
+                                                        navController.navigate("sign-In") {
+                                                            popUpTo(navController.graph.id)
+                                                        }
+                                                        clearUserData()
+                                                    }
+                                                }
+                                            }
+                                        }
                                         .clip(
                                             RoundedCornerShape(8.dp)
                                         ),
@@ -233,7 +256,17 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                                         )
                                         .clickable {
                                             CoroutineScope(Dispatchers.IO).launch {
-                                                model.deleteFromFavoriteMovies(movie.id)
+                                                if (checkUserAlive()) {
+                                                    model.deleteFromFavoriteMovies(movie.id)
+                                                    favorites.remove(movie)
+                                                } else {
+                                                    launch(Dispatchers.Main) {
+                                                        navController.navigate("sign-In") {
+                                                            popUpTo(navController.graph.id)
+                                                        }
+                                                        clearUserData()
+                                                    }
+                                                }
                                             }
                                         }
                                 )
@@ -246,12 +279,21 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
     }
 }
 
-fun calculateRating(reviews: List<Reviews>): String {
+fun calculateRating(reviews: List<Reviews>): Float {
     var summ = 0f
     for (review in reviews) {
         summ += review.rating
     }
-    return String.format("%.1f", summ / reviews.size)
+    return summ / reviews.size
+}
+
+
+fun calculateColor(rating: Float): Color {
+    return Color(
+        ((20f - 2f * rating) / 10f).coerceAtLeast(0f).coerceAtMost(1f).pow(2),
+        ((2f * rating) / 10f).pow(3).coerceAtLeast(0f).coerceAtMost(1f) / 255f * 185f,
+        ((rating - 7f) / 3f).coerceAtLeast(0f).coerceAtMost(1f) / 255f * 34f
+    )
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -264,7 +306,22 @@ fun GalleryMovie(navController: NavController, movie: Movies) {
         .background(MaterialTheme.colorScheme.background)
         .clickable {
             if (movie != null) {
-                navController.navigate("movie/${movie.id}")
+                CoroutineScope(Dispatchers.IO).launch {
+                    if (checkUserAlive()) {
+                        launch(Dispatchers.Main) {
+                            navController.navigate("movie/${movie.id}")
+                        }
+                    } else {
+                        launch(Dispatchers.Main) {
+                            navController.navigate("sign-In") {
+                                popUpTo(navController.graph.id)
+                            }
+                            clearUserData()
+                        }
+                    }
+                }
+
+
             }
         }) {
         Row(
@@ -275,7 +332,8 @@ fun GalleryMovie(navController: NavController, movie: Movies) {
         ) {
 
             GlideImage(
-                model = movie.poster, contentDescription = null,
+                model = movie.poster,
+                contentDescription = null,
                 modifier = Modifier
                     .size(120.dp, 172.dp),
                 contentScale = ContentScale.FillHeight
@@ -290,6 +348,9 @@ fun GalleryMovie(navController: NavController, movie: Movies) {
                 val (title, about, genresList, rating) = createRefs()
 
                 val genres = mutableListOf<String>()
+
+
+                val ratingValue = calculateRating(movie.reviews)
 
                 for (i in movie.genres) {
                     genres.add(i.name)
@@ -328,7 +389,7 @@ fun GalleryMovie(navController: NavController, movie: Movies) {
                 Box(
                     modifier = Modifier
                         .background(
-                            MaterialTheme.colorScheme.primary,
+                            calculateColor(ratingValue),
                             RoundedCornerShape(16.dp)
                         )
                         .constrainAs(rating) {
@@ -337,7 +398,7 @@ fun GalleryMovie(navController: NavController, movie: Movies) {
                         }
                 ) {
                     Text(
-                        text = calculateRating(movie.reviews),
+                        text = String.format("%.1f", ratingValue),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(

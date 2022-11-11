@@ -22,22 +22,6 @@ class MovieScreenViewModel : ViewModel() {
     private val reviewRepository: ReviewRepository = ReviewRepository()
 
     var movieData: MovieDetailsResponse? = null
-//        MovieDetailsResponse(
-//        "",
-//        "",
-//        "",
-//        0,
-//        "",
-//        listOf(Genres("", "")),
-//        listOf(ReviewsDetails("", 0, "", false, "", Author("", "", ""))),
-//        0,
-//        "",
-//        "",
-//        "",
-//        0,
-//        0,
-//        0,
-//    )
 
     var favoriteMovies: MutableList<String> = mutableListOf()
 
@@ -85,12 +69,12 @@ class MovieScreenViewModel : ViewModel() {
     }
 
     suspend fun addReview(movieId: String, reviewText: String, rating: Int, isAnonymous: Boolean){
-        reviewRepository.addReview(movieId, ReviewRequestBody(reviewText.ifEmpty { " " }, rating, isAnonymous))
+        reviewRepository.addReview(movieId, ReviewRequestBody(reviewText.ifEmpty { "ㅤ" }, rating, isAnonymous))
         loadMovieDetails(movieId)
     }
 
     suspend fun editReview(movieId: String, reviewText: String, rating: Int, isAnonymous: Boolean, reviewId: String){
-        reviewRepository.editReview(movieId, ReviewRequestBody(reviewText.ifEmpty { " " }, rating, isAnonymous), reviewId)
+        reviewRepository.editReview(movieId, ReviewRequestBody(reviewText.ifEmpty { "ㅤ" }, rating, isAnonymous), reviewId)
         loadMovieDetails(movieId)
     }
 
