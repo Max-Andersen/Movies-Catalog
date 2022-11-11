@@ -1,9 +1,12 @@
 package com.example.moviecatalog.mainScreen.profileScreen
 
 import android.widget.Toast
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.TextButton
@@ -35,7 +38,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewModel(), ) {
+fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewModel()) {
     val email = remember {
         mutableStateOf("")
     }
@@ -89,7 +92,10 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                     GlideImage(
                         model = if (avatarLink.value == "") R.drawable.empty_profile_photo else avatarLink.value,
                         contentDescription = null,
-                        modifier = Modifier.clip(CircleShape)
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .size(88.dp),
+                        contentScale = ContentScale.Crop
                     )
                     Text(
                         text = currentName.value,
@@ -133,7 +139,7 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                 OutlinedButton(
                     onClick = {
                         CoroutineScope(Dispatchers.IO).launch {
-                            if (checkUserAlive()){
+                            if (checkUserAlive()) {
                                 val answer = model.putInformation(
                                     email,
                                     avatarLink,
@@ -150,10 +156,9 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                                         ).show()
                                     }
                                 }
-                            }
-                            else{
+                            } else {
                                 launch(Dispatchers.Main) {
-                                    navController.navigate("sign-In"){
+                                    navController.navigate("sign-In") {
                                         popUpTo(navController.graph.id)
                                     }
                                     clearUserData()
@@ -188,18 +193,17 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                 TextButton(
                     onClick = {
                         CoroutineScope(Dispatchers.IO).launch {
-                            if (checkUserAlive()){
+                            if (checkUserAlive()) {
                                 model.logout()
                                 launch(Dispatchers.Main) {
-                                    navController.navigate("sign-In"){
+                                    navController.navigate("sign-In") {
                                         popUpTo(navController.graph.id)
                                     }
                                     clearUserData()
                                 }
-                            }
-                            else{
+                            } else {
                                 launch(Dispatchers.Main) {
-                                    navController.navigate("sign-In"){
+                                    navController.navigate("sign-In") {
                                         popUpTo(navController.graph.id)
                                     }
                                     clearUserData()
