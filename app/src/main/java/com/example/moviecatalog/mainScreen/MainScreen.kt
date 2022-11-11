@@ -1,9 +1,6 @@
 package com.example.moviecatalog.mainScreen
 
-import ListOfMovies
-import android.graphics.Color.rgb
 import com.example.moviecatalog.mainScreen.movieData.Movies
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -29,12 +26,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.paging.compose.items
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.moviecatalog.checkUserAlive
 import com.example.moviecatalog.clearUserData
-import com.example.moviecatalog.mainScreen.movieData.Genres
 import com.example.moviecatalog.mainScreen.movieData.Reviews
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -82,7 +77,15 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                     }
                     item { Spacer(modifier = Modifier.size(10.dp)) }
 
-                    item { Favorite(navController = navController, model = model) }
+                    item {
+                        if (superLazyMovieItems.itemCount > 0) {
+                            Favorite(
+                                navController = navController,
+                                model = model,
+                                promotedMovie = superLazyMovieItems[0]!!
+                            )
+                        }
+                    }
 
                     item {
                         Text(
@@ -92,8 +95,13 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     }
-                    if (superLazyMovieItems.itemCount > 0){
-                        items(superLazyMovieItems.itemSnapshotList.subList(1, superLazyMovieItems.itemCount)) { newMovie ->
+                    if (superLazyMovieItems.itemCount > 0) {
+                        items(
+                            superLazyMovieItems.itemSnapshotList.subList(
+                                1,
+                                superLazyMovieItems.itemCount
+                            )
+                        ) { newMovie ->
                             if (newMovie != null) {
                                 GalleryMovie(navController = navController, movie = newMovie)
                             }
@@ -165,7 +173,7 @@ fun PromotedFilm(navController: NavController, movie: Movies) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun Favorite(navController: NavController, model: MainScreenViewModel) {
+fun Favorite(navController: NavController, model: MainScreenViewModel, promotedMovie: Movies) {
 
     val favorites = remember {
         mutableStateListOf<Movies>()//model.favoriteMovies.toMutableList()
@@ -176,7 +184,9 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
         if (checkUserAlive()) {
             model.getFavoriteMovies()
             model.favoriteMovies.forEach { movie ->
-                favorites.add(movie)
+                if (movie != promotedMovie) {
+                    favorites.add(movie)
+                }
             }
         } else {
             launch(Dispatchers.Main) {
@@ -271,6 +281,7 @@ fun Favorite(navController: NavController, model: MainScreenViewModel) {
                                         }
                                 )
                             }
+
                         }
                     }
                 }
@@ -284,7 +295,7 @@ fun calculateRating(reviews: List<Reviews>): Float {
     for (review in reviews) {
         summ += review.rating
     }
-    return summ / reviews.size
+    return summ / reviews.size.toFloat()
 }
 
 
@@ -398,7 +409,7 @@ fun GalleryMovie(navController: NavController, movie: Movies) {
                         }
                 ) {
                     Text(
-                        text = String.format("%.1f", ratingValue),
+                        text = String.format("%.1f", ratingValue).replace(',', '.'),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(

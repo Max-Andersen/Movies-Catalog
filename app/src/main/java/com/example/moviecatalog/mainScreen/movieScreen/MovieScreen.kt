@@ -1,6 +1,5 @@
 package com.example.moviecatalog.mainScreen.movieScreen
 
-import android.util.Log
 import android.widget.Toast
 import com.example.moviecatalog.network.Movie.MovieDetailsResponse
 import com.example.moviecatalog.mainScreen.movieData.ReviewsDetails
@@ -37,7 +36,6 @@ import com.example.moviecatalog.R
 import com.example.moviecatalog.checkUserAlive
 import com.example.moviecatalog.clearUserData
 import com.example.moviecatalog.mainScreen.calculateColor
-import com.example.moviecatalog.mainScreen.movieData.Author
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.MainAxisAlignment
