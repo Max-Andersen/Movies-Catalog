@@ -31,7 +31,8 @@ private val MyColorScheme = darkColorScheme(
     surface = SystemColor,
     onSurface = DescriptionColor,
     onSurfaceVariant = GenresColor,
-    surfaceVariant = ReviewColor
+    surfaceVariant = ReviewColor,
+
 )
 
 @Composable
@@ -42,7 +43,8 @@ fun MovieCatalogTheme(content: @Composable () -> Unit) {
     currentActivity.window.navigationBarColor = MyColorScheme.surface.toArgb()
 
     WindowInsetsControllerCompat(currentActivity.window, LocalView.current).let { controller ->
-        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         controller.hide(WindowInsetsCompat.Type.navigationBars())
     }
 

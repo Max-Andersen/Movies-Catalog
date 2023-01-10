@@ -26,10 +26,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.integration.compose.RequestBuilderTransform
 import com.example.moviecatalog.*
 import com.example.moviecatalog.R
 import com.example.moviecatalog.signUp.DatePickerView
@@ -92,19 +90,12 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     GlideImage(
-                        model = try{
-                            avatarLink.value
-                        } catch(e: com.bumptech.glide.load.HttpException){
-                            R.drawable.empty_profile_photo
-                        },
-
-
-                        //if (avatarLink.value == "")  else ,
+                        model = if (avatarLink.value == "") R.drawable.empty_profile_photo else avatarLink.value,
                         contentDescription = null,
                         modifier = Modifier
                             .clip(CircleShape)
                             .size(88.dp),
-                        contentScale = ContentScale.Crop,
+                        contentScale = ContentScale.Crop
                     )
                     Text(
                         text = currentName.value,
@@ -145,22 +136,34 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                 Spacer(modifier = Modifier.size(10.dp))
 
                 val context = LocalContext.current
+                val catsAnswer = stringResource(id = R.string.validationAnswer)
                 OutlinedButton(
                     onClick = {
                         CoroutineScope(Dispatchers.IO).launch {
                             if (checkUserAlive()) {
-                                val answer = model.putInformation(
-                                    email,
-                                    avatarLink,
-                                    name,
-                                    dateOfBirthday,
-                                    gender
-                                )
-                                if (answer.isNotEmpty()) {
+                                try {
+                                    val answer = model.putInformation(
+                                        email,
+                                        avatarLink,
+                                        name,
+                                        dateOfBirthday,
+                                        gender
+                                    )
+
+                                    if (answer.isNotEmpty()) {
+                                        launch(Dispatchers.Main) {
+                                            Toast.makeText(
+                                                context,
+                                                catsAnswer + answer,
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    }
+                                } catch (e: Exception) {
                                     launch(Dispatchers.Main) {
                                         Toast.makeText(
                                             context,
-                                            "Ответ от валидирующих котиков:${answer}",
+                                            "HTTP 400 Bad Request",
                                             Toast.LENGTH_LONG
                                         ).show()
                                     }

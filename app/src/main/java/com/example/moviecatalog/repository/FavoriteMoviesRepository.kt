@@ -9,11 +9,11 @@ class FavoriteMoviesRepository {
 
     suspend fun getFavoriteMovies(): ListOfMovies = favoriteMoviesApi.getFavoriteMovies()
 
-    suspend fun addToFavorites(id: String){
+    suspend fun addToFavorites(id: String) {
         favoriteMoviesApi.addToFavorite(id)
     }
 
-    suspend fun deleteFromFavorites(id: String){
+    suspend fun deleteFromFavorites(id: String) {
         favoriteMoviesApi.deleteFromFavorites(id)
     }
 

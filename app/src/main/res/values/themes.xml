@@ -4,6 +4,7 @@
     <style name="Theme.MovieCatalog" parent="android:Theme.Material.Light.NoActionBar" >
         <item name = "android:windowTranslucentStatus">true</item>
         <item name = "android:windowTranslucentNavigation">true</item>
+        <item name="android:windowBackground">@color/background</item>
     </style>
 
     <style name="datepicker" parent="Theme.AppCompat.Light.Dialog">

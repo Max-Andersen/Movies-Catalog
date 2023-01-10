@@ -17,13 +17,12 @@ class AuthRepository {
 
     private val api: AuthApi = Network.getAuthApi()
 
-    fun register(body: RegisterRequestBody): Flow<Result<TokenResponse>> = flow{
+    fun register(body: RegisterRequestBody): Flow<Result<TokenResponse>> = flow {
         try {
             val tokenData = api.register(body)
             Network.token = tokenData.token
-            emit(Result.success(tokenData) )
-        }
-        catch (e: java.lang.Exception){
+            emit(Result.success(tokenData))
+        } catch (e: java.lang.Exception) {
             emit(Result.failure(e))
         }
     }.flowOn(Dispatchers.IO)
@@ -33,9 +32,8 @@ class AuthRepository {
         try {
             val tokenData = api.login(body)
             Network.token = tokenData.token
-            emit(Result.success(tokenData) )
-        }
-        catch (e: java.lang.Exception){
+            emit(Result.success(tokenData))
+        } catch (e: java.lang.Exception) {
             emit(Result.failure(e))
         }
 
@@ -43,7 +41,7 @@ class AuthRepository {
 
 
     fun logout() {
-        CoroutineScope(Dispatchers.IO).launch{
+        CoroutineScope(Dispatchers.IO).launch {
             api.logout()
             Network.token = ""
             Network.userId = ""

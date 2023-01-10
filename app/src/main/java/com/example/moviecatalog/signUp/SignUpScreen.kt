@@ -3,6 +3,9 @@ package com.example.moviecatalog.signUp
 import android.app.DatePickerDialog
 import android.widget.DatePicker
 import android.widget.Toast
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -134,6 +137,19 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
             dateOfBirthday,
             gender
         )
+        val scale = remember {
+            Animatable(1f)
+        }
+
+        LaunchedEffect(scale) {
+            scale.animateTo(
+                targetValue = 0.6f,
+                animationSpec = tween(
+                    durationMillis = 180,
+                    easing = LinearOutSlowInEasing
+                )
+            )
+        }
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -143,7 +159,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
-                        top = 32.dp,
+                        top = 16.dp,
                         start = 16.dp,
                         end = 16.dp
                     )
@@ -156,8 +172,9 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                     painter = painterResource(id = R.drawable.logo_group),
                     contentDescription = null,
                     modifier = Modifier.padding(
-                        start = 90.dp,
-                        end = 90.dp
+                        top = scale.value.dp * (-40) + 40.dp,
+                        start = scale.value.dp * (-127.5f) + 166.5f.dp,
+                        end = scale.value.dp * (-127.5f) + 166.5f.dp
                     )
                 )
 
@@ -197,20 +214,21 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                                 context
                             )
 
-                            launch(Dispatchers.Main){
+                            launch(Dispatchers.Main) {
                                 if (answer.first == 1) {
                                     navController.navigate("mainScreen") {
                                         popUpTo(
                                             navController.graph.id
                                         )
                                     }
-                                }
-                                else{
-                                    Toast.makeText(context, "Ответ от валидирующих котиков:${answer.second}", Toast.LENGTH_LONG).show()
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Ответ от валидирующих котиков:${answer.second}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 }
                             }
-
-
                         }
                     },
                     enabled = allTextsFull,

@@ -59,7 +59,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation "com.github.bumptech.glide:compose:1.0.0-alpha.1"
-    //implementation "com.github.skydoves:landscapist-glide:1.1.7"
     implementation 'com.google.accompanist:accompanist-flowlayout:0.27.0'
 
     testImplementation 'junit:junit:4.13.2'
@@ -89,4 +88,7 @@ dependencies {
 
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+
+    implementation "com.airbnb.android:lottie-compose:4.0.0" //Animations
+
 }

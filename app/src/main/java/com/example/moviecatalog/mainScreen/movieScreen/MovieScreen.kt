@@ -30,12 +30,17 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.moviecatalog.R
 import com.example.moviecatalog.checkUserAlive
 import com.example.moviecatalog.clearUserData
 import com.example.moviecatalog.mainScreen.calculateColor
+import com.example.moviecatalog.mainScreen.movieData.Genres
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.MainAxisAlignment
@@ -50,19 +55,7 @@ fun MovieScreen(
     navController: NavController,
     model: MovieScreenViewModel = viewModel()
 ) {
-    val dataExist = remember {
-        mutableStateOf(false)
-    }
-
-    LaunchedEffect(key1 = 1) {
-        CoroutineScope(Dispatchers.IO).launch {
-            model.loadMovieDetails(filmId)
-            model.getFavoriteMovies()
-            model.getMyId()
-            model.getMyReview()
-            dataExist.value = true
-        }
-    }
+    val data = model.getData(filmId).collectAsState(initial = null)
 
     MovieCatalogTheme {
         Surface(
@@ -70,7 +63,7 @@ fun MovieScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            if (dataExist.value) {
+            if (data.value != null) {
                 FilmContent(navController, model.movieData, model)
             }
         }
@@ -83,7 +76,7 @@ private val toolbarHeight = 56.dp
 private val paddingMedium = 16.dp
 
 private val titlePaddingStart = 16.dp
-private val titlePaddingEnd = 40.dp
+private val titlePaddingEnd = 49.dp
 
 private const val titleFontScaleStart = 1f
 private const val titleFontScaleEnd = 0.66f
@@ -91,29 +84,28 @@ private const val titleFontScaleEnd = 0.66f
 @Composable
 fun FilmContent(
     navController: NavController,
-    movieData: MovieDetailsResponse?,
+    movieData: MovieDetailsResponse,
     model: MovieScreenViewModel
 ) {
     val scroll: ScrollState = rememberScrollState(0)
 
+    val scrollCompleted = remember {
+        mutableStateOf(false)
+    }
+
     val headerHeightPx = with(LocalDensity.current) { headerHeight.toPx() }
     val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.toPx() }
 
-    if (movieData != null) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            ImageHeader(scroll, headerHeightPx, movieData)
-            Body(scroll, movieData, model, navController)
-            Toolbar(scroll, headerHeightPx, navController, model)
-            Title(scroll, headerHeightPx, toolbarHeightPx, movieData)
-
-        }
-
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        ImageHeader(scroll, headerHeightPx, movieData.poster)
+        Body(scroll, model, navController)
+        Toolbar(scroll, headerHeightPx, navController, model, scrollCompleted)
+        Title(scroll, headerHeightPx, toolbarHeightPx, movieData.name, scrollCompleted)
     }
-
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -121,7 +113,7 @@ fun FilmContent(
 private fun ImageHeader(
     scroll: ScrollState,
     headerHeightPx: Float,
-    movieData: MovieDetailsResponse
+    poster: String
 ) {
     Box(
         modifier = Modifier
@@ -134,41 +126,12 @@ private fun ImageHeader(
     ) {
 
         GlideImage(
-            model = movieData.poster,
+            model = poster,
             contentDescription = null,
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.clip(RoundedCornerShape(0.dp, 0.dp, 16.dp, 16.dp))
         )
     }
-}
-
-@Composable
-fun AboutFilmDescriptionText(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodyLarge,
-        color = MaterialTheme.colorScheme.onSurface,
-        modifier = Modifier.width(100.dp)
-    )
-}
-
-@Composable
-fun DataDescriptionText(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodyLarge,
-        color = MaterialTheme.colorScheme.onPrimary
-    )
-}
-
-@Composable
-fun SetStar(number: Int, amount: MutableState<Int>) {
-    Image(
-        painter = painterResource(id = if (amount.value >= number) R.drawable.full_star else R.drawable.star),
-        contentDescription = null,
-        modifier = Modifier
-            .clickable { amount.value = number }
-            .size(24.dp)
-    )
 }
 
 fun separatedNumber(number: Int): String {
@@ -185,16 +148,115 @@ fun separatedNumber(number: Int): String {
     return result.reversed()
 }
 
-fun refreshScreen(navController: NavController, movieId: String){
-    navController.popBackStack()
-    navController.navigate("movie/${movieId}")
+@Composable
+fun MovieDescriptionItem(itemName: String, itemData: String) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = itemName,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.width(100.dp)
+        )
+        Text(
+            text = itemData,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MovieDataDescription(movieData: MovieDetailsResponse) {
+    Column(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        if (movieData.year != 0) {
+            MovieDescriptionItem(
+                itemName = stringResource(id = R.string.year),
+                itemData = movieData.year.toString()
+            )
+        }
+        if (movieData.country != "") {
+            MovieDescriptionItem(
+                itemName = stringResource(id = R.string.country),
+                itemData = movieData.country
+            )
+        }
+        if (movieData.time != 0) {
+            MovieDescriptionItem(
+                itemName = stringResource(id = R.string.time),
+                itemData = "${movieData.time} ${stringResource(id = R.string.minutes)}"
+            )
+        }
+        if (movieData.tagline != "") {
+            MovieDescriptionItem(
+                itemName = stringResource(id = R.string.tagline),
+                itemData = "«${movieData.tagline}»"
+            )
+        }
+        if (movieData.director != "") {
+            MovieDescriptionItem(
+                itemName = stringResource(id = R.string.director),
+                itemData = movieData.director
+            )
+        }
+        if (movieData.budget != 0) {
+            MovieDescriptionItem(
+                itemName = stringResource(id = R.string.budget),
+                itemData = "\$${separatedNumber(movieData.budget)}"
+            )
+        }
+        if (movieData.fees != 0) {
+            MovieDescriptionItem(
+                itemName = stringResource(id = R.string.fees),
+                itemData = "\$${separatedNumber(movieData.fees)}"
+            )
+        }
+        if (movieData.ageLimit != 0) {
+            MovieDescriptionItem(
+                itemName = stringResource(id = R.string.ageLimit),
+                itemData = "${movieData.ageLimit}+"
+            )
+        }
+    }
+}
+
+@Composable
+fun PlaceGenres(genres: List<Genres>) {
+    FlowRow(
+        mainAxisAlignment = MainAxisAlignment.Start,
+        mainAxisSize = SizeMode.Expand,
+        crossAxisSpacing = 8.dp,
+        mainAxisSpacing = 8.dp
+    ) {
+        genres.toList().forEach { genre ->
+            Box(
+                modifier = Modifier
+                    .background(
+                        MaterialTheme.colorScheme.primary,
+                        RoundedCornerShape(8.dp)
+                    )
+                    .height(27.dp)
+            ) {
+                Text(
+                    text = genre.name,
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        top = 6.dp,
+                        bottom = 6.dp,
+                        end = 16.dp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyLarge,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun Body(
     scroll: ScrollState,
-    movieData: MovieDetailsResponse,
     model: MovieScreenViewModel,
     navController: NavController
 ) {
@@ -202,188 +264,9 @@ private fun Body(
         mutableStateOf(false)
     }
 
-    val isAnonymous = remember {
-        mutableStateOf(false)
-    }
+    val movieData = model.movieData
 
-    val reviewText = remember {
-        mutableStateOf("")
-    }
-
-    val starAmount = remember {
-        mutableStateOf(0)
-    }
-
-    if (openReviewDialog.value) {
-        if (model.myReview != null) {
-            reviewText.value = model.myReview!!.reviewText
-            starAmount.value = model.myReview!!.rating
-            isAnonymous.value = model.myReview!!.isAnonymous
-        }
-
-        AlertDialog(
-            onDismissRequest = { openReviewDialog.value = false },
-            title = {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = stringResource(id = R.string.makeReview),
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(3.dp)
-                    ) {
-                        for (i in 1..10) {
-                            SetStar(number = i, amount = starAmount)
-                        }
-                    }
-                    Spacer(modifier = Modifier.size(16.dp))
-                    TextField(
-                        value = reviewText.value,
-                        onValueChange = { newText -> reviewText.value = newText },
-                        modifier = Modifier
-                            .background(
-                                MaterialTheme.colorScheme.onPrimary,
-                                RoundedCornerShape(8.dp)
-                            )
-                            .height(120.dp)
-                            .fillMaxWidth(),
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = MaterialTheme.colorScheme.onPrimary,
-                            textColor = MaterialTheme.colorScheme.background
-                        ),
-                        placeholder = {
-                            Text(
-                                text = stringResource(id = R.string.someText),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.background
-                            )
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.size(16.dp))
-
-                    ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-                        val (anonymousText, checkBox) = createRefs()
-
-                        Text(
-                            text = stringResource(id = R.string.anonymousReview),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.constrainAs(anonymousText) {
-                                start.linkTo(parent.start)
-                            }
-                        )
-
-                        Box(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .constrainAs(checkBox) {
-                                    end.linkTo(parent.end)
-                                }
-                                .clickable {
-                                    isAnonymous.value = !isAnonymous.value
-                                }
-                        ) {
-                            Image(
-                                painter = painterResource(id = if (isAnonymous.value) R.drawable.full_checkbox else R.drawable.empty_checkbox),
-                                contentDescription = null
-                            )
-                        }
-
-                    }
-
-
-                    Spacer(modifier = Modifier.size(16.dp))
-                    val context = LocalContext.current
-                    Button(
-                        onClick = {
-                            openReviewDialog.value = false
-
-                            CoroutineScope(Dispatchers.IO).launch {
-                                if (checkUserAlive()) {
-                                    if (model.myReview != null) {
-                                        try {
-                                            model.editReview(
-                                                model.movieData!!.id,
-                                                reviewText.value,
-                                                starAmount.value,
-                                                isAnonymous.value,
-                                                model.myReview!!.id
-                                            )
-                                            launch(Dispatchers.Main) {
-                                                refreshScreen(navController, model.movieData!!.id)
-                                            }
-                                        } catch (e: Exception) {
-                                            launch(Dispatchers.Main) {
-                                                Toast.makeText(
-                                                    context,
-                                                    "Косяк api! нельзя изменить отзыв на анонимный!",
-                                                    Toast.LENGTH_LONG
-                                                ).show()
-                                            }
-                                        }
-
-                                    } else {
-                                        model.addReview(
-                                            model.movieData!!.id,
-                                            reviewText.value,
-                                            starAmount.value,
-                                            isAnonymous.value
-                                        )
-                                        launch(Dispatchers.Main) {
-                                            refreshScreen(navController, model.movieData!!.id)
-                                        }
-                                    }
-                                } else {
-                                    launch(Dispatchers.Main) {
-                                        navController.navigate("sign-In") {
-                                            popUpTo(navController.graph.id)
-                                        }
-                                        clearUserData()
-                                    }
-                                }
-
-                                // TODO(обновление в live режиме)
-                                model.getMyReview()
-                            }
-                        },
-                        modifier = Modifier
-                            .background(
-                                MaterialTheme.colorScheme.primary,
-                                RoundedCornerShape(4.dp)
-                            )
-                            .fillMaxWidth()
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.save),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-
-                    TextButton(
-                        onClick = {
-                            openReviewDialog.value = false
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.cancel),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-
-                }
-
-            },
-            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-            buttons = { }
-        )
-    }
+    ReviewDialog(navController = navController, model = model, openReviewDialog = openReviewDialog)
 
     Column(
         modifier = Modifier
@@ -394,8 +277,8 @@ private fun Body(
         Surface(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
             Column(
                 modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
                 Text(
@@ -404,7 +287,7 @@ private fun Body(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
 
-                Spacer(modifier = Modifier.size(1.dp))
+                Spacer(modifier = Modifier.size(0.dp))
 
                 Text(
                     text = stringResource(id = R.string.aboutMovie),
@@ -412,97 +295,21 @@ private fun Body(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
 
-                Spacer(modifier = Modifier.size(1.dp))
 
-                if (movieData.year != 0) {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = stringResource(id = R.string.year))
-                        DataDescriptionText(text = movieData.year.toString())
-                    }
-                }
-                if (movieData.country != "") {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = stringResource(id = R.string.country))
-                        DataDescriptionText(text = movieData.country)
-                    }
-                }
-                if (movieData.time != 0) {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = stringResource(id = R.string.time))
-                        DataDescriptionText(text = "${movieData.time} ${stringResource(id = R.string.minutes)}")
-                    }
-                }
-                if (movieData.tagline != "") {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = stringResource(id = R.string.tagline))
-                        DataDescriptionText(text = "«${movieData.tagline}»")
-                    }
-                }
-                if (movieData.director != "") {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = stringResource(id = R.string.director))
-                        DataDescriptionText(text = movieData.director)
-                    }
-                }
-                if (movieData.budget != 0) {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = stringResource(id = R.string.budget))
-                        DataDescriptionText(text = "\$${separatedNumber(movieData.budget)}")
-                    }
-                }
-                if (movieData.fees != 0) {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = stringResource(id = R.string.fees))
-                        DataDescriptionText(text = "\$${separatedNumber(movieData.fees)}")
-                    }
-                }
-                if (movieData.ageLimit != 0) {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        AboutFilmDescriptionText(text = stringResource(id = R.string.ageLimit))
-                        DataDescriptionText(text = "${movieData.ageLimit}+")
-                    }
-                }
+                MovieDataDescription(movieData = movieData)
 
-                Spacer(modifier = Modifier.size(1.dp))
+
+                Spacer(modifier = Modifier.size(0.dp))
 
                 Text(
-                    text = stringResource(id = R.string.gender),
+                    text = stringResource(id = R.string.genres),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
 
-                FlowRow(
-                    mainAxisAlignment = MainAxisAlignment.Start,
-                    mainAxisSize = SizeMode.Expand,
-                    crossAxisSpacing = 8.dp,
-                    mainAxisSpacing = 8.dp
-                ) {
-                    movieData.genres.toList().forEach { genre ->
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    MaterialTheme.colorScheme.primary,
-                                    RoundedCornerShape(8.dp)
-                                )
-                                .height(27.dp)
-                        ) {
-                            Text(
-                                text = genre.name,
-                                modifier = Modifier.padding(
-                                    start = 16.dp,
-                                    top = 6.dp,
-                                    bottom = 6.dp,
-                                    end = 16.dp
-                                ),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.bodyLarge,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1
-                            )
-                        }
-                    }
-                }
+                PlaceGenres(genres = movieData.genres)
 
+                Spacer(modifier = Modifier.size(0.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -516,7 +323,9 @@ private fun Body(
                     Image(
                         painter = painterResource(id = R.drawable.plus),
                         contentDescription = null,
-                        modifier = Modifier.clickable { openReviewDialog.value = true }
+                        modifier = Modifier
+                            .clickable { openReviewDialog.value = true }
+                            .size(24.dp)
                     )
                 }
 
@@ -542,165 +351,43 @@ private fun Body(
                         ReviewBox(review = review, model, navController)
                     }
                 }
-
-                Spacer(modifier = Modifier.size(180.dp))
+                Spacer(modifier = Modifier.size(100.dp))
             }
         }
     }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ReviewBox(
-    review: ReviewsDetails,
-    model: MovieScreenViewModel,
-    navController: NavController,
-    openReviewDialog: MutableState<Boolean>? = null,
+fun HeartAnimation(
+    isChanged: MutableState<Boolean>,
+    state: Boolean
 ) {
-    Box(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxWidth()
-            .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(8.dp))
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-                val (avatar, author, rating) = createRefs()
-                GlideImage(
-                    model = if (review.author == null) R.drawable.empty_profile_photo else (if (review.author.avatar == null || review.author.avatar == "") R.drawable.empty_profile_photo else review.author.avatar),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .constrainAs(avatar) {
-                            top.linkTo(parent.top, 8.dp)
-                            start.linkTo(parent.start, 8.dp)
-                        },
-                    contentScale = ContentScale.Crop
-                )
-                Column(modifier = Modifier.constrainAs(author) {
-                    start.linkTo(parent.start, 56.dp)
-                    top.linkTo(parent.top, 8.dp)
-                }) {
-                    Text(
-                        text = if (!review.isAnonymous) review.author.nickName else stringResource(
-                            id = R.string.anonymous
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                    )
-                    if (review.author != null) {
-                        if (review.author.userId == model.myId) {
-                            Text(
-                                text = stringResource(id = R.string.myReview),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.secondary,
-                                fontSize = 12.sp
-                            )
-                        }
-                    }
+    val likeComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.heart_like_animation))
+    val likeProgress by animateLottieCompositionAsState(
+        likeComposition,
+    )
 
-                }
-                Box(
-                    modifier = Modifier
-                        .background(
-                            calculateColor(review.rating.toFloat()),
-                            RoundedCornerShape(16.dp)
-                        )
-                        .constrainAs(rating) {
-                            top.linkTo(parent.top, 14.dp)
-                            end.linkTo(parent.end, 8.dp)
-                        }
-                ) {
-                    Text(
-                        text = review.rating.toString(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.padding(
-                            start = 16.dp,
-                            end = 16.dp,
-                            top = 4.dp,
-                            bottom = 4.dp
-                        )
-                    )
-                }
-            }
-
-
-
-            Text(
-                text = review.reviewText,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp)
-            )
-
-            ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-                val (date, editButton, deleteButton) = createRefs()
-
-                Text(
-                    text = review.createDateTime.slice(8..9) + "." + review.createDateTime.slice(5..6) + "." + review.createDateTime.slice(
-                        0..3
-                    ),
-                    color = MaterialTheme.colorScheme.secondary,
-                    fontSize = 12.sp,
-                    modifier = Modifier.constrainAs(date) {//.padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 8.dp)
-                        start.linkTo(parent.start, 8.dp)
-                        bottom.linkTo(parent.bottom, 8.dp)
-                    }
-                )
-
-                if (review.author != null) {
-                    if (review.author.userId == model.myId) {
-                        Image(
-                            painter = painterResource(id = R.drawable.delete),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .constrainAs(deleteButton) {
-                                    end.linkTo(parent.end, 8.dp)
-                                    bottom.linkTo(parent.bottom, 8.dp)
-                                }
-                                .clickable {
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        if (checkUserAlive()) {
-                                            model.deleteReview(
-                                                model.movieData!!.id,
-                                                model.myReview!!.id
-                                            )
-                                            model.getMyReview()
-                                            launch(Dispatchers.Main) {
-                                                refreshScreen(navController, model.movieData!!.id)
-                                            }
-                                        } else {
-                                            launch(Dispatchers.Main) {
-                                                navController.navigate("sign-In") {
-                                                    popUpTo(navController.graph.id)
-                                                }
-                                                clearUserData()
-                                            }
-                                        }
-
-                                    }
-                                }
-                        )
-                        Image(
-                            painter = painterResource(id = R.drawable.edit),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .constrainAs(editButton) {
-                                    end.linkTo(deleteButton.start, 8.dp)
-                                    bottom.linkTo(parent.bottom, 8.dp)
-                                }
-                                .clickable {
-                                    if (openReviewDialog != null) {
-                                        openReviewDialog.value = true
-                                    }
-                                }
-                        )
-                    }
-                }
-            }
-        }
+    val unlikeComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.heart_unlike_animation))
+    val unlikeProgress by animateLottieCompositionAsState(
+        unlikeComposition,
+    )
+    if (state) {
+        LottieAnimation(
+            likeComposition,
+            likeProgress,
+            alignment = Alignment.CenterEnd,
+            modifier = Modifier.padding(top = 17.dp)
+        )
+    } else {
+        LottieAnimation(
+            unlikeComposition,
+            unlikeProgress,
+            alignment = Alignment.CenterEnd,
+            modifier = Modifier.padding(top = 17.dp)
+        )
+    }
+    if (likeProgress == 1f || unlikeProgress == 1f) {
+        isChanged.value = false
     }
 }
 
@@ -709,51 +396,88 @@ private fun Toolbar(
     scroll: ScrollState,
     headerHeightPx: Float,
     navController: NavController,
-    model: MovieScreenViewModel
+    model: MovieScreenViewModel,
+    scrollCompleted: MutableState<Boolean>
 ) {
     val isFavorite = remember {
-        mutableStateOf(model.movieData!!.id in model.favoriteMovies)
+        mutableStateOf(model.movieData.id in model.favoriteMovies)
     }
 
     val half = headerHeightPx / 4f
     val position = if (scroll.value > half) (scroll.value - half) / (half * 2.5f) else 0f
 
     TopAppBar(
-        modifier = Modifier.height(80.dp),
+        modifier = Modifier
+            .height(80.dp)
+            .fillMaxWidth(),
         backgroundColor = Color.Transparent,
         elevation = 0.dp
     ) {
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Transparent)
         ) {
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .alpha(position)
-                    .background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.BottomEnd
+                    .background(MaterialTheme.colorScheme.background)
             ) {
-                Image(
-                    painter = painterResource(id = if (!isFavorite.value) R.drawable.heart else R.drawable.full_heart),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(top = 40.dp, bottom = 16.dp, end = 16.dp)
-                        .clickable {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                if (isFavorite.value) {
-                                    model.deleteFromFavorite(model.movieData!!.id)
-                                } else {
-                                    model.addToFavorite(model.movieData!!.id)
-                                }
-                                isFavorite.value = !isFavorite.value
-                            }
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = model.movieData.name,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.headlineLarge,
+                        modifier = Modifier
+                            .padding(start = 49.dp, end = 48.dp, top = 33.dp, bottom = 12.dp)
+                            .alpha(if (scrollCompleted.value) 1f else 0f)
+                    )
+                }
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    val isChanged = remember {
+                        mutableStateOf(false)
+                    }
 
+                    if (isChanged.value) {
+                        HeartAnimation(isChanged, isFavorite.value)
+                    } else {
+                        val image = if (isFavorite.value) {
+                            R.drawable.heart_transformed_full
+                        } else {
+                            R.drawable.heart_transformed
                         }
-                )
+
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 40.dp, bottom = 16.dp, end = 16.dp),
+                        ) {
+                            Image(
+                                painter = painterResource(id = image),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .clickable {
+                                        isChanged.value = true
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            if (isFavorite.value) {
+                                                model.deleteFromFavorite(model.movieData.id)
+                                            } else {
+                                                model.addToFavorite(model.movieData.id)
+                                            }
+                                            isFavorite.value = !isFavorite.value
+                                        }
+                                    }
+                            )
+                        }
+                    }
+                }
+
+
             }
             Image(
                 painter = painterResource(id = R.drawable.arrow_back),
@@ -762,10 +486,8 @@ private fun Toolbar(
                     .padding(top = 40.dp, bottom = 16.dp, start = 16.dp)
                     .clickable { navController.navigateUp() }
             )
-
         }
     }
-
 }
 
 @Composable
@@ -773,50 +495,59 @@ fun Title(
     scroll: ScrollState,
     headerHeightPx: Float,
     toolbarHeightPx: Float,
-    movieData: MovieDetailsResponse
+    filmName: String,
+    scrollCompleted: MutableState<Boolean>
 ) {
     var titleHeightPx by remember { mutableStateOf(0f) }
+    var titleWidthPx by remember { mutableStateOf(0f) }
     val titleHeightDp = with(LocalDensity.current) { titleHeightPx.toDp() }
 
+    var scaleXY by remember {
+        mutableStateOf(0.dp)
+    }
+
     Text(
-        text = movieData.name,
+        text = filmName,
         style = MaterialTheme.typography.titleLarge,
         modifier = Modifier
             .graphicsLayer {
-                val collapseRange: Float = (headerHeightPx - toolbarHeightPx)
+                val collapseRange: Float =
+                    (headerHeightPx - toolbarHeightPx) // text should move to center of image header
                 val collapseFraction: Float = (scroll.value / collapseRange).coerceIn(0f, 1f)
-                //val titleExtraStartPadding = titleWidthPx.toDp() * (1 - scaleXY.value) / 2
 
                 val titleY = lerp(
                     headerHeight - titleHeightDp - paddingMedium, // start Y
-                    toolbarHeight / 1.15f - titleHeightDp / 2f, // end Y
+                    toolbarHeight / 1.15f - titleHeightDp / 2, // end Y
                     collapseFraction
                 )
 
-                val titleX = lerp(
-                    titlePaddingStart,
-                    titlePaddingEnd,
-                    collapseFraction
-                )
-
-                val scaleXY = lerp(
+                scaleXY = lerp(
                     titleFontScaleStart.dp,
                     titleFontScaleEnd.dp,
                     collapseFraction
                 )
 
+                val titleExtraStartPadding = titleWidthPx.toDp() * (1 - scaleXY.value) / 2
 
+                val titleX = lerp(
+                    titlePaddingStart, // start X
+                    titlePaddingEnd - titleExtraStartPadding, // end X
+                    collapseFraction
+                )
 
                 translationY = titleY.toPx()
                 translationX = titleX.toPx()
 
                 scaleX = scaleXY.value
                 scaleY = scaleXY.value
-
             }
             .onGloballyPositioned {
                 titleHeightPx = it.size.height.toFloat()
-            },
-        color = MaterialTheme.colorScheme.onPrimary
+                titleWidthPx = it.size.width.toFloat()
+
+                scrollCompleted.value = scroll.value >= headerHeightPx / 2
+            }
+            .alpha(if (scrollCompleted.value) 0f else 1f),
+        color = MaterialTheme.colorScheme.onPrimary,
     )
 }

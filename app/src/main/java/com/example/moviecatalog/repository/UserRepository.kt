@@ -18,13 +18,13 @@ class UserRepository {
             val data = userApi.getProfileData()
             Network.userId = data.id
             emit(Result.success(data))
-        } catch (e: java.lang.Exception){
+        } catch (e: java.lang.Exception) {
             emit(Result.failure(e))
         }
 
     }.flowOn(Dispatchers.IO)
 
-    suspend fun putData(data: UserDataResponse){
+    suspend fun putData(data: UserDataResponse) {
         userApi.putProfileData(data)
     }
 }

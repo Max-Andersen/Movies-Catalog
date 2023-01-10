@@ -30,28 +30,11 @@ import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @ExperimentalFoundationApi
 @ExperimentalMaterial3Api
 @Composable
 fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavController) {
-
-    val repository = AuthRepository()
     val context = LocalContext.current
-//    LaunchedEffect(key1 = true) {
-//        CoroutineScope(Dispatchers.IO).launch {
-//            repository.loggin(LoginRequestBody(username = "antoshaa", password = "1235545")).collect { token ->
-//                println("-----------------")
-//                token.onSuccess {
-//                    println(it.token)
-//                }.onFailure {
-//                    println(it.message.toString())
-//                }
-//                println("-----------------")
-//            }
-//        }
-//    }
-
 
     MovieCatalogTheme {
         val login = remember { mutableStateOf("") }
@@ -72,7 +55,7 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                     contentDescription = null,
                     modifier = Modifier.padding(
                         start = 55.dp,
-                        top = 16.dp,
+                        top = 56.dp,
                         end = 55.dp
                     )
                 )
@@ -113,7 +96,7 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
 
                     OutlinedButton(
                         onClick = {
-                            coroutineScope.launch(Dispatchers.IO){
+                            coroutineScope.launch(Dispatchers.IO) {
                                 val answer = model.signInButtonPressed(
                                     login,
                                     password
@@ -125,10 +108,10 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                                             popUpTo(
                                                 navController.graph.id
                                             )
-                                        } }
+                                        }
+                                    }
 
-                                }
-                                else {
+                                } else {
                                     println("Fail")
                                     launch(Dispatchers.Main) {
                                         Toast.makeText(

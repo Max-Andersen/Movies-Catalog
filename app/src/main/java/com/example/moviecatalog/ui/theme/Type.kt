@@ -15,15 +15,25 @@ val MyFontFamily = FontFamily(
 
 )
 
-val ibmRegular = FontFamily( Font(resId = R.font.ibm_plex_sans_regular, FontWeight.W400, style = FontStyle.Normal))
-val ibmMedium = FontFamily(Font(resId = R.font.ibm_plex_sans_medium, FontWeight.W500, style = FontStyle.Normal))
-val ibmBold = FontFamily(Font(resId = R.font.ibm_plex_sans_bold, FontWeight.W700, style = FontStyle.Normal))
-val montserratMedium = FontFamily(Font(resId = R.font.montserrat_medium, FontWeight.W500, style = FontStyle.Normal))
+val ibmRegular = FontFamily(
+    Font(
+        resId = R.font.ibm_plex_sans_regular,
+        FontWeight.W400,
+        style = FontStyle.Normal
+    )
+)
+val ibmMedium =
+    FontFamily(Font(resId = R.font.ibm_plex_sans_medium, FontWeight.W500, style = FontStyle.Normal))
+val ibmBold =
+    FontFamily(Font(resId = R.font.ibm_plex_sans_bold, FontWeight.W700, style = FontStyle.Normal))
+val montserratMedium =
+    FontFamily(Font(resId = R.font.montserrat_medium, FontWeight.W500, style = FontStyle.Normal))
 
 // Set of Material typography styles to start with
 val Typography = Typography(
 
-    bodyLarge = TextStyle(    // for montserrat
+    bodyLarge = TextStyle(
+        // for montserrat
         //fontWeight = FontWeight.Normal,
         fontFamily = montserratMedium,
         fontWeight = FontWeight.W500,
@@ -32,42 +42,48 @@ val Typography = Typography(
         //letterSpacing = 0.5.sp
     ),
 
-    headlineLarge = TextStyle( //H1
+    headlineLarge = TextStyle(
+        //H1
         fontFamily = ibmBold,
         //fontWeight = FontWeight.W700,
         fontSize = 24.sp,
         lineHeight = 32.sp,
     ),
 
-    headlineMedium = TextStyle( //H2
+    headlineMedium = TextStyle(
+        //H2
         //fontWeight = FontWeight.W700,
         fontFamily = ibmBold,
         fontSize = 20.sp,
         lineHeight = 24.sp,
     ),
 
-    bodyMedium = TextStyle( //Body
+    bodyMedium = TextStyle(
+        //Body
         //fontWeight = FontWeight.W500,
         fontFamily = ibmMedium,
         fontSize = 16.sp,
         lineHeight = 20.sp,
     ),
 
-    bodySmall = TextStyle( //Body Small
+    bodySmall = TextStyle(
+        //Body Small
         //fontWeight = FontWeight.W400,
         fontFamily = ibmRegular,
         fontSize = 14.sp,
         lineHeight = 18.sp,
     ),
 
-    titleLarge = TextStyle( //Title
+    titleLarge = TextStyle(
+        //Title
         //fontWeight = FontWeight.W700,
         fontFamily = ibmBold,
         fontSize = 36.sp,
         lineHeight = 40.sp,
     ),
 
-    labelSmall = TextStyle( //Footnote
+    labelSmall = TextStyle(
+        //Footnote
         //fontWeight = FontWeight.W500,
         fontFamily = ibmMedium,
         fontSize = 14.sp,

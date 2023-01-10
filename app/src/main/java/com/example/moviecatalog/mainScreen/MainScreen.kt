@@ -58,8 +58,6 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                 val screenHeight = configuration.screenHeightDp.dp
                 val screenWidth = configuration.screenWidthDp.dp
 
-
-
                 LazyColumn(
                     state = listState,
                     modifier = Modifier
@@ -73,7 +71,6 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                         if (superLazyMovieItems.itemCount > 0) {
                             PromotedFilm(navController, superLazyMovieItems[0]!!)
                         }
-                        //Log.d("available movie count", superLazyMovieItems.itemCount.toString())
                     }
                     item { Spacer(modifier = Modifier.size(10.dp)) }
 
@@ -95,15 +92,14 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     }
-                    if (superLazyMovieItems.itemCount > 0) {
-                        items(
-                            superLazyMovieItems.itemSnapshotList.subList(
-                                1,
-                                superLazyMovieItems.itemCount
-                            )
-                        ) { newMovie ->
-                            if (newMovie != null) {
-                                GalleryMovie(navController = navController, movie = newMovie)
+
+                    for (i in 1 until superLazyMovieItems.itemCount) {
+                        item {
+                            superLazyMovieItems[i]?.let {
+                                GalleryMovie(
+                                    navController = navController,
+                                    movie = it
+                                )
                             }
                         }
                     }
@@ -128,7 +124,6 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
         }
     }
 }
-
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -178,7 +173,6 @@ fun Favorite(navController: NavController, model: MainScreenViewModel, promotedM
     val favorites = remember {
         mutableStateListOf<Movies>()//model.favoriteMovies.toMutableList()
     }
-
 
     LaunchedEffect(key1 = true) {
         if (checkUserAlive()) {
@@ -298,7 +292,6 @@ fun calculateRating(reviews: List<Reviews>): Float {
     return summ / reviews.size.toFloat()
 }
 
-
 fun calculateColor(rating: Float): Color {
     return Color(
         ((20f - 2f * rating) / 10f).coerceAtLeast(0f).coerceAtMost(1f).pow(2),
@@ -312,7 +305,7 @@ fun calculateColor(rating: Float): Color {
 fun GalleryMovie(navController: NavController, movie: Movies) {
     Surface(modifier = Modifier
         .fillMaxWidth()
-        .padding(start = 16.dp, top = 16.dp)
+        .padding(top = 16.dp, start = 7.dp)
         .height(144.dp)
         .background(MaterialTheme.colorScheme.background)
         .clickable {

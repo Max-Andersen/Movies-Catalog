@@ -120,7 +120,7 @@ class ProfileViewModel() : ViewModel() {
         return answer
     }
 
-    suspend fun logout(){
+    fun logout() {
         authRepository.logout()
     }
 }

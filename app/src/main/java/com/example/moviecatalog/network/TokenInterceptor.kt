@@ -23,5 +23,4 @@ class TokenInterceptor: Interceptor {
             chain.proceed(request)
         }
     }
-
 }

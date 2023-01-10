@@ -37,8 +37,6 @@ fun MainScreenController(externalNavController: NavController) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
-    val userRepository = UserRepository()
-
     MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             Scaffold(
@@ -104,6 +102,4 @@ fun MainScreenController(externalNavController: NavController) {
             }
         }
     }
-
-
 }
