@@ -24,6 +24,7 @@ import kotlin.math.absoluteValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -353,7 +354,6 @@ fun GalleryMovie(navController: NavController, movie: Movies) {
 
                 val genres = mutableListOf<String>()
 
-
                 val ratingValue = calculateRating(movie.reviews)
 
                 for (i in movie.genres) {
@@ -368,8 +368,8 @@ fun GalleryMovie(navController: NavController, movie: Movies) {
                         start.linkTo(parent.start)
                         top.linkTo(parent.top)
                     },
-                    fontSize = if (movie.name.length > 25) 15.sp else 20.sp
-
+                    fontSize = if (movie.name.length > 30) 17.sp else 20.sp,
+                    lineHeight = if (movie.name.length > 30) 17.sp else 20.sp,
                 )
                 Text(
                     text = "${movie.year} • ${movie.country}",

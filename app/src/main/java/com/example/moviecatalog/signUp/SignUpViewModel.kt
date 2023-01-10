@@ -56,19 +56,19 @@ class SignUpViewModel : ViewModel() {
         val enteredYear = dateOfBirthday.value.substringAfterLast('.').toInt()
 
 
-        if (!emailCorrect) {  //email incorrect
+        if (!emailCorrect) {
             resultMessage += "\nНеверная почта!"
         }
 
-        if (password.value != passwordConfirmation.value) {   //password incorrect
+        if (password.value != passwordConfirmation.value) {
             resultMessage += "\nПароли не совпадают!"
         }
 
         if ((enteredYear > currentYear) ||
-            (enteredYear <= currentYear && enteredMonth > currentMonth) ||
-            (enteredYear <= currentYear && enteredMonth == currentMonth && enteredDay >= currentDay)
+            (enteredYear == currentYear && enteredMonth > currentMonth) ||
+            (enteredYear == currentYear && enteredMonth == currentMonth && enteredDay >= currentDay)
         ) {
-            resultMessage += "\nДата рождения должна быть меньше текущего дня!" // date of birthday incorrect
+            resultMessage += "\nДата рождения должна быть меньше текущего дня!"
         }
 
         var success = 0

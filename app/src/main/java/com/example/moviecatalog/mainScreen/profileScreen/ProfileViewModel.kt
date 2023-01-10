@@ -85,16 +85,16 @@ class ProfileViewModel() : ViewModel() {
         val enteredMonth = enteredBirthDay.value.substringAfter('.').substringBefore(".").toInt()
         val enteredYear = enteredBirthDay.value.substringAfterLast('.').toInt()
 
-        if (!emailCorrect) {  //email incorrect
+        if (!emailCorrect) {
             resultMessage += "\nНеверная почта!"
         }
 
 
         if ((enteredYear > currentYear) ||
-            (enteredYear <= currentYear && enteredMonth > currentMonth) ||
-            (enteredYear <= currentYear && enteredMonth == currentMonth && enteredDay >= currentDay)
+            (enteredYear == currentYear && enteredMonth > currentMonth) ||
+            (enteredYear == currentYear && enteredMonth == currentMonth && enteredDay >= currentDay)
         ) {
-            resultMessage += "\nДата рождения должна быть меньше текущего дня!" // date of birthday incorrect
+            resultMessage += "\nДата рождения должна быть меньше текущего дня!"
         }
 
         val normalizedDate = normalizeDate(enteredBirthDay.value)
