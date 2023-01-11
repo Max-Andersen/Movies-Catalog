@@ -143,11 +143,11 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                             if (checkUserAlive()) {
                                 try {
                                     val answer = model.putInformation(
-                                        email,
-                                        avatarLink,
-                                        name,
-                                        dateOfBirthday,
-                                        gender
+                                        email.value,
+                                        avatarLink.value,
+                                        name.value,
+                                        dateOfBirthday.value,
+                                        gender.value
                                     )
 
                                     if (answer.isNotEmpty()) {

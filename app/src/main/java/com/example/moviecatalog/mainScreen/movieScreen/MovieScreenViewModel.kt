@@ -1,27 +1,17 @@
 package com.example.moviecatalog.mainScreen.movieScreen
 
 import ReviewRequestBody
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import com.example.moviecatalog.mainScreen.movieData.Author
-import com.example.moviecatalog.mainScreen.movieData.Genres
-import com.example.moviecatalog.network.Movie.MovieDetailsResponse
-import com.example.moviecatalog.mainScreen.movieData.ReviewsDetails
 import androidx.lifecycle.ViewModel
-import com.example.moviecatalog.mainScreen.movieData.Movies
+import com.example.moviecatalog.mainScreen.movieData.ReviewsDetails
+import com.example.moviecatalog.network.Movie.MovieDetailsResponse
 import com.example.moviecatalog.network.Network
 import com.example.moviecatalog.repository.FavoriteMoviesRepository
 import com.example.moviecatalog.repository.MovieRepository
 import com.example.moviecatalog.repository.ReviewRepository
-import com.example.moviecatalog.repository.UserRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import javax.sql.StatementEvent
 
 class MovieScreenViewModel : ViewModel() {
     private val movieRepository: MovieRepository = MovieRepository()

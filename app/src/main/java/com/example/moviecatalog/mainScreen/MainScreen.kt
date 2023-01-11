@@ -24,7 +24,6 @@ import kotlin.math.absoluteValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -59,6 +58,7 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                 val screenHeight = configuration.screenHeightDp.dp
                 val screenWidth = configuration.screenWidthDp.dp
 
+
                 LazyColumn(
                     state = listState,
                     modifier = Modifier
@@ -72,6 +72,7 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                         if (superLazyMovieItems.itemCount > 0) {
                             PromotedFilm(navController, superLazyMovieItems[0]!!)
                         }
+                        //PromotedFilm(navController, model.promotedFilm)
                     }
                     item { Spacer(modifier = Modifier.size(10.dp)) }
 
@@ -171,18 +172,18 @@ fun PromotedFilm(navController: NavController, movie: Movies) {
 @Composable
 fun Favorite(navController: NavController, model: MainScreenViewModel, promotedMovie: Movies) {
 
-    val favorites = remember {
-        mutableStateListOf<Movies>()//model.favoriteMovies.toMutableList()
-    }
-
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(Unit) {
         if (checkUserAlive()) {
+            model.promotedFilm = promotedMovie
             model.getFavoriteMovies()
-            model.favoriteMovies.forEach { movie ->
-                if (movie != promotedMovie) {
-                    favorites.add(movie)
-                }
-            }
+
+            //favorites = model.favoriteMovies
+//            model.getFavoriteMovies() //!!!!!!!!!!!!!!!!!!!!!!!!!!
+//            model.favoriteMovies.forEach { movie ->
+//                if (movie != promotedMovie) {
+//                    favorites.add(movie)
+//                }
+//            }//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         } else {
             launch(Dispatchers.Main) {
                 navController.navigate("sign-In") {
@@ -193,7 +194,7 @@ fun Favorite(navController: NavController, model: MainScreenViewModel, promotedM
         }
     }
 
-    if (favorites.isNotEmpty()) {
+    if (model.favoriteMovies.isNotEmpty()) {
         MovieCatalogTheme {
             Surface(modifier = Modifier.height(212.dp)) {
                 Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -211,7 +212,8 @@ fun Favorite(navController: NavController, model: MainScreenViewModel, promotedM
                             end = 180.dp,
                         ),
                     ) {
-                        items(favorites, key = { it.id }) { movie ->
+                        items(model.favoriteMovies, key = { it.id }) { movie ->
+
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -262,8 +264,7 @@ fun Favorite(navController: NavController, model: MainScreenViewModel, promotedM
                                         .clickable {
                                             CoroutineScope(Dispatchers.IO).launch {
                                                 if (checkUserAlive()) {
-                                                    model.deleteFromFavoriteMovies(movie.id)
-                                                    favorites.remove(movie)
+                                                    model.deleteFromFavoriteMovies(movie)
                                                 } else {
                                                     launch(Dispatchers.Main) {
                                                         navController.navigate("sign-In") {
@@ -276,7 +277,6 @@ fun Favorite(navController: NavController, model: MainScreenViewModel, promotedM
                                         }
                                 )
                             }
-
                         }
                     }
                 }
@@ -299,6 +299,79 @@ fun calculateColor(rating: Float): Color {
         ((2f * rating) / 10f).pow(3).coerceAtLeast(0f).coerceAtMost(1f) / 255f * 185f,
         ((rating - 7f) / 3f).coerceAtLeast(0f).coerceAtMost(1f) / 255f * 34f
     )
+}
+
+@Composable
+fun PlaceGalleryFilmCard(movie: Movies) {
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(start = 16.dp)
+    ) {
+        val (title, about, genresList, rating) = createRefs()
+
+        val genres = mutableListOf<String>()
+
+        val ratingValue = calculateRating(movie.reviews)
+
+        for (i in movie.genres) {
+            genres.add(i.name)
+        }
+
+        Text(
+            text = movie.name,
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.constrainAs(title) {
+                start.linkTo(parent.start)
+                top.linkTo(parent.top)
+            },
+            fontSize = if (movie.name.length > 30) 17.sp else 20.sp,
+            lineHeight = if (movie.name.length > 30) 17.sp else 20.sp,
+        )
+        Text(
+            text = "${movie.year} • ${movie.country}",
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.constrainAs(about) {
+                start.linkTo(parent.start)
+                top.linkTo(title.bottom)
+            }
+        )
+        Text(
+            text = genres.joinToString(),
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.constrainAs(genresList) {
+                start.linkTo(parent.start)
+                top.linkTo(about.bottom)
+            }
+        )
+
+        Box(
+            modifier = Modifier
+                .background(
+                    calculateColor(ratingValue),
+                    RoundedCornerShape(16.dp)
+                )
+                .constrainAs(rating) {
+                    start.linkTo(parent.start)
+                    bottom.linkTo(parent.bottom)
+                }
+        ) {
+            Text(
+                text = String.format("%.1f", ratingValue).replace(',', '.'),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 4.dp,
+                    bottom = 4.dp
+                )
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -344,76 +417,7 @@ fun GalleryMovie(navController: NavController, movie: Movies) {
                 contentScale = ContentScale.FillHeight
             )
 
-
-            ConstraintLayout(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 16.dp)
-            ) {
-                val (title, about, genresList, rating) = createRefs()
-
-                val genres = mutableListOf<String>()
-
-                val ratingValue = calculateRating(movie.reviews)
-
-                for (i in movie.genres) {
-                    genres.add(i.name)
-                }
-
-                Text(
-                    text = movie.name,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.constrainAs(title) {
-                        start.linkTo(parent.start)
-                        top.linkTo(parent.top)
-                    },
-                    fontSize = if (movie.name.length > 30) 17.sp else 20.sp,
-                    lineHeight = if (movie.name.length > 30) 17.sp else 20.sp,
-                )
-                Text(
-                    text = "${movie.year} • ${movie.country}",
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.constrainAs(about) {
-                        start.linkTo(parent.start)
-                        top.linkTo(title.bottom)
-                    }
-                )
-                Text(
-                    text = genres.joinToString(),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.constrainAs(genresList) {
-                        start.linkTo(parent.start)
-                        top.linkTo(about.bottom)
-                    }
-                )
-
-                Box(
-                    modifier = Modifier
-                        .background(
-                            calculateColor(ratingValue),
-                            RoundedCornerShape(16.dp)
-                        )
-                        .constrainAs(rating) {
-                            start.linkTo(parent.start)
-                            bottom.linkTo(parent.bottom)
-                        }
-                ) {
-                    Text(
-                        text = String.format("%.1f", ratingValue).replace(',', '.'),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.padding(
-                            start = 16.dp,
-                            end = 16.dp,
-                            top = 4.dp,
-                            bottom = 4.dp
-                        )
-                    )
-                }
-            }
+            PlaceGalleryFilmCard(movie)
         }
     }
 }

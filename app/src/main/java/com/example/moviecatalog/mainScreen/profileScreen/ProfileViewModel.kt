@@ -2,6 +2,7 @@ package com.example.moviecatalog.mainScreen.profileScreen
 
 import UserDataResponse
 import android.text.TextUtils
+import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -64,14 +65,14 @@ class ProfileViewModel() : ViewModel() {
     }
 
     suspend fun putInformation(
-        enteredEmail: MutableState<String>,
-        enteredAvatarLink: MutableState<String> = mutableStateOf(""),
-        enteredName: MutableState<String>,
-        enteredBirthDay: MutableState<String>,
-        enteredGender: MutableState<String>
+        enteredEmail: String,
+        enteredAvatarLink: String = "",
+        enteredName: String,
+        enteredBirthDay: String,
+        enteredGender: String
     ): String {
         val emailCorrect =
-            !TextUtils.isEmpty(enteredEmail.value) && Patterns.EMAIL_ADDRESS.matcher(enteredEmail.value)
+            !TextUtils.isEmpty(enteredEmail) && Patterns.EMAIL_ADDRESS.matcher(enteredEmail)
                 .matches()
         var resultMessage = ""
 
@@ -81,9 +82,9 @@ class ProfileViewModel() : ViewModel() {
         val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
 
 
-        val enteredDay = enteredBirthDay.value.substringBefore('.').toInt()
-        val enteredMonth = enteredBirthDay.value.substringAfter('.').substringBefore(".").toInt()
-        val enteredYear = enteredBirthDay.value.substringAfterLast('.').toInt()
+        val enteredDay = enteredBirthDay.substringBefore('.').toInt()
+        val enteredMonth = enteredBirthDay.substringAfter('.').substringBefore(".").toInt()
+        val enteredYear = enteredBirthDay.substringAfterLast('.').toInt()
 
         if (!emailCorrect) {
             resultMessage += "\nНеверная почта!"
@@ -97,7 +98,7 @@ class ProfileViewModel() : ViewModel() {
             resultMessage += "\nДата рождения должна быть меньше текущего дня!"
         }
 
-        val normalizedDate = normalizeDate(enteredBirthDay.value)
+        val normalizedDate = normalizeDate(enteredBirthDay)
 
         var answer = ""
 
@@ -106,17 +107,16 @@ class ProfileViewModel() : ViewModel() {
                 UserDataResponse(
                     id = Network.userId,
                     nickName = nickname,
-                    email = enteredEmail.value,
-                    avatarLink = enteredAvatarLink.value,
-                    name = enteredName.value,
+                    email = enteredEmail,
+                    avatarLink = enteredAvatarLink,
+                    name = enteredName,
                     birthDate = normalizedDate,
-                    gender = enteredGender.value.toInt()
+                    gender = enteredGender.toInt()
                 )
             )
         } else {
             answer = resultMessage
         }
-
         return answer
     }
 

@@ -139,7 +139,7 @@ fun separatedNumber(number: Int): String {
 }
 
 @Composable
-fun MovieDescriptionItem(itemName: String, itemData: String) {
+fun MovieDataDescriptionItem(itemName: String, itemData: String) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = itemName,
@@ -159,49 +159,49 @@ fun MovieDescriptionItem(itemName: String, itemData: String) {
 fun MovieDataDescription(movieData: MovieDetailsResponse) {
     Column(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         if (movieData.year != 0) {
-            MovieDescriptionItem(
+            MovieDataDescriptionItem(
                 itemName = stringResource(id = R.string.year),
                 itemData = movieData.year.toString()
             )
         }
         if (movieData.country != "") {
-            MovieDescriptionItem(
+            MovieDataDescriptionItem(
                 itemName = stringResource(id = R.string.country),
                 itemData = movieData.country
             )
         }
         if (movieData.time != 0) {
-            MovieDescriptionItem(
+            MovieDataDescriptionItem(
                 itemName = stringResource(id = R.string.time),
                 itemData = "${movieData.time} ${stringResource(id = R.string.minutes)}"
             )
         }
         if (movieData.tagline != "") {
-            MovieDescriptionItem(
+            MovieDataDescriptionItem(
                 itemName = stringResource(id = R.string.tagline),
                 itemData = "«${movieData.tagline}»"
             )
         }
         if (movieData.director != "") {
-            MovieDescriptionItem(
+            MovieDataDescriptionItem(
                 itemName = stringResource(id = R.string.director),
                 itemData = movieData.director
             )
         }
         if (movieData.budget != 0) {
-            MovieDescriptionItem(
+            MovieDataDescriptionItem(
                 itemName = stringResource(id = R.string.budget),
                 itemData = "\$${separatedNumber(movieData.budget)}"
             )
         }
         if (movieData.fees != 0) {
-            MovieDescriptionItem(
+            MovieDataDescriptionItem(
                 itemName = stringResource(id = R.string.fees),
                 itemData = "\$${separatedNumber(movieData.fees)}"
             )
         }
         if (movieData.ageLimit != 0) {
-            MovieDescriptionItem(
+            MovieDataDescriptionItem(
                 itemName = stringResource(id = R.string.ageLimit),
                 itemData = "${movieData.ageLimit}+"
             )

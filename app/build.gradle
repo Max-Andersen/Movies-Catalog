@@ -89,6 +89,10 @@ dependencies {
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 
-    implementation "com.airbnb.android:lottie-compose:4.0.0" //Animations
+    //Animations
+    implementation "com.airbnb.android:lottie-compose:4.0.0"
+
+    // for EncryptedSharedPreferences
+    implementation "androidx.security:security-crypto:1.1.0-alpha04"
 
 }

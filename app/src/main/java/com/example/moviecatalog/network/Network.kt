@@ -1,6 +1,8 @@
 package com.example.moviecatalog.network
 
 
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.example.moviecatalog.network.Auth.AuthApi
 import com.example.moviecatalog.network.FavoriteMovies.FavoriteMoviesApi
 import com.example.moviecatalog.network.Movie.MovieApi
@@ -11,16 +13,45 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import java.util.concurrent.TimeUnit
+import android.content.Context
+import com.example.moviecatalog.MainApplication
+
 
 object Network {
-
     private const val BASE_URL = "https://react-midterm.kreosoft.space/api/"
 
     //private const val BASE_URL = "https://6e71-5-165-213-157.in.ngrok.io/api/"
 
-    var token = ""
+    var masterKey = MasterKey.Builder(MainApplication.applicationContext())
+        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+        .build()
+
+    var sharedPreferences = EncryptedSharedPreferences.create(
+        MainApplication.applicationContext(),
+        "secret_shared_prefs",
+        masterKey,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+
+    fun updateToken(newToken: String){
+        sharedPreferences.edit().putString("bearer_token", newToken).apply()
+        token = newToken
+    }
+
+    @JvmName("getToken1")
+    fun getToken(): String {
+        return if (token == null){
+            ""
+        } else{
+            token as String
+        }
+
+    }
+
+    private var token = sharedPreferences.getString("bearer_token", "")
+
     var userId = ""
 
     private val json = Json {

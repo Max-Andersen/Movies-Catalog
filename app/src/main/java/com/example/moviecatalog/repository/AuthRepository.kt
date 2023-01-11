@@ -1,5 +1,6 @@
 package com.example.moviecatalog.repository
 
+import com.example.moviecatalog.clearUserData
 import com.example.moviecatalog.network.Auth.AuthApi
 import com.example.moviecatalog.network.Auth.LoginRequestBody
 import com.example.moviecatalog.network.Auth.RegisterRequestBody
@@ -20,7 +21,7 @@ class AuthRepository {
     fun register(body: RegisterRequestBody): Flow<Result<TokenResponse>> = flow {
         try {
             val tokenData = api.register(body)
-            Network.token = tokenData.token
+            Network.updateToken(tokenData.token)
             emit(Result.success(tokenData))
         } catch (e: java.lang.Exception) {
             emit(Result.failure(e))
@@ -31,7 +32,7 @@ class AuthRepository {
     fun login(body: LoginRequestBody): Flow<Result<TokenResponse>> = flow {
         try {
             val tokenData = api.login(body)
-            Network.token = tokenData.token
+            Network.updateToken(tokenData.token)
             emit(Result.success(tokenData))
         } catch (e: java.lang.Exception) {
             emit(Result.failure(e))
@@ -43,8 +44,7 @@ class AuthRepository {
     fun logout() {
         CoroutineScope(Dispatchers.IO).launch {
             api.logout()
-            Network.token = ""
-            Network.userId = ""
+            clearUserData()
         }
     }
 }

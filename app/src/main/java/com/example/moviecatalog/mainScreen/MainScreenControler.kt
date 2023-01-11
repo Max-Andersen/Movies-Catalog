@@ -27,7 +27,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalAnimationApi
 @Composable
@@ -89,7 +88,6 @@ fun MainScreenController(externalNavController: NavController) {
                                     )
                                 })
                         }
-
                     }
                 }
             ) {

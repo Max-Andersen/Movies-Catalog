@@ -1,11 +1,12 @@
 package com.example.moviecatalog.mainScreen
 
-import com.example.moviecatalog.mainScreen.movieData.Movies
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.moviecatalog.mainScreen.movieData.MovieSource
+import com.example.moviecatalog.mainScreen.movieData.Movies
 import com.example.moviecatalog.repository.FavoriteMoviesRepository
 import com.example.moviecatalog.repository.MovieRepository
 import kotlinx.coroutines.flow.Flow
@@ -20,13 +21,58 @@ class MainScreenViewModel() : ViewModel() {
         MovieSource(movieRepository)
     }.flow
 
-    var favoriteMovies: List<Movies> = listOf()
+    var favoriteMovies = mutableStateListOf<Movies>()
+
+    lateinit var promotedFilm: Movies
+
+//    var favorites: Flow<Movies> = flow {
+//        getFavoriteMovies()
+//        promotedFilm = favoriteMovies[0]
+//        favoriteMovies.forEach { movie ->
+//            if (movie != promotedFilm){
+//                emit(movie)
+//            }
+//        }
+//    }.flowOn(Dispatchers.IO)
+
+//    suspend fun getFavoriteMovies() {
+//        favoriteMovies = favoriteMoviesRepository.getFavoriteMovies().movies as SnapshotStateList<Movies>
+//    }
 
     suspend fun getFavoriteMovies() {
-        favoriteMovies = favoriteMoviesRepository.getFavoriteMovies().movies
+        val noLongerFavoriteFilms = favoriteMovies.slice(0 until favoriteMovies.size).toMutableList()
+        favoriteMoviesRepository.getFavoriteMovies().movies.forEach { movie ->
+            if (movie != promotedFilm && !favoriteMovies.contains(movie)){
+                favoriteMovies.add(movie)
+                noLongerFavoriteFilms.remove(movie)
+            }
+            if (favoriteMovies.contains(movie)){
+                noLongerFavoriteFilms.remove(movie)
+            }
+        }
+        noLongerFavoriteFilms.forEach { movie ->
+            favoriteMovies.remove(movie)
+        }
     }
 
-    suspend fun deleteFromFavoriteMovies(movieId: String){
-        favoriteMoviesRepository.deleteFromFavorites(movieId)
+//    @JvmName("getFavoriteMovies1")
+//    fun getFavoriteMovies() {
+//
+//        val a = flow{
+//            favoriteMoviesRepository.getFavoriteMovies().movies.forEach { movie ->
+//                favoriteMovies.add(movie)
+//            }
+//            emit("")
+//        }.flowOn(Dispatchers.IO)
+////        CoroutineScope(Dispatchers.IO).launch {
+////            favoriteMovies = favoriteMoviesRepository.getFavoriteMovies().movies as SnapshotStateList<Movies>
+////            return@launch
+////        }
+//        //return favoriteMovies
+//    }
+
+    suspend fun deleteFromFavoriteMovies(movie: Movies){
+        favoriteMoviesRepository.deleteFromFavorites(movie.id)
+        favoriteMovies.remove(movie)
     }
 }

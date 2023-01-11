@@ -10,7 +10,7 @@ class TokenInterceptor: Interceptor {
         val request: Request = chain.request().newBuilder().apply {
             addHeader("accept", "application/json")
             addHeader("content-Type", "application/x-www-form-urlencoded")
-            addHeader("Authorization", "Bearer ${Network.token}" )
+            addHeader("Authorization", "Bearer ${Network.getToken()}" )
         }.build()
 
         var response: Response? = null

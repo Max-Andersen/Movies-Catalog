@@ -234,7 +234,7 @@ suspend fun checkUserAlive(): Boolean{
     return result
 }
 
-suspend fun clearUserData(){
+fun clearUserData(){
     Network.userId = ""
-    Network.token = ""
+    Network.updateToken("")
 }
