@@ -37,9 +37,12 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
     val context = LocalContext.current
 
     MovieCatalogTheme {
-        val login = remember { mutableStateOf("") }
-        val password = remember { mutableStateOf("") }
         val coroutineScope = rememberCoroutineScope()
+
+        val allTextFieldsFull = isAllTextFieldsFull(
+            model.login,
+            model.password
+        )
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -69,13 +72,15 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
 
                     ) {
 
-
-                    SetOutlinedTextField(variable = login, stringResource(id = R.string.login))
+                    SetOutlinedTextField(
+                        variable = model.login,
+                        stringResource(id = R.string.login)
+                    )
 
                     Spacer(modifier = Modifier.size(14.dp))
 
                     SetOutlinedTextField(
-                        variable = password,
+                        variable = model.password,
                         stringResource(id = R.string.password)
                     )
                 }
@@ -93,14 +98,10 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
 
                     ) {
 
-
                     OutlinedButton(
                         onClick = {
                             coroutineScope.launch(Dispatchers.IO) {
-                                val answer = model.signInButtonPressed(
-                                    login,
-                                    password
-                                )
+                                val answer = model.signInButtonPressed()
                                 if (answer.first == 1) {
                                     println("Success")
                                     launch(Dispatchers.Main) {
@@ -122,38 +123,25 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                                     }
                                 }
                             }
-
-
-                        }, // TODO( обработка ответа)
-                        enabled = isAllTextFieldsFull(login, password),
+                        },
+                        enabled = allTextFieldsFull,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(53.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = if (isAllTextFieldsFull(
-                                    login,
-                                    password
-                                )
-                            ) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background,
+                            backgroundColor = if (allTextFieldsFull) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background,
                             contentColor = MaterialTheme.colorScheme.primary,
                             disabledContentColor = MaterialTheme.colorScheme.background
                         ),
                         border = BorderStroke(
                             1.dp,
-                            if (isAllTextFieldsFull(
-                                    login,
-                                    password
-                                )
-                            ) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary
+                            if (allTextFieldsFull) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary
                         )
 
                     ) {
                         Text(
                             text = stringResource(id = R.string.enter),
-                            color = if (isAllTextFieldsFull(
-                                    login,
-                                    password
-                                )
+                            color = if (allTextFieldsFull
                             ) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.bodyMedium
                         )

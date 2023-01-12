@@ -4,6 +4,8 @@ import android.content.Context
 import android.text.TextUtils
 import android.util.Patterns
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import com.example.moviecatalog.network.Auth.RegisterRequestBody
 import com.example.moviecatalog.repository.AuthRepository
@@ -13,12 +15,17 @@ import java.util.*
 class SignUpViewModel : ViewModel() {
     private val authRepository = AuthRepository()
 
-    fun changeGender(
-        currentGender: MutableState<String>,
-        buttonType: String
-    ) { // 0 - male   1 - female
-        if (currentGender.value != buttonType) {
-            currentGender.value = buttonType
+    val login: MutableState<String> = mutableStateOf("")
+    val email: MutableState<String> = mutableStateOf("")
+    val name: MutableState<String> = mutableStateOf("")
+    val password: MutableState<String> = mutableStateOf("")
+    val passwordConfirmation: MutableState<String> = mutableStateOf("")
+    val dateOfBirthday: MutableState<String> = mutableStateOf("")
+    val gender: MutableState<String> = mutableStateOf("")
+
+    fun changeGender(buttonType: String) { // 0 - male   1 - female
+        if (gender.value != buttonType) {
+            gender.value = buttonType
         }
     }
 
@@ -31,15 +38,7 @@ class SignUpViewModel : ViewModel() {
         return result
     }
 
-    suspend fun register(
-        login: MutableState<String>,
-        email: MutableState<String>,
-        name: MutableState<String>,
-        password: MutableState<String>,
-        passwordConfirmation: MutableState<String>,
-        dateOfBirthday: MutableState<String>,
-        gender: MutableState<String>, context: Context
-    ): Pair<Int, String> {  // the fields are not empty, because then the button would be inactive
+    suspend fun register(): Pair<Int, String> {  // the fields are not empty, because then the button would be inactive
 
         val emailCorrect =
             !TextUtils.isEmpty(email.value) && Patterns.EMAIL_ADDRESS.matcher(email.value).matches()
@@ -69,6 +68,10 @@ class SignUpViewModel : ViewModel() {
             (enteredYear == currentYear && enteredMonth == currentMonth && enteredDay >= currentDay)
         ) {
             resultMessage += "\nДата рождения должна быть меньше текущего дня!"
+        }
+
+        if (password.value.length < 6) {
+            resultMessage += "\nПароль доджен быть не меньше 6 символов"
         }
 
         var success = 0

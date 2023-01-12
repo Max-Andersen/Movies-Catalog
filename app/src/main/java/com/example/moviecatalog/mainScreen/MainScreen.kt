@@ -72,7 +72,6 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                         if (superLazyMovieItems.itemCount > 0) {
                             PromotedFilm(navController, superLazyMovieItems[0]!!)
                         }
-                        //PromotedFilm(navController, model.promotedFilm)
                     }
                     item { Spacer(modifier = Modifier.size(10.dp)) }
 
@@ -171,7 +170,6 @@ fun PromotedFilm(navController: NavController, movie: Movies) {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun Favorite(navController: NavController, model: MainScreenViewModel, promotedMovie: Movies) {
-
     LaunchedEffect(Unit) {
         if (checkUserAlive()) {
             model.promotedFilm = promotedMovie
@@ -256,11 +254,12 @@ fun Favorite(navController: NavController, model: MainScreenViewModel, promotedM
                                     contentDescription = null,
                                     modifier = Modifier
                                         .padding(
-                                            start = 104.dp,
+                                            start = 94.dp,
                                             top = 4.dp,
                                             end = 4.dp,
-                                            bottom = 156.dp
+                                            bottom = 146.dp
                                         )
+                                        .size(20.dp)
                                         .clickable {
                                             CoroutineScope(Dispatchers.IO).launch {
                                                 if (checkUserAlive()) {
@@ -398,8 +397,6 @@ fun GalleryMovie(navController: NavController, movie: Movies) {
                         }
                     }
                 }
-
-
             }
         }) {
         Row(

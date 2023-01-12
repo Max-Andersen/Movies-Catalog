@@ -61,7 +61,7 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
 
     val allFieldsFull = isAllTextFieldsFull(email, name, dateOfBirthday, gender)
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(Unit) {
         model.getInformation()
         email.value = model.email
         avatarLink.value = model.avatarLink

@@ -35,7 +35,7 @@ fun SplashScreen(navController: NavController) {
         Animatable(0f)
     }
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(Unit) {
         scale.animateTo(
             targetValue = 1.2f,
             animationSpec = tween(
@@ -45,7 +45,7 @@ fun SplashScreen(navController: NavController) {
                 })
         )
 
-        delay(1500L)
+        delay(1300L)
         CoroutineScope(Dispatchers.IO).launch {
             if (checkUserAlive()){
                 launch(Dispatchers.Main) {

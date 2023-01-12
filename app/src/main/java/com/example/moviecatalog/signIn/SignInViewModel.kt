@@ -1,6 +1,7 @@
 package com.example.moviecatalog.signIn
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.moviecatalog.network.Auth.LoginRequestBody
 import com.example.moviecatalog.repository.AuthRepository
@@ -8,11 +9,10 @@ import com.example.moviecatalog.repository.AuthRepository
 class SignInViewModel : ViewModel() {
     private val authRepository = AuthRepository()
 
-    suspend fun signInButtonPressed(
-        login: MutableState<String>,
-        password: MutableState<String>
-    ): Pair<Int, String> {
+    val login: MutableState<String> = mutableStateOf("")
+    val password: MutableState<String> = mutableStateOf("")
 
+    suspend fun signInButtonPressed(): Pair<Int, String> {
         var success = 0
         var answer = ""
 
@@ -31,7 +31,7 @@ class SignInViewModel : ViewModel() {
             }
         }
 
-        println("RESULTTT  $success   $answer")
+        println("RESULT  $success   $answer")
         return Pair(success, answer)
     }
 }

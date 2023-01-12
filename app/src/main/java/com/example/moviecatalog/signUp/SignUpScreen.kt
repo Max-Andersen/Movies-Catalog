@@ -120,22 +120,14 @@ fun DatePickerView(date: MutableState<String>) {
 @Composable
 fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavController) {
     MovieCatalogTheme {
-        val login = remember { mutableStateOf("") }
-        val email = remember { mutableStateOf("") }
-        val name = remember { mutableStateOf("") }
-        val password = remember { mutableStateOf("") }
-        val passwordConfirmation = remember { mutableStateOf("") }
-        val dateOfBirthday = remember { mutableStateOf("") }
-        val gender = remember { mutableStateOf("") }
-
         val allTextsFull = isAllTextFieldsFull(
-            login,
-            email,
-            name,
-            password,
-            passwordConfirmation,
-            dateOfBirthday,
-            gender
+            model.login,
+            model.email,
+            model.name,
+            model.password,
+            model.passwordConfirmation,
+            model.dateOfBirthday,
+            model.gender
         )
         val scale = remember {
             Animatable(1f)
@@ -184,18 +176,18 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                     style = MaterialTheme.typography.headlineLarge,
                 )
 
-                SetOutlinedTextField(login, stringResource(id = R.string.login))
-                SetOutlinedTextField(email, stringResource(id = R.string.E_Mail))
-                SetOutlinedTextField(name, stringResource(id = R.string.name))
-                SetOutlinedTextField(password, stringResource(id = R.string.password))
+                SetOutlinedTextField(model.login, stringResource(id = R.string.login))
+                SetOutlinedTextField(model.email, stringResource(id = R.string.E_Mail))
+                SetOutlinedTextField(model.name, stringResource(id = R.string.name))
+                SetOutlinedTextField(model.password, stringResource(id = R.string.password))
                 SetOutlinedTextField(
-                    passwordConfirmation,
+                    model.passwordConfirmation,
                     stringResource(id = R.string.passwordConfirmation)
                 )
 
-                DatePickerView(dateOfBirthday)
+                DatePickerView(model.dateOfBirthday)
 
-                ChoseGender(model = model, gender = gender)
+                ChoseGender(model = model)
 
                 Spacer(modifier = Modifier.size(16.dp))
 
@@ -203,16 +195,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                 OutlinedButton(
                     onClick = {
                         CoroutineScope(Dispatchers.IO).launch {
-                            val answer = model.register(
-                                login,
-                                email,
-                                name,
-                                password,
-                                passwordConfirmation,
-                                dateOfBirthday,
-                                gender,
-                                context
-                            )
+                            val answer = model.register()
 
                             launch(Dispatchers.Main) {
                                 if (answer.first == 1) {

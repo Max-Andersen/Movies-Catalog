@@ -25,7 +25,7 @@ import com.example.moviecatalog.signUp.SignUpViewModel
 import kotlinx.coroutines.flow.collect
 
 @Composable
-fun getTextInputColorTheme(): TextFieldColors{
+fun getTextInputColorTheme(): TextFieldColors {
     return TextFieldDefaults.outlinedTextFieldColors(
         textColor = MaterialTheme.colorScheme.primary,
         cursorColor = MaterialTheme.colorScheme.secondary,
@@ -35,18 +35,28 @@ fun getTextInputColorTheme(): TextFieldColors{
 }
 
 @Composable
-fun SetOutlinedTextField(variable: MutableState<String>, name: String){
+fun SetOutlinedTextField(variable: MutableState<String>, name: String) {
     var passwordVisible by remember { mutableStateOf(false) }
     val textInputColorTheme = getTextInputColorTheme()
 
-    if(name in setOf(stringResource(id = R.string.password), stringResource(id = R.string.passwordConfirmation)) ){
+    if (name in setOf(
+            stringResource(id = R.string.password),
+            stringResource(id = R.string.passwordConfirmation)
+        )
+    ) {
         OutlinedTextField(
             value = variable.value,
-            onValueChange = {newText -> variable.value = newText} ,
+            onValueChange = { newText -> variable.value = newText },
             textStyle = MaterialTheme.typography.bodySmall,
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(text = name, color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.bodySmall) },
+            placeholder = {
+                Text(
+                    text = name,
+                    color = MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            },
             colors = textInputColorTheme,
             shape = RoundedCornerShape(8.dp),
             visualTransformation = if (!passwordVisible) PasswordVisualTransformation('*') else VisualTransformation.None,
@@ -57,21 +67,30 @@ fun SetOutlinedTextField(variable: MutableState<String>, name: String){
 
                 val description = if (passwordVisible) "Hide password" else "Show password"
 
-                IconButton(onClick = {passwordVisible = !passwordVisible}){
-                    Icon(imageVector  = image, description, tint = MaterialTheme.colorScheme.secondary)
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        imageVector = image,
+                        description,
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
                 }
             }
         )
-    }
-    else{
+    } else {
         OutlinedTextField(
             value = variable.value,
-            onValueChange = {newText -> variable.value = newText} ,
+            onValueChange = { newText -> variable.value = newText },
             textStyle = MaterialTheme.typography.bodySmall,
             singleLine = true,
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(text = name, color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.bodySmall) },
+            placeholder = {
+                Text(
+                    text = name,
+                    color = MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            },
             colors = textInputColorTheme,
         )
     }
@@ -80,7 +99,7 @@ fun SetOutlinedTextField(variable: MutableState<String>, name: String){
 }
 
 fun isAllTextFieldsFull(vararg strings: MutableState<String>): Boolean {
-    return strings.map{ if(it.value.isNotBlank()) 1 else 0 }.sum() == strings.size
+    return strings.map { if (it.value.isNotBlank()) 1 else 0 }.sum() == strings.size
 }
 
 fun LazyListLayoutInfo.normalizedItemPosition(key: Any): Float =
@@ -93,7 +112,7 @@ fun LazyListLayoutInfo.normalizedItemPosition(key: Any): Float =
         ?: 0F
 
 @Composable
-fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>) {
+fun ChoseGender(model: SignUpViewModel) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(1.dp))
@@ -106,9 +125,9 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>) {
         ) {
 
             OutlinedButton(
-                onClick = { model.changeGender(gender, "0") },
+                onClick = { model.changeGender("0") },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = if (gender.value == "0") MaterialTheme.colorScheme.primary
+                    backgroundColor = if (model.gender.value == "0") MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
                 ),
                 modifier = Modifier
@@ -125,16 +144,16 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>) {
             {
                 Text(
                     text = stringResource(id = R.string.male),
-                    color = if (gender.value == "0") MaterialTheme.colorScheme.onPrimary
+                    color = if (model.gender.value == "0") MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
 
             OutlinedButton(
-                onClick = { model.changeGender(gender, "1") },
+                onClick = { model.changeGender("1") },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = if (gender.value == "1") MaterialTheme.colorScheme.primary
+                    backgroundColor = if (model.gender.value == "1") MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
                 ),
                 modifier = Modifier
@@ -150,7 +169,7 @@ fun ChoseGender(model: SignUpViewModel, gender: MutableState<String>) {
             ) {
                 Text(
                     text = stringResource(id = R.string.female),
-                    color = if (gender.value == "1") MaterialTheme.colorScheme.onPrimary
+                    color = if (model.gender.value == "1") MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -226,15 +245,15 @@ fun ChoseGender(model: ProfileViewModel, gender: MutableState<String>) {
     }
 }
 
-suspend fun checkUserAlive(): Boolean{
+suspend fun checkUserAlive(): Boolean {
     var result = false
-    UserRepository().getData().collect{
+    UserRepository().getData().collect {
         result = it.isSuccess
     }
     return result
 }
 
-fun clearUserData(){
+fun clearUserData() {
     Network.userId = ""
     Network.updateToken("")
 }

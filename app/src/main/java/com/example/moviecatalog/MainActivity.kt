@@ -62,7 +62,6 @@ class MainActivity : ComponentActivity() {
                             MovieScreen(filmId, navController)
                         }
                     }
-
                 }
             }
         }
