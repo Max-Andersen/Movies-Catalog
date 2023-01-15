@@ -25,20 +25,6 @@ class MainScreenViewModel() : ViewModel() {
 
     lateinit var promotedFilm: Movies
 
-//    var favorites: Flow<Movies> = flow {
-//        getFavoriteMovies()
-//        promotedFilm = favoriteMovies[0]
-//        favoriteMovies.forEach { movie ->
-//            if (movie != promotedFilm){
-//                emit(movie)
-//            }
-//        }
-//    }.flowOn(Dispatchers.IO)
-
-//    suspend fun getFavoriteMovies() {
-//        favoriteMovies = favoriteMoviesRepository.getFavoriteMovies().movies as SnapshotStateList<Movies>
-//    }
-
     suspend fun getFavoriteMovies() {
         val noLongerFavoriteFilms = favoriteMovies.slice(0 until favoriteMovies.size).toMutableList()
         favoriteMoviesRepository.getFavoriteMovies().movies.forEach { movie ->
@@ -54,22 +40,6 @@ class MainScreenViewModel() : ViewModel() {
             favoriteMovies.remove(movie)
         }
     }
-
-//    @JvmName("getFavoriteMovies1")
-//    fun getFavoriteMovies() {
-//
-//        val a = flow{
-//            favoriteMoviesRepository.getFavoriteMovies().movies.forEach { movie ->
-//                favoriteMovies.add(movie)
-//            }
-//            emit("")
-//        }.flowOn(Dispatchers.IO)
-////        CoroutineScope(Dispatchers.IO).launch {
-////            favoriteMovies = favoriteMoviesRepository.getFavoriteMovies().movies as SnapshotStateList<Movies>
-////            return@launch
-////        }
-//        //return favoriteMovies
-//    }
 
     suspend fun deleteFromFavoriteMovies(movie: Movies){
         favoriteMoviesRepository.deleteFromFavorites(movie.id)

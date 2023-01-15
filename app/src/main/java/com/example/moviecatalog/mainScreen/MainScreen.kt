@@ -118,10 +118,7 @@ fun MainScreen(navController: NavController, model: MainScreenViewModel = viewMo
                         .size(40.dp)
                         .alpha(if (showUpButton) 0.7f else 0f)
                 )
-
             }
-
-
         }
     }
 }

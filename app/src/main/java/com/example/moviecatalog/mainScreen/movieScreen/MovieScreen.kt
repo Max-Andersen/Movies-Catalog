@@ -285,9 +285,7 @@ private fun Body(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
 
-
                 MovieDataDescription(movieData = movieData)
-
 
                 Spacer(modifier = Modifier.size(0.dp))
 
@@ -318,14 +316,6 @@ private fun Body(
                             .size(24.dp)
                     )
                 }
-
-//                for (review in movieData.reviews) {
-//                    if (review.author.userId == model.myId) {
-//                        model.myReview = review
-//                        movieData.reviews.toMutableList().remove(review)
-//                        break
-//                    }
-//                }
 
                 model.myReview?.let {
                     ReviewBox(

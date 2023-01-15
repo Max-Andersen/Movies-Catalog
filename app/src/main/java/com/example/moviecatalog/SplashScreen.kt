@@ -1,35 +1,30 @@
 package com.example.moviecatalog
 
-import android.util.Log
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.airbnb.lottie.Lottie
-import com.airbnb.lottie.compose.*
-import com.example.moviecatalog.mainScreen.profileScreen.ProfileScreen
-import com.example.moviecatalog.network.Network
 import com.example.moviecatalog.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @Composable
 fun SplashScreen(navController: NavController) {
-    val userRepository: UserRepository = UserRepository()
+    UserRepository()
 
     val scale = remember {
         Animatable(0f)

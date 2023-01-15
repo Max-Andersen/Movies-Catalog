@@ -133,7 +133,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
             Animatable(1f)
         }
 
-        LaunchedEffect(scale) {
+        LaunchedEffect(Unit) {
             scale.animateTo(
                 targetValue = 0.6f,
                 animationSpec = tween(

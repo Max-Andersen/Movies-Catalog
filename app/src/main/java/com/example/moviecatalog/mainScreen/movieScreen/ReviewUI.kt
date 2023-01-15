@@ -201,7 +201,6 @@ fun ReviewDialog(
                                         clearUserData()
                                     }
                                 }
-                                //model.getMyReview()
                             }
                         },
                         modifier = Modifier
