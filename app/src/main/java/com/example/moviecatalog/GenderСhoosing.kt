@@ -2,117 +2,26 @@ package com.example.moviecatalog
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyListLayoutInfo
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.moviecatalog.mainScreen.profileScreen.ProfileViewModel
-import com.example.moviecatalog.network.Network
-import com.example.moviecatalog.repository.UserRepository
 import com.example.moviecatalog.signUp.SignUpViewModel
-import kotlinx.coroutines.flow.collect
 
 @Composable
-fun getTextInputColorTheme(): TextFieldColors {
-    return TextFieldDefaults.outlinedTextFieldColors(
-        textColor = MaterialTheme.colorScheme.primary,
-        cursorColor = MaterialTheme.colorScheme.secondary,
-        focusedBorderColor = MaterialTheme.colorScheme.secondary,
-        unfocusedBorderColor = MaterialTheme.colorScheme.secondary
-    )
-}
-
-@Composable
-fun SetOutlinedTextField(variable: MutableState<String>, name: String) {
-    var passwordVisible by remember { mutableStateOf(false) }
-    val textInputColorTheme = getTextInputColorTheme()
-
-    if (name in setOf(
-            stringResource(id = R.string.password),
-            stringResource(id = R.string.passwordConfirmation)
-        )
-    ) {
-        OutlinedTextField(
-            value = variable.value,
-            onValueChange = { newText -> variable.value = newText },
-            textStyle = MaterialTheme.typography.bodySmall,
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = {
-                Text(
-                    text = name,
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            },
-            colors = textInputColorTheme,
-            shape = RoundedCornerShape(8.dp),
-            visualTransformation = if (!passwordVisible) PasswordVisualTransformation('*') else VisualTransformation.None,
-            trailingIcon = {
-                val image = if (passwordVisible)
-                    Icons.Filled.Visibility
-                else Icons.Filled.VisibilityOff
-
-                val description = if (passwordVisible) "Hide password" else "Show password"
-
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(
-                        imageVector = image,
-                        description,
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            }
-        )
-    } else {
-        OutlinedTextField(
-            value = variable.value,
-            onValueChange = { newText -> variable.value = newText },
-            textStyle = MaterialTheme.typography.bodySmall,
-            singleLine = true,
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = {
-                Text(
-                    text = name,
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            },
-            colors = textInputColorTheme,
-        )
-    }
-
-
-}
-
-fun isAllTextFieldsFull(vararg strings: MutableState<String>): Boolean {
-    return strings.map { if (it.value.isNotBlank()) 1 else 0 }.sum() == strings.size
-}
-
-fun LazyListLayoutInfo.normalizedItemPosition(key: Any): Float =
-    visibleItemsInfo
-        .firstOrNull { it.key == key }
-        ?.let {
-            val center = (viewportEndOffset + viewportStartOffset - it.size * 2.4f) / 2F
-            (it.offset.toFloat() - center) / center
-        }
-        ?: 0F
-
-@Composable
-fun ChoseGender(model: SignUpViewModel) {
+fun ChoiceGender(model: SignUpViewModel) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(1.dp))
@@ -179,7 +88,7 @@ fun ChoseGender(model: SignUpViewModel) {
 }
 
 @Composable
-fun ChoseGender(model: ProfileViewModel, gender: MutableState<String>) {
+fun ChoiceGender(model: ProfileViewModel, gender: MutableState<String>) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(1.dp))
@@ -243,17 +152,4 @@ fun ChoseGender(model: ProfileViewModel, gender: MutableState<String>) {
             }
         }
     }
-}
-
-suspend fun checkUserAlive(): Boolean {
-    var result = false
-    UserRepository().getData().collect {
-        result = it.isSuccess
-    }
-    return result
-}
-
-fun clearUserData() {
-    Network.userId = ""
-    Network.updateToken("")
 }

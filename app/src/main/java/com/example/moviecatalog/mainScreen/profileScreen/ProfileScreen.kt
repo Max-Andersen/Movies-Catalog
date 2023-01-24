@@ -131,7 +131,7 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                     text = stringResource(id = R.string.gender),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                ChoseGender(model = model, gender = gender)
+                ChoiceGender(model = model, gender = gender)
 
                 Spacer(modifier = Modifier.size(10.dp))
 

@@ -32,7 +32,7 @@
     <string name="main">Главное</string>
     <string name="profile">Профиль</string>
     <string name="makeReview">Оставить отзыв</string>
-    <string name="someText">Некий текст</string>
+    <string name="someText">Отзыв</string>
     <string name="cancel">Отмена</string>
     <string name="aboutMovie">О фильме</string>
     <string name="year">Год</string>

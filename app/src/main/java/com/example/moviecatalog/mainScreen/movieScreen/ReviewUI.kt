@@ -79,7 +79,8 @@ fun ReviewDialog(
 
         AlertDialog(
             onDismissRequest = { openReviewDialog.value = false },
-            title = {
+            title = null,
+            text = {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = stringResource(id = R.string.makeReview),
@@ -99,13 +100,14 @@ fun ReviewDialog(
                     TextField(
                         value = reviewText.value,
                         onValueChange = { newText -> reviewText.value = newText },
+                        //shape = CircleShape,
                         modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp)
                             .background(
                                 MaterialTheme.colorScheme.onPrimary,
-                                RoundedCornerShape(8.dp)
-                            )
-                            .height(120.dp)
-                            .fillMaxWidth(),
+                                RoundedCornerShape(6.dp)
+                            ),
                         colors = TextFieldDefaults.textFieldColors(
                             containerColor = MaterialTheme.colorScheme.onPrimary,
                             textColor = MaterialTheme.colorScheme.background

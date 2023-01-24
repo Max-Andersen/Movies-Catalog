@@ -1,6 +1,5 @@
 package com.example.moviecatalog.mainScreen
 
-import com.example.moviecatalog.mainScreen.movieData.Movies
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -9,32 +8,41 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.moviecatalog.R
-import com.example.moviecatalog.normalizedItemPosition
-import com.example.moviecatalog.ui.theme.MovieCatalogTheme
-import kotlin.math.absoluteValue
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.moviecatalog.R
 import com.example.moviecatalog.checkUserAlive
 import com.example.moviecatalog.clearUserData
+import com.example.moviecatalog.mainScreen.movieData.Movies
 import com.example.moviecatalog.mainScreen.movieData.Reviews
+import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 import kotlin.math.pow
+
+fun LazyListLayoutInfo.normalizedItemPosition(key: Any): Float =
+    visibleItemsInfo
+        .firstOrNull { it.key == key }
+        ?.let {
+            val center = (viewportEndOffset + viewportStartOffset - it.size * 2.4f) / 2F
+            (it.offset.toFloat() - center) / center
+        }
+        ?: 0F
 
 @Composable
 fun MainScreen(navController: NavController, model: MainScreenViewModel = viewModel()) {

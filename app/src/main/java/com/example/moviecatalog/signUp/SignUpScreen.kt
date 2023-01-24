@@ -30,7 +30,7 @@ import com.example.moviecatalog.R
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.moviecatalog.ChoseGender
+import com.example.moviecatalog.ChoiceGender
 import com.example.moviecatalog.SetOutlinedTextField
 import com.example.moviecatalog.isAllTextFieldsFull
 import kotlinx.coroutines.CoroutineScope
@@ -187,7 +187,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
 
                 DatePickerView(model.dateOfBirthday)
 
-                ChoseGender(model = model)
+                ChoiceGender(model = model)
 
                 Spacer(modifier = Modifier.size(16.dp))
 

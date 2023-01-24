@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.github.bumptech.glide:compose:1.0.0-alpha.1@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/13bbeba4068dc22b49f25d2d1e7b5fba/transformed/compose-1.0.0-alpha.1/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/13bbeba4068dc22b49f25d2d1e7b5fba/transformed/compose-1.0.0-alpha.1/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/12093bac6750c5aa8f576522ad2dbb30/transformed/compose-1.0.0-alpha.1/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/12093bac6750c5aa8f576522ad2dbb30/transformed/compose-1.0.0-alpha.1/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.bumptech.glide/compose/1.0.0-alpha.1/d568e33ab6864de29f617fbe08f683a7041e5249/compose-1.0.0-alpha.1-javadoc.jar!/" />
