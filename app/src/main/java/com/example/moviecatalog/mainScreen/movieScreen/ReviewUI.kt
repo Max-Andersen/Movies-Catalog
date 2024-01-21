@@ -31,6 +31,7 @@ import com.example.moviecatalog.checkUserAlive
 import com.example.moviecatalog.clearUserData
 import com.example.moviecatalog.mainScreen.calculateColor
 import com.example.moviecatalog.mainScreen.movieData.ReviewsDetails
+import com.example.moviecatalog.unNormalizeDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -330,9 +331,7 @@ fun ReviewBox(
                 val (date, editButton, deleteButton) = createRefs()
 
                 Text(
-                    text = review.createDateTime.slice(8..9) + "." + review.createDateTime.slice(5..6) + "." + review.createDateTime.slice(
-                        0..3
-                    ),
+                    text = review.createDateTime.unNormalizeDate(),
                     color = MaterialTheme.colorScheme.secondary,
                     fontSize = 12.sp,
                     modifier = Modifier.constrainAs(date) {//.padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 8.dp)

@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import com.example.moviecatalog.network.Network
+import com.example.moviecatalog.normalizeDate
 import com.example.moviecatalog.repository.AuthRepository
 import com.example.moviecatalog.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,23 +20,6 @@ class ProfileViewModel() : ViewModel() {
     private val _userData = MutableStateFlow(UserData())
 
     val userData: StateFlow<UserData> = _userData
-
-    private fun normalizeDate(date: String): String {
-        var result = ""
-        result += date.slice(6..9) + "-"
-        result += date.slice(3..4) + "-"
-        result += date.slice(0..1)
-        result += "T18:14:23.985Z"
-        return result
-    }
-
-    private fun unNormalizeDate(date: String): String {
-        var result = ""
-        result += date.slice(8..9) + "."
-        result += date.slice(5..6) + "."
-        result += date.slice(0..3)
-        return result
-    }
 
     suspend fun getInformation() {
         userRepository.getData().collect {
@@ -76,7 +60,7 @@ class ProfileViewModel() : ViewModel() {
                 resultMessage += "\nДата рождения должна быть меньше текущего дня!"
             }
 
-            val normalizedDate = normalizeDate(dateOfBirthday)
+            val normalizedDate = dateOfBirthday.normalizeDate()
 
             var answer = ""
 

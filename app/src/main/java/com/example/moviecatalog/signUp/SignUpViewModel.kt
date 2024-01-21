@@ -2,12 +2,9 @@ package com.example.moviecatalog.signUp
 
 import android.text.TextUtils
 import android.util.Patterns
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.moviecatalog.mainScreen.profileScreen.UserData
 import com.example.moviecatalog.network.Auth.RegisterRequestBody
-import com.example.moviecatalog.network.User.Gender
+import com.example.moviecatalog.normalizeDate
 import com.example.moviecatalog.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,15 +17,6 @@ class SignUpViewModel : ViewModel() {
     private val _userData = MutableStateFlow(SignUpScreenState())
 
     val userData: StateFlow<SignUpScreenState> = _userData
-
-    private fun normalizeDate(date: String): String {
-        var result = ""
-        result += date.slice(6..9) + "-"
-        result += date.slice(3..4) + "-"
-        result += date.slice(0..1)
-        result += "T18:14:23.985Z"
-        return result
-    }
 
     suspend fun register(screenState: SignUpScreenState): Pair<Int, String> {  // the fields are not empty, because then the button would be inactive
         with(screenState){
@@ -69,7 +57,7 @@ class SignUpViewModel : ViewModel() {
             var success = 0
             var answer = ""
 
-            val normalizedDate = normalizeDate(dateOfBirthday)
+            val normalizedDate = dateOfBirthday.normalizeDate()
 
             if (resultMessage.isEmpty()) {
                 authRepository.register(
