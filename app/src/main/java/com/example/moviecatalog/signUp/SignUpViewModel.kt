@@ -3,6 +3,7 @@ package com.example.moviecatalog.signUp
 import android.text.TextUtils
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
+import com.example.moviecatalog.network.Auth.AuthResponse
 import com.example.moviecatalog.network.Auth.RegisterRequestBody
 import com.example.moviecatalog.normalizeDate
 import com.example.moviecatalog.repository.AuthRepository
@@ -18,11 +19,11 @@ class SignUpViewModel : ViewModel() {
 
     val userData: StateFlow<SignUpScreenState> = _userData
 
-    suspend fun register(screenState: SignUpScreenState): Pair<Int, String> {  // the fields are not empty, because then the button would be inactive
-        with(screenState){
+    suspend fun register(screenState: SignUpScreenState): AuthResponse {  // the fields are not empty, because then the button would be inactive
+        with(screenState) {
             val emailCorrect =
                 !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches()
-            var resultMessage = ""
+            var validationMessage = ""
 
             val calendar = Calendar.getInstance()
             val currentYear = calendar.get(Calendar.YEAR)
@@ -36,30 +37,27 @@ class SignUpViewModel : ViewModel() {
 
 
             if (!emailCorrect) {
-                resultMessage += "\nНеверная почта!"
+                validationMessage += "\nНеверная почта!"
             }
 
             if (password != passwordConfirmation) {
-                resultMessage += "\nПароли не совпадают!"
+                validationMessage += "\nПароли не совпадают!"
             }
 
             if ((enteredYear > currentYear) ||
                 (enteredYear == currentYear && enteredMonth > currentMonth) ||
                 (enteredYear == currentYear && enteredMonth == currentMonth && enteredDay >= currentDay)
             ) {
-                resultMessage += "\nДата рождения должна быть меньше текущего дня!"
+                validationMessage += "\nДата рождения должна быть меньше текущего дня!"
             }
 
             if (password.length < 6) {
-                resultMessage += "\nПароль доджен быть не меньше 6 символов"
+                validationMessage += "\nПароль доджен быть не меньше 6 символов"
             }
-
-            var success = 0
-            var answer = ""
 
             val normalizedDate = dateOfBirthday.normalizeDate()
 
-            if (resultMessage.isEmpty()) {
+            return if (validationMessage.isEmpty()) {
                 authRepository.register(
                     RegisterRequestBody(
                         login,
@@ -69,21 +67,10 @@ class SignUpViewModel : ViewModel() {
                         normalizedDate,
                         gender.serverId
                     )
-                ).collect { token ->
-                    token.onSuccess {
-                        answer = it.token
-                        success = 1
-
-                    }.onFailure {
-                        answer = it.message.toString()
-                    }
-                }
-
+                )
             } else {
-                answer = resultMessage
+                AuthResponse.Fail(validationMessage)
             }
-
-            return Pair(success, answer)
         }
 
     }

@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import com.example.moviecatalog.R
 import com.example.moviecatalog.SetOutlinedTextField
 import com.example.moviecatalog.isAllTextFieldsFull
+import com.example.moviecatalog.network.Auth.AuthResponse
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -77,7 +78,7 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                     SetOutlinedTextField(
                         value = screenState.value.login,
                         stringResource(id = R.string.login)
-                    ){
+                    ) {
                         screenState.value = screenState.value.copy(login = it)
                     }
 
@@ -86,7 +87,7 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                     SetOutlinedTextField(
                         value = screenState.value.password,
                         stringResource(id = R.string.password)
-                    ){
+                    ) {
                         screenState.value = screenState.value.copy(password = it)
 
                     }
@@ -109,9 +110,8 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                         onClick = {
                             coroutineScope.launch(Dispatchers.IO) {
                                 val answer = model.signInButtonPressed(screenState.value)
-                                if (answer.first == 1) {
-                                    println("Success")
-                                    launch(Dispatchers.Main) {
+                                when (answer) {
+                                    is AuthResponse.Success -> launch(Dispatchers.Main) {
                                         navController.navigate("mainScreen") {
                                             popUpTo(
                                                 navController.graph.id
@@ -119,12 +119,10 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                                         }
                                     }
 
-                                } else {
-                                    println("Fail")
-                                    launch(Dispatchers.Main) {
+                                    is AuthResponse.Fail -> launch(Dispatchers.Main) {
                                         Toast.makeText(
                                             context,
-                                            answer.second,
+                                            answer.cause,
                                             Toast.LENGTH_LONG
                                         ).show()
                                     }

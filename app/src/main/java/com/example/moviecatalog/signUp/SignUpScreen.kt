@@ -49,6 +49,7 @@ import com.example.moviecatalog.ChoiceGender
 import com.example.moviecatalog.R
 import com.example.moviecatalog.SetOutlinedTextField
 import com.example.moviecatalog.isAllTextFieldsFull
+import com.example.moviecatalog.network.Auth.AuthResponse
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -232,16 +233,16 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                             val answer = model.register(state.value)
 
                             launch(Dispatchers.Main) {
-                                if (answer.first == 1) {
-                                    navController.navigate("mainScreen") {
-                                        popUpTo(
-                                            navController.graph.id
-                                        )
-                                    }
-                                } else {
-                                    Toast.makeText(
+                                when(answer){
+                                    is AuthResponse.Success ->
+                                        navController.navigate("mainScreen") {
+                                            popUpTo(
+                                                navController.graph.id
+                                            )
+                                        }
+                                    is AuthResponse.Fail -> Toast.makeText(
                                         context,
-                                        "Ответ от валидирующих котиков:${answer.second}",
+                                        "Ответ от валидирующих котиков:${answer.cause}",
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }

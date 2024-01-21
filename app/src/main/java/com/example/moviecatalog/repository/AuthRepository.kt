@@ -2,43 +2,38 @@ package com.example.moviecatalog.repository
 
 import com.example.moviecatalog.clearUserData
 import com.example.moviecatalog.network.Auth.AuthApi
+import com.example.moviecatalog.network.Auth.AuthResponse
 import com.example.moviecatalog.network.Auth.LoginRequestBody
 import com.example.moviecatalog.network.Auth.RegisterRequestBody
 import com.example.moviecatalog.network.Network
-import com.example.moviecatalog.network.Auth.TokenResponse
 import kotlinx.coroutines.CoroutineScope
-
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 class AuthRepository {
 
     private val api: AuthApi = Network.getAuthApi()
 
-    fun register(body: RegisterRequestBody): Flow<Result<TokenResponse>> = flow {
-        try {
-            val tokenData = api.register(body)
-            Network.updateToken(tokenData.token)
-            emit(Result.success(tokenData))
+    suspend fun register(body: RegisterRequestBody): AuthResponse {
+        return try {
+            val token = api.register(body).token
+            Network.updateToken(token)
+            AuthResponse.Success(token)
         } catch (e: java.lang.Exception) {
-            emit(Result.failure(e))
+            AuthResponse.Fail(e.message ?: "Unknown failure")
         }
-    }.flowOn(Dispatchers.IO)
+    }
 
 
-    fun login(body: LoginRequestBody): Flow<Result<TokenResponse>> = flow {
-        try {
-            val tokenData = api.login(body)
-            Network.updateToken(tokenData.token)
-            emit(Result.success(tokenData))
+    suspend fun login(body: LoginRequestBody): AuthResponse {
+        return try {
+            val token = api.login(body).token
+            Network.updateToken(token)
+            AuthResponse.Success(token)
         } catch (e: java.lang.Exception) {
-            emit(Result.failure(e))
+            AuthResponse.Fail(e.message ?: "Unknown failure")
         }
-
-    }.flowOn(Dispatchers.IO)
+    }
 
 
     fun logout() {
