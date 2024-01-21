@@ -1,4 +1,7 @@
-/* 
+import com.example.moviecatalog.mainScreen.profileScreen.UserData
+import com.example.moviecatalog.network.User.Gender
+
+/*
 Copyright (c) 2022 Kotlin Data Classes Generated from JSON powered by http://www.json2kotlin.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -10,13 +13,23 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 For support, please feel free to contact me at https://www.linkedin.com/in/syedabsar */
 
 @kotlinx.serialization.Serializable
-data class UserDataResponse (
+data class UserDataResponse(
 
-	val id : String,
-	val nickName : String,
-	val email : String,
-	val avatarLink : String,
-	val name : String,
-	val birthDate : String,
-	val gender : Int
+    val id: String,
+    val nickName: String,
+    val email: String,
+    val avatarLink: String,
+    val name: String,
+    val birthDate: String,
+    val gender: Int
+)
+
+fun UserDataResponse.toUiModel() = UserData(
+    email = email,
+    avatarLink = avatarLink,
+    name = name,
+    nickName = nickName,
+    dateOfBirthday = birthDate,
+    gender = if (gender == 0) Gender.MALE else Gender.FEMALE,
+    currentName = nickName,
 )

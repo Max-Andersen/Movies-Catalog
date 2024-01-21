@@ -3,7 +3,15 @@ package com.example.moviecatalog.mainScreen.profileScreen
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -15,8 +23,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,8 +36,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.example.moviecatalog.*
+import com.example.moviecatalog.ChoiceGender
 import com.example.moviecatalog.R
+import com.example.moviecatalog.SetOutlinedTextField
+import com.example.moviecatalog.checkUserAlive
+import com.example.moviecatalog.clearUserData
+import com.example.moviecatalog.isAllTextFieldsFull
 import com.example.moviecatalog.network.User.Gender
 import com.example.moviecatalog.signUp.DatePickerView
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
@@ -40,36 +52,16 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewModel()) {
-    val email = remember {
-        mutableStateOf("")
-    }
-    val avatarLink = remember {
-        mutableStateOf("")
-    }
-    val name = remember {
-        mutableStateOf("")
-    }
-    val dateOfBirthday = remember {
-        mutableStateOf("")
-    }
-    val gender = remember {
-        mutableStateOf(Gender.MALE)
-    }
+    val userData = model.userData.collectAsState() as MutableState<UserData>
 
-    val currentName = remember {
-        mutableStateOf("")
-    }
-
-    val allFieldsFull = isAllTextFieldsFull(email, name, dateOfBirthday)
+    val allFieldsFull = isAllTextFieldsFull(
+        userData.value.email,
+        userData.value.name,
+        userData.value.dateOfBirthday
+    )
 
     LaunchedEffect(Unit) {
         model.getInformation()
-        email.value = model.email
-        avatarLink.value = model.avatarLink
-        name.value = model.name
-        dateOfBirthday.value = model.dateOfBirthday
-        gender.value = model.gender
-        currentName.value = model.name
     }
     MovieCatalogTheme {
         Surface(
@@ -91,7 +83,7 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     GlideImage(
-                        model = if (avatarLink.value == "") R.drawable.empty_profile_photo else avatarLink.value,
+                        model = if (userData.value.avatarLink == "") R.drawable.empty_profile_photo else userData.value.avatarLink,
                         contentDescription = null,
                         modifier = Modifier
                             .clip(CircleShape)
@@ -99,7 +91,7 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                         contentScale = ContentScale.Crop
                     )
                     Text(
-                        text = currentName.value,
+                        text = userData.value.currentName,
                         style = MaterialTheme.typography.headlineLarge,
                     )
                 }
@@ -108,31 +100,42 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                     text = stringResource(id = R.string.E_Mail),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                SetOutlinedTextField(variable = email, name = "E-Mail")
+                SetOutlinedTextField(value = userData.value.email, name = "E-Mail") {
+                    userData.value = userData.value.copy(email = it)
+                }
 
                 Text(
                     text = stringResource(id = R.string.avatarLink),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                SetOutlinedTextField(variable = avatarLink, name = "url")
+                SetOutlinedTextField(value = userData.value.avatarLink, name = "url") {
+                    userData.value = userData.value.copy(avatarLink = it)
+                }
 
                 Text(
                     text = stringResource(id = R.string.name),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                SetOutlinedTextField(variable = name, name = "Имя(name)")
+                SetOutlinedTextField(value = userData.value.name, name = "Имя(name)") {
+                    userData.value = userData.value.copy(name = it)
+                }
 
                 Text(
                     text = stringResource(id = R.string.dateOfBirthday),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                DatePickerView(date = dateOfBirthday)
+                DatePickerView(date = userData.value.dateOfBirthday) {
+                    userData.value = userData.value.copy(dateOfBirthday = it)
+                }
 
                 Text(
                     text = stringResource(id = R.string.gender),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                ChoiceGender(model = model, gender = gender)
+
+                ChoiceGender(gender = userData.value.gender) { gender: Gender ->
+                    userData.value = userData.value.copy(gender = gender)
+                }
 
                 Spacer(modifier = Modifier.size(10.dp))
 
@@ -144,11 +147,7 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
                             if (checkUserAlive()) {
                                 try {
                                     val answer = model.putInformation(
-                                        email.value,
-                                        avatarLink.value,
-                                        name.value,
-                                        dateOfBirthday.value,
-                                        gender.value
+                                        userData.value
                                     )
 
                                     if (answer.isNotEmpty()) {

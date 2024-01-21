@@ -5,28 +5,21 @@ import android.util.Patterns
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.moviecatalog.mainScreen.profileScreen.UserData
 import com.example.moviecatalog.network.Auth.RegisterRequestBody
 import com.example.moviecatalog.network.User.Gender
 import com.example.moviecatalog.repository.AuthRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.util.Calendar
 
 
 class SignUpViewModel : ViewModel() {
     private val authRepository = AuthRepository()
 
-    val login: MutableState<String> = mutableStateOf("")
-    val email: MutableState<String> = mutableStateOf("")
-    val name: MutableState<String> = mutableStateOf("")
-    val password: MutableState<String> = mutableStateOf("")
-    val passwordConfirmation: MutableState<String> = mutableStateOf("")
-    val dateOfBirthday: MutableState<String> = mutableStateOf("")
-    val gender: MutableState<Gender> = mutableStateOf(Gender.MALE)
+    private val _userData = MutableStateFlow(SignUpScreenState())
 
-    fun changeGender(buttonType: Gender) {
-        if (gender.value != buttonType) {
-            gender.value = buttonType
-        }
-    }
+    val userData: StateFlow<SignUpScreenState> = _userData
 
     private fun normalizeDate(date: String): String {
         var result = ""
@@ -37,71 +30,73 @@ class SignUpViewModel : ViewModel() {
         return result
     }
 
-    suspend fun register(): Pair<Int, String> {  // the fields are not empty, because then the button would be inactive
+    suspend fun register(screenState: SignUpScreenState): Pair<Int, String> {  // the fields are not empty, because then the button would be inactive
+        with(screenState){
+            val emailCorrect =
+                !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+            var resultMessage = ""
 
-        val emailCorrect =
-            !TextUtils.isEmpty(email.value) && Patterns.EMAIL_ADDRESS.matcher(email.value).matches()
-        var resultMessage = ""
-
-        val calendar = Calendar.getInstance()
-        val currentYear = calendar.get(Calendar.YEAR)
-        val currentMonth = calendar.get(Calendar.MONTH) + 1
-        val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
-
-
-        val enteredDay = dateOfBirthday.value.substringBefore('.').toInt()
-        val enteredMonth = dateOfBirthday.value.substringAfter('.').substringBefore(".").toInt()
-        val enteredYear = dateOfBirthday.value.substringAfterLast('.').toInt()
+            val calendar = Calendar.getInstance()
+            val currentYear = calendar.get(Calendar.YEAR)
+            val currentMonth = calendar.get(Calendar.MONTH) + 1
+            val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
 
 
-        if (!emailCorrect) {
-            resultMessage += "\nНеверная почта!"
-        }
+            val enteredDay = dateOfBirthday.substringBefore('.').toInt()
+            val enteredMonth = dateOfBirthday.substringAfter('.').substringBefore(".").toInt()
+            val enteredYear = dateOfBirthday.substringAfterLast('.').toInt()
 
-        if (password.value != passwordConfirmation.value) {
-            resultMessage += "\nПароли не совпадают!"
-        }
 
-        if ((enteredYear > currentYear) ||
-            (enteredYear == currentYear && enteredMonth > currentMonth) ||
-            (enteredYear == currentYear && enteredMonth == currentMonth && enteredDay >= currentDay)
-        ) {
-            resultMessage += "\nДата рождения должна быть меньше текущего дня!"
-        }
-
-        if (password.value.length < 6) {
-            resultMessage += "\nПароль доджен быть не меньше 6 символов"
-        }
-
-        var success = 0
-        var answer = ""
-
-        val normalizedDate = normalizeDate(dateOfBirthday.value)
-
-        if (resultMessage.isEmpty()) {
-            authRepository.register(
-                RegisterRequestBody(
-                    login.value,
-                    name.value,
-                    password.value,
-                    email.value,
-                    normalizedDate,
-                    gender.value.serverId
-                )
-            ).collect { token ->
-                token.onSuccess {
-                    answer = it.token
-                    success = 1
-
-                }.onFailure {
-                    answer = it.message.toString()
-                }
+            if (!emailCorrect) {
+                resultMessage += "\nНеверная почта!"
             }
 
-        } else {
-            answer = resultMessage
+            if (password != passwordConfirmation) {
+                resultMessage += "\nПароли не совпадают!"
+            }
+
+            if ((enteredYear > currentYear) ||
+                (enteredYear == currentYear && enteredMonth > currentMonth) ||
+                (enteredYear == currentYear && enteredMonth == currentMonth && enteredDay >= currentDay)
+            ) {
+                resultMessage += "\nДата рождения должна быть меньше текущего дня!"
+            }
+
+            if (password.length < 6) {
+                resultMessage += "\nПароль доджен быть не меньше 6 символов"
+            }
+
+            var success = 0
+            var answer = ""
+
+            val normalizedDate = normalizeDate(dateOfBirthday)
+
+            if (resultMessage.isEmpty()) {
+                authRepository.register(
+                    RegisterRequestBody(
+                        login,
+                        name,
+                        password,
+                        email,
+                        normalizedDate,
+                        gender.serverId
+                    )
+                ).collect { token ->
+                    token.onSuccess {
+                        answer = it.token
+                        success = 1
+
+                    }.onFailure {
+                        answer = it.message.toString()
+                    }
+                }
+
+            } else {
+                answer = resultMessage
+            }
+
+            return Pair(success, answer)
         }
 
-        return Pair(success, answer)
     }
 }

@@ -21,11 +21,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.example.moviecatalog.R
 import com.example.moviecatalog.SetOutlinedTextField
 import com.example.moviecatalog.isAllTextFieldsFull
-import com.example.moviecatalog.repository.AuthRepository
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,12 +34,16 @@ import kotlinx.coroutines.launch
 fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavController) {
     val context = LocalContext.current
 
+    val screenState = remember {
+        mutableStateOf(SignInScreenState())
+    }
+
     MovieCatalogTheme {
         val coroutineScope = rememberCoroutineScope()
 
         val allTextFieldsFull = isAllTextFieldsFull(
-            model.login,
-            model.password
+            screenState.value.login,
+            screenState.value.password
         )
 
         Surface(
@@ -73,16 +75,21 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                     ) {
 
                     SetOutlinedTextField(
-                        variable = model.login,
+                        value = screenState.value.login,
                         stringResource(id = R.string.login)
-                    )
+                    ){
+                        screenState.value = screenState.value.copy(login = it)
+                    }
 
                     Spacer(modifier = Modifier.size(14.dp))
 
                     SetOutlinedTextField(
-                        variable = model.password,
+                        value = screenState.value.password,
                         stringResource(id = R.string.password)
-                    )
+                    ){
+                        screenState.value = screenState.value.copy(password = it)
+
+                    }
                 }
 
                 Column(
@@ -101,7 +108,7 @@ fun SignInScreen(model: SignInViewModel = viewModel(), navController: NavControl
                     OutlinedButton(
                         onClick = {
                             coroutineScope.launch(Dispatchers.IO) {
-                                val answer = model.signInButtonPressed()
+                                val answer = model.signInButtonPressed(screenState.value)
                                 if (answer.first == 1) {
                                     println("Success")
                                     launch(Dispatchers.Main) {

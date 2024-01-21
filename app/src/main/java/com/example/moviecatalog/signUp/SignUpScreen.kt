@@ -6,9 +6,22 @@ import android.widget.Toast
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.TextButton
@@ -16,7 +29,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -26,21 +43,22 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.moviecatalog.R
-import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.moviecatalog.ChoiceGender
+import com.example.moviecatalog.R
 import com.example.moviecatalog.SetOutlinedTextField
 import com.example.moviecatalog.isAllTextFieldsFull
+import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 
 @Composable
-fun DatePickerView(date: MutableState<String>) {
+fun DatePickerView(date: String, onDateChanged: (String) -> Unit) {
     val context = LocalContext.current
 
     val year: Int
@@ -59,10 +77,10 @@ fun DatePickerView(date: MutableState<String>) {
         context,
         R.style.datepicker,
         { _: DatePicker, mYear: Int, mMonth: Int, dayOfMonth: Int ->
-            if (dayOfMonth < 10 && mMonth < 9) date.value = "0$dayOfMonth.0${mMonth + 1}.$mYear"
-            else if (dayOfMonth < 10) date.value = "0$dayOfMonth.${mMonth + 1}.$mYear"
-            else if (mMonth < 9) date.value = "$dayOfMonth.0${mMonth + 1}.$mYear"
-            else date.value = "$dayOfMonth.${mMonth + 1}.$mYear"
+            if (dayOfMonth < 10 && mMonth < 9) onDateChanged("0$dayOfMonth.0${mMonth + 1}.$mYear")
+            else if (dayOfMonth < 10) onDateChanged("0$dayOfMonth.${mMonth + 1}.$mYear")
+            else if (mMonth < 9) onDateChanged("$dayOfMonth.0${mMonth + 1}.$mYear")
+            else onDateChanged("$dayOfMonth.${mMonth + 1}.$mYear")
         }, year, month, day
     )
 
@@ -84,8 +102,8 @@ fun DatePickerView(date: MutableState<String>) {
             val (label, iconView) = createRefs()
 
             Text(
-                text = if (date.value == "") stringResource(id = R.string.dateOfBirthday) else date.value,
-                color = if (date.value == "") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
+                text = if (date == "") stringResource(id = R.string.dateOfBirthday) else date,
+                color = if (date == "") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .fillMaxWidth()
                     .constrainAs(label) {
@@ -120,14 +138,16 @@ fun DatePickerView(date: MutableState<String>) {
 @Composable
 fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavController) {
     MovieCatalogTheme {
+
+        val state = model.userData.collectAsState() as MutableState<SignUpScreenState>
+
         val allTextsFull = isAllTextFieldsFull(
-            model.login,
-            model.email,
-            model.name,
-            model.password,
-            model.passwordConfirmation,
-            model.dateOfBirthday,
-            model.gender
+            state.value.login,
+            state.value.email,
+            state.value.name,
+            state.value.password,
+            state.value.passwordConfirmation,
+            state.value.dateOfBirthday,
         )
         val scale = remember {
             Animatable(1f)
@@ -176,18 +196,32 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                     style = MaterialTheme.typography.headlineLarge,
                 )
 
-                SetOutlinedTextField(model.login, stringResource(id = R.string.login))
-                SetOutlinedTextField(model.email, stringResource(id = R.string.E_Mail))
-                SetOutlinedTextField(model.name, stringResource(id = R.string.name))
-                SetOutlinedTextField(model.password, stringResource(id = R.string.password))
+                SetOutlinedTextField(state.value.login, stringResource(id = R.string.login)) {
+                    state.value = state.value.copy(login = it)
+                }
+                SetOutlinedTextField(state.value.email, stringResource(id = R.string.E_Mail)) {
+                    state.value = state.value.copy(email = it)
+                }
+                SetOutlinedTextField(state.value.name, stringResource(id = R.string.name)) {
+                    state.value = state.value.copy(name = it)
+                }
+                SetOutlinedTextField(state.value.password, stringResource(id = R.string.password)) {
+                    state.value = state.value.copy(password = it)
+                }
                 SetOutlinedTextField(
-                    model.passwordConfirmation,
+                    state.value.passwordConfirmation,
                     stringResource(id = R.string.passwordConfirmation)
-                )
+                ) {
+                    state.value = state.value.copy(passwordConfirmation = it)
+                }
 
-                DatePickerView(model.dateOfBirthday)
+                DatePickerView(state.value.dateOfBirthday) {
+                    state.value = state.value.copy(dateOfBirthday = it)
+                }
 
-                ChoiceGender(model = model)
+                ChoiceGender(gender = state.value.gender) {
+                    state.value = state.value.copy(gender = it)
+                }
 
                 Spacer(modifier = Modifier.size(16.dp))
 
@@ -195,7 +229,7 @@ fun SignUpScreen(model: SignUpViewModel = viewModel(), navController: NavControl
                 OutlinedButton(
                     onClick = {
                         CoroutineScope(Dispatchers.IO).launch {
-                            val answer = model.register()
+                            val answer = model.register(state.value)
 
                             launch(Dispatchers.Main) {
                                 if (answer.first == 1) {

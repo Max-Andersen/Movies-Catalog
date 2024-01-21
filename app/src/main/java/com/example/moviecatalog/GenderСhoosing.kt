@@ -22,7 +22,7 @@ import com.example.moviecatalog.network.User.Gender
 import com.example.moviecatalog.signUp.SignUpViewModel
 
 @Composable
-fun ChoiceGender(model: SignUpViewModel) {
+fun ChoiceGender(gender: Gender, onGenderChanged: (Gender) -> Unit) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(1.dp))
@@ -35,9 +35,9 @@ fun ChoiceGender(model: SignUpViewModel) {
         ) {
 
             OutlinedButton(
-                onClick = { model.changeGender(Gender.MALE) },
+                onClick = { onGenderChanged(Gender.MALE) },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = if (model.gender.value == Gender.MALE) MaterialTheme.colorScheme.primary
+                    backgroundColor = if (gender == Gender.MALE) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
                 ),
                 modifier = Modifier
@@ -54,16 +54,16 @@ fun ChoiceGender(model: SignUpViewModel) {
             {
                 Text(
                     text = stringResource(id = R.string.male),
-                    color = if (model.gender.value == Gender.MALE) MaterialTheme.colorScheme.onPrimary
+                    color = if (gender == Gender.MALE) MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
 
             OutlinedButton(
-                onClick = { model.changeGender(Gender.FEMALE) },
+                onClick = { onGenderChanged(Gender.FEMALE) },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = if (model.gender.value == Gender.FEMALE) MaterialTheme.colorScheme.primary
+                    backgroundColor = if (gender == Gender.FEMALE) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
                 ),
                 modifier = Modifier
@@ -79,74 +79,7 @@ fun ChoiceGender(model: SignUpViewModel) {
             ) {
                 Text(
                     text = stringResource(id = R.string.female),
-                    color = if (model.gender.value == Gender.FEMALE) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun ChoiceGender(model: ProfileViewModel, gender: MutableState<Gender>) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(1.dp))
-            .border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(8.dp))
-            .height(47.dp)
-    )
-    {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-
-            OutlinedButton(
-                onClick = { model.changeGender(gender, Gender.MALE) },
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = if (gender.value == Gender.MALE) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.background,
-                ),
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize(),
-                border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.secondary),
-                shape = RoundedCornerShape(
-                    topStart = 8.dp,
-                    bottomStart = 8.dp,
-                    topEnd = 0.dp,
-                    bottomEnd = 0.dp
-                )
-            )
-            {
-                Text(
-                    text = stringResource(id = R.string.male),
-                    color = if (gender.value == Gender.MALE) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-
-            OutlinedButton(
-                onClick = { model.changeGender(gender, Gender.FEMALE) },
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = if (gender.value == Gender.FEMALE) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.background,
-                ),
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize(),
-                border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.secondary),
-                shape = RoundedCornerShape(
-                    topStart = 0.dp,
-                    bottomStart = 0.dp,
-                    topEnd = 8.dp,
-                    bottomEnd = 8.dp
-                )
-            ) {
-                Text(
-                    text = stringResource(id = R.string.female),
-                    color = if (gender.value == Gender.FEMALE) MaterialTheme.colorScheme.onPrimary
+                    color = if (gender == Gender.FEMALE) MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodySmall
                 )

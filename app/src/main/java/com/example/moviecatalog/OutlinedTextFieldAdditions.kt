@@ -26,7 +26,7 @@ fun getTextInputColorTheme(): TextFieldColors {
 }
 
 @Composable
-fun SetOutlinedTextField(variable: MutableState<String>, name: String) {
+fun SetOutlinedTextField(value: String, name: String, onTextChange: (String) -> Unit) {
     var passwordVisible by remember { mutableStateOf(false) }
     val textInputColorTheme = getTextInputColorTheme()
 
@@ -36,8 +36,8 @@ fun SetOutlinedTextField(variable: MutableState<String>, name: String) {
         )
     ) {
         OutlinedTextField(
-            value = variable.value,
-            onValueChange = { newText -> variable.value = newText },
+            value = value,
+            onValueChange = onTextChange,
             textStyle = MaterialTheme.typography.bodySmall,
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
@@ -69,8 +69,8 @@ fun SetOutlinedTextField(variable: MutableState<String>, name: String) {
         )
     } else {
         OutlinedTextField(
-            value = variable.value,
-            onValueChange = { newText -> variable.value = newText },
+            value = value,
+            onValueChange = onTextChange,
             textStyle = MaterialTheme.typography.bodySmall,
             singleLine = true,
             shape = RoundedCornerShape(8.dp),
@@ -89,6 +89,6 @@ fun SetOutlinedTextField(variable: MutableState<String>, name: String) {
 
 }
 
-fun isAllTextFieldsFull(vararg strings: MutableState<String>): Boolean {
-    return strings.map { if (it.value.isNotBlank()) 1 else 0 }.sum() == strings.size
+fun isAllTextFieldsFull(vararg strings: String): Boolean {
+    return strings.map { if (it.isNotBlank()) 1 else 0 }.sum() == strings.size
 }
