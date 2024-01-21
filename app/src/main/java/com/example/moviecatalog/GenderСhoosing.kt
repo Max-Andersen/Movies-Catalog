@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.moviecatalog.mainScreen.profileScreen.ProfileViewModel
+import com.example.moviecatalog.network.User.Gender
 import com.example.moviecatalog.signUp.SignUpViewModel
 
 @Composable
@@ -34,9 +35,9 @@ fun ChoiceGender(model: SignUpViewModel) {
         ) {
 
             OutlinedButton(
-                onClick = { model.changeGender("0") },
+                onClick = { model.changeGender(Gender.MALE) },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = if (model.gender.value == "0") MaterialTheme.colorScheme.primary
+                    backgroundColor = if (model.gender.value == Gender.MALE) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
                 ),
                 modifier = Modifier
@@ -53,16 +54,16 @@ fun ChoiceGender(model: SignUpViewModel) {
             {
                 Text(
                     text = stringResource(id = R.string.male),
-                    color = if (model.gender.value == "0") MaterialTheme.colorScheme.onPrimary
+                    color = if (model.gender.value == Gender.MALE) MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
 
             OutlinedButton(
-                onClick = { model.changeGender("1") },
+                onClick = { model.changeGender(Gender.FEMALE) },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = if (model.gender.value == "1") MaterialTheme.colorScheme.primary
+                    backgroundColor = if (model.gender.value == Gender.FEMALE) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
                 ),
                 modifier = Modifier
@@ -78,7 +79,7 @@ fun ChoiceGender(model: SignUpViewModel) {
             ) {
                 Text(
                     text = stringResource(id = R.string.female),
-                    color = if (model.gender.value == "1") MaterialTheme.colorScheme.onPrimary
+                    color = if (model.gender.value == Gender.FEMALE) MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -88,7 +89,7 @@ fun ChoiceGender(model: SignUpViewModel) {
 }
 
 @Composable
-fun ChoiceGender(model: ProfileViewModel, gender: MutableState<String>) {
+fun ChoiceGender(model: ProfileViewModel, gender: MutableState<Gender>) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(1.dp))
@@ -101,9 +102,9 @@ fun ChoiceGender(model: ProfileViewModel, gender: MutableState<String>) {
         ) {
 
             OutlinedButton(
-                onClick = { model.changeGender(gender, "0") },
+                onClick = { model.changeGender(gender, Gender.MALE) },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = if (gender.value == "0") MaterialTheme.colorScheme.primary
+                    backgroundColor = if (gender.value == Gender.MALE) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
                 ),
                 modifier = Modifier
@@ -120,16 +121,16 @@ fun ChoiceGender(model: ProfileViewModel, gender: MutableState<String>) {
             {
                 Text(
                     text = stringResource(id = R.string.male),
-                    color = if (gender.value == "0") MaterialTheme.colorScheme.onPrimary
+                    color = if (gender.value == Gender.MALE) MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
 
             OutlinedButton(
-                onClick = { model.changeGender(gender, "1") },
+                onClick = { model.changeGender(gender, Gender.FEMALE) },
                 colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = if (gender.value == "1") MaterialTheme.colorScheme.primary
+                    backgroundColor = if (gender.value == Gender.FEMALE) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.background,
                 ),
                 modifier = Modifier
@@ -145,7 +146,7 @@ fun ChoiceGender(model: ProfileViewModel, gender: MutableState<String>) {
             ) {
                 Text(
                     text = stringResource(id = R.string.female),
-                    color = if (gender.value == "1") MaterialTheme.colorScheme.onPrimary
+                    color = if (gender.value == Gender.FEMALE) MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodySmall
                 )

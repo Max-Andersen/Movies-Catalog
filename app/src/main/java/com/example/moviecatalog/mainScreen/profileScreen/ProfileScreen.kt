@@ -30,6 +30,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.moviecatalog.*
 import com.example.moviecatalog.R
+import com.example.moviecatalog.network.User.Gender
 import com.example.moviecatalog.signUp.DatePickerView
 import com.example.moviecatalog.ui.theme.MovieCatalogTheme
 import kotlinx.coroutines.CoroutineScope
@@ -52,14 +53,14 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
         mutableStateOf("")
     }
     val gender = remember {
-        mutableStateOf("")
+        mutableStateOf(Gender.MALE)
     }
 
     val currentName = remember {
         mutableStateOf("")
     }
 
-    val allFieldsFull = isAllTextFieldsFull(email, name, dateOfBirthday, gender)
+    val allFieldsFull = isAllTextFieldsFull(email, name, dateOfBirthday)
 
     LaunchedEffect(Unit) {
         model.getInformation()
@@ -67,7 +68,7 @@ fun ProfileScreen(navController: NavController, model: ProfileViewModel = viewMo
         avatarLink.value = model.avatarLink
         name.value = model.name
         dateOfBirthday.value = model.dateOfBirthday
-        gender.value = model.gender.toString()
+        gender.value = model.gender
         currentName.value = model.name
     }
     MovieCatalogTheme {

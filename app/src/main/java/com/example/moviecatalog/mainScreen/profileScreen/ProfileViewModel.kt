@@ -2,16 +2,14 @@ package com.example.moviecatalog.mainScreen.profileScreen
 
 import UserDataResponse
 import android.text.TextUtils
-import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.moviecatalog.network.Auth.RegisterRequestBody
 import com.example.moviecatalog.network.Network
+import com.example.moviecatalog.network.User.Gender
 import com.example.moviecatalog.repository.AuthRepository
 import com.example.moviecatalog.repository.UserRepository
-import java.util.*
+import java.util.Calendar
 
 class ProfileViewModel() : ViewModel() {
     private val authRepository = AuthRepository()
@@ -21,13 +19,13 @@ class ProfileViewModel() : ViewModel() {
     var avatarLink = ""
     var name = ""
     var dateOfBirthday = ""
-    var gender = 0
+    var gender = Gender.MALE
     var nickname = ""
 
     fun changeGender(
-        currentGender: MutableState<String>,
-        buttonType: String
-    ) { // 0 - male   1 - female
+        currentGender: MutableState<Gender>,
+        buttonType: Gender
+    ) {
         if (currentGender.value != buttonType) {
             currentGender.value = buttonType
         }
@@ -57,7 +55,7 @@ class ProfileViewModel() : ViewModel() {
                 avatarLink = if (data.avatarLink == null) "" else data.avatarLink
                 name = data.name
                 dateOfBirthday = unNormalizeDate(data.birthDate)
-                gender = data.gender
+                gender = Gender.fromServerIdToEnumValue(data.gender)
                 nickname = data.nickName
             }
 
@@ -69,7 +67,7 @@ class ProfileViewModel() : ViewModel() {
         enteredAvatarLink: String = "",
         enteredName: String,
         enteredBirthDay: String,
-        enteredGender: String
+        enteredGender: Gender
     ): String {
         val emailCorrect =
             !TextUtils.isEmpty(enteredEmail) && Patterns.EMAIL_ADDRESS.matcher(enteredEmail)
@@ -111,7 +109,7 @@ class ProfileViewModel() : ViewModel() {
                     avatarLink = enteredAvatarLink,
                     name = enteredName,
                     birthDate = normalizedDate,
-                    gender = enteredGender.toInt()
+                    gender = enteredGender.serverId
                 )
             )
         } else {

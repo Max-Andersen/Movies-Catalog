@@ -1,15 +1,14 @@
 package com.example.moviecatalog.signUp
 
-import android.content.Context
 import android.text.TextUtils
 import android.util.Patterns
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import com.example.moviecatalog.network.Auth.RegisterRequestBody
+import com.example.moviecatalog.network.User.Gender
 import com.example.moviecatalog.repository.AuthRepository
-import java.util.*
+import java.util.Calendar
 
 
 class SignUpViewModel : ViewModel() {
@@ -21,9 +20,9 @@ class SignUpViewModel : ViewModel() {
     val password: MutableState<String> = mutableStateOf("")
     val passwordConfirmation: MutableState<String> = mutableStateOf("")
     val dateOfBirthday: MutableState<String> = mutableStateOf("")
-    val gender: MutableState<String> = mutableStateOf("")
+    val gender: MutableState<Gender> = mutableStateOf(Gender.MALE)
 
-    fun changeGender(buttonType: String) { // 0 - male   1 - female
+    fun changeGender(buttonType: Gender) {
         if (gender.value != buttonType) {
             gender.value = buttonType
         }
@@ -87,7 +86,7 @@ class SignUpViewModel : ViewModel() {
                     password.value,
                     email.value,
                     normalizedDate,
-                    gender.value.toInt()
+                    gender.value.serverId
                 )
             ).collect { token ->
                 token.onSuccess {
