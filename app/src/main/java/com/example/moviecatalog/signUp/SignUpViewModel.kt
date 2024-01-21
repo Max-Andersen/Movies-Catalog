@@ -25,17 +25,6 @@ class SignUpViewModel : ViewModel() {
                 !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches()
             var validationMessage = ""
 
-            val calendar = Calendar.getInstance()
-            val currentYear = calendar.get(Calendar.YEAR)
-            val currentMonth = calendar.get(Calendar.MONTH) + 1
-            val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
-
-
-            val enteredDay = dateOfBirthday.substringBefore('.').toInt()
-            val enteredMonth = dateOfBirthday.substringAfter('.').substringBefore(".").toInt()
-            val enteredYear = dateOfBirthday.substringAfterLast('.').toInt()
-
-
             if (!emailCorrect) {
                 validationMessage += "\nНеверная почта!"
             }
@@ -44,10 +33,7 @@ class SignUpViewModel : ViewModel() {
                 validationMessage += "\nПароли не совпадают!"
             }
 
-            if ((enteredYear > currentYear) ||
-                (enteredYear == currentYear && enteredMonth > currentMonth) ||
-                (enteredYear == currentYear && enteredMonth == currentMonth && enteredDay >= currentDay)
-            ) {
+            if (isEnteredDateBeforeCurrent(dateOfBirthday)) {
                 validationMessage += "\nДата рождения должна быть меньше текущего дня!"
             }
 
@@ -72,6 +58,23 @@ class SignUpViewModel : ViewModel() {
                 AuthResponse.Fail(validationMessage)
             }
         }
+
+    }
+
+    private fun isEnteredDateBeforeCurrent(dateOfBirthday: String): Boolean {
+        val calendar = Calendar.getInstance()
+        val currentYear = calendar.get(Calendar.YEAR)
+        val currentMonth = calendar.get(Calendar.MONTH) + 1
+        val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+
+
+        val enteredDay = dateOfBirthday.substringBefore('.').toInt()
+        val enteredMonth = dateOfBirthday.substringAfter('.').substringBefore(".").toInt()
+        val enteredYear = dateOfBirthday.substringAfterLast('.').toInt()
+
+        return (enteredYear > currentYear) ||
+                (enteredYear == currentYear && enteredMonth > currentMonth) ||
+                (enteredYear == currentYear && enteredMonth == currentMonth && enteredDay >= currentDay)
 
     }
 }

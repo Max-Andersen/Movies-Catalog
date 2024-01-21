@@ -36,35 +36,22 @@ class ProfileViewModel() : ViewModel() {
             val emailCorrect =
                 !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email)
                     .matches()
-            var resultMessage = ""
 
-            val calendar = Calendar.getInstance()
-            val currentYear = calendar.get(Calendar.YEAR)
-            val currentMonth = calendar.get(Calendar.MONTH) + 1
-            val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
-
-
-            val enteredDay = dateOfBirthday.substringBefore('.').toInt()
-            val enteredMonth = dateOfBirthday.substringAfter('.').substringBefore(".").toInt()
-            val enteredYear = dateOfBirthday.substringAfterLast('.').toInt()
+            var validationMessage = ""
 
             if (!emailCorrect) {
-                resultMessage += "\nНеверная почта!"
+                validationMessage += "\nНеверная почта!"
             }
 
-
-            if ((enteredYear > currentYear) ||
-                (enteredYear == currentYear && enteredMonth > currentMonth) ||
-                (enteredYear == currentYear && enteredMonth == currentMonth && enteredDay >= currentDay)
-            ) {
-                resultMessage += "\nДата рождения должна быть меньше текущего дня!"
+            if (isEnteredDateBeforeCurrent(dateOfBirthday)) {
+                validationMessage += "\nДата рождения должна быть меньше текущего дня!"
             }
 
             val normalizedDate = dateOfBirthday.normalizeDate()
 
             var answer = ""
 
-            if (resultMessage.isEmpty()) {
+            if (validationMessage.isEmpty()) {
                 userRepository.putData(
                     UserDataResponse(
                         id = Network.userId,
@@ -77,10 +64,27 @@ class ProfileViewModel() : ViewModel() {
                     )
                 )
             } else {
-                answer = resultMessage
+                answer = validationMessage
             }
             return answer
         }
+
+    }
+
+    private fun isEnteredDateBeforeCurrent(dateOfBirthday: String): Boolean {
+        val calendar = Calendar.getInstance()
+        val currentYear = calendar.get(Calendar.YEAR)
+        val currentMonth = calendar.get(Calendar.MONTH) + 1
+        val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+
+
+        val enteredDay = dateOfBirthday.substringBefore('.').toInt()
+        val enteredMonth = dateOfBirthday.substringAfter('.').substringBefore(".").toInt()
+        val enteredYear = dateOfBirthday.substringAfterLast('.').toInt()
+
+        return (enteredYear > currentYear) ||
+                (enteredYear == currentYear && enteredMonth > currentMonth) ||
+                (enteredYear == currentYear && enteredMonth == currentMonth && enteredDay >= currentDay)
 
     }
 
